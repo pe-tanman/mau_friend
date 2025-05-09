@@ -18,6 +18,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   @override
   void initState() {
     super.initState();
+    /*
     initLocation();
     location.onLocationChanged.listen((LocationData currentLocation) {
       setState(() {
@@ -26,6 +27,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         verocity();
       });
     });
+    */
   }
 
   void verocity() {

@@ -3,6 +3,10 @@
         android:label="mau_friend"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+         <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyCjW1ujz7fEpUKNuRo_anFBWt5xtgEmVk4"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

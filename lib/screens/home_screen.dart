@@ -11,11 +11,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
+  final _screens = [FriendsScreen(), MyAccountScreen()];
+
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    print(_selectedIndex);
+  }
+
   Widget build(BuildContext context) {
-    final _screens = [FriendsScreen(), MyAccountScreen()];
-
-    int _selectedIndex = 0;
-
+    
     return Scaffold(
       appBar: AppBar(title: const Text('🐈 mau')),
       body: _screens[_selectedIndex],
@@ -27,12 +35,9 @@ class HomeScreenState extends State<HomeScreen> {
             label: 'Me',
           ),
         ],
-        currentIndex: 0,
+        currentIndex: _selectedIndex,
         onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          print(_selectedIndex);
+          _onItemTapped(index);
         },
       ),
     );
