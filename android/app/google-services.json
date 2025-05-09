@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "540379093695",
+    "project_id": "mau-friend-new",
+    "storage_bucket": "mau-friend-new.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:540379093695:android:ae371e660fdb7c0708440a",
+        "android_client_info": {
+          "package_name": "com.example.mau_friend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvSSDDGO6-Qw_JRaQr7KXp6_pkowSsyiQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
