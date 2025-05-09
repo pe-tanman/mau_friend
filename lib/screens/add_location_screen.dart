@@ -8,6 +8,7 @@ import 'package:mau_friend/screens/myaccount_screen.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class AddLocationScreen extends StatefulWidget {
   static const routeName = 'add-location-screen';
@@ -25,6 +26,11 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   EmojiData? icon;
   int radius = 0;
   LatLng coordinates = Statics.initLocation;
+  Completer<GoogleMapController> _googleMapController =
+    Completer<GoogleMapController>();
+  );
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
@@ -52,6 +58,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
         if (result != null) {
           setState(() {
             address = result.formattedAddress ?? "";
+            convertAddressToLatLng(address);
           });
         }
       },
@@ -65,12 +72,14 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
     );
   }
 
-  void convertAddressToLatLng(String address) async {
+  Future<void> convertAddressToLatLng(String address) async {
     var locations = await locationFromAddress(address);
+    print('Locations: $locations');
     if (locations.isNotEmpty) {
       setState(() {
         coordinates = LatLng(locations[0].latitude, locations[0].longitude);
       });
+      print('Coordinates: ${coordinates.latitude}, ${coordinates.longitude}');
     }
   }
 
@@ -86,18 +95,26 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
               foregroundColor: Colors.white,
             ),
             onPressed: () {
-              icon ??= EmojiData(
-                id: '',
-                char: '📍',
-                unified: '',
-                category: 'Smileys & Emotion',
-                name: '',
-                skin: 1,
-              );
+              if (_formKey.currentState!.validate()) {
+                icon ??= EmojiData(
+                  id: '',
+                  char: '📍',
+                  unified: '',
+                  category: 'Smileys & Emotion',
+                  name: '',
+                  skin: 1,
+                );
 
-              var result = RegisteredLocation(name, icon!.char, coordinates, radius);
-              Navigator.pop(context, result);
-              //save on db here
+                var result = RegisteredLocation(
+                  name,
+                  icon!.char,
+                  coordinates,
+                  radius,
+                );
+
+                Navigator.pop(context, result);
+                //save on db here}
+              }
             },
             child: Text('Save'),
           ),
@@ -106,7 +123,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: Key('add_location_form'),
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -144,9 +161,11 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                   SizedBox(
                     width: 250,
                     child: TextFormField(
-                      validator: (value) => (value == null || value.isEmpty)
-                          ? 'Please enter a name'
-                          : null,
+                      validator:
+                          (value) =>
+                              (value == null || value.isEmpty)
+                                  ? 'Please enter a name'
+                                  : null,
                       decoration: InputDecoration(
                         labelText: 'Name',
                         border: OutlineInputBorder(),
@@ -158,26 +177,28 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                   ),
                 ],
               ),
-          
+
               SizedBox(height: 20),
-          
+
               Text('Address', style: appTheme().textTheme.headlineMedium),
               SizedBox(height: 10),
               Row(
                 children: [
-                    SizedBox(
+                  SizedBox(
                     width: 300,
                     child: TextFormField(
                       readOnly: true,
-                      controller: TextEditingController(text: autocompletePlace ?? address),
-                      decoration: InputDecoration(
-                      border: null,
+                      controller: TextEditingController(
+                        text: autocompletePlace ?? address,
                       ),
-                      validator: (value) => (value == null || value.isEmpty)
-                        ? 'Please pick a position'
-                        : null,
+                      decoration: InputDecoration(border: null),
+                      validator:
+                          (value) =>
+                              (value == null || value.isEmpty)
+                                  ? 'Please pick a position'
+                                  : null,
                     ),
-                    ),
+                  ),
                   IconButton(
                     onPressed: () {
                       Navigator.push(
@@ -197,16 +218,30 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
               Text('Radius', style: appTheme().textTheme.headlineMedium),
               SizedBox(height: 10),
               Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   SizedBox(
                     width: 100,
-                    child: TextField(
+                    child: TextFormField(
                       keyboardType: TextInputType.phone,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a radius';
+                        }
+                        if (int.tryParse(value) == null ||
+                            int.parse(value) <= 0) {
+                          return 'Please enter a valid number';
+                        }
+                        if (int.parse(value) >= 200) {
+                          return 'Limit in 200m';
+                        }
+                        return null;
+                      },
                       decoration: InputDecoration(border: OutlineInputBorder()),
                       onChanged: (value) {
-                        radius = int.tryParse(value) ?? 0;
+                        setState(() {
+                          radius = int.tryParse(value) ?? 0;
+                        });
                       },
                     ),
                   ),
@@ -214,39 +249,32 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                   Text('m', style: TextStyle(fontSize: 20)),
                 ],
               ),
-              SizedBox(height: 40),
-                SizedBox(
+              SizedBox(height: 30),
+              SizedBox(
                 height: 300,
                 child: GoogleMap(
                   initialCameraPosition: CameraPosition(
-                  target: coordinates,
-                  zoom: 14,
+                    target: coordinates,
+                    zoom: 50,
                   ),
+,
                   markers: {
-                  Marker(
-                    markerId: MarkerId('selected-location'),
-                    position: coordinates,
-                  ),
+                    Marker(
+                      markerId: MarkerId('selected-location'),
+                      position: coordinates,
+                    ),
                   },
-                  onTap: (LatLng position) {
-                  setState(() {
-                    coordinates = position;
-                  });
-                  },
-                   circles: {
+                  circles: {
                     Circle(
                       circleId: const CircleId('circle_1'),
-                      center: const LatLng(
-                        35.68123428932672,
-                        139.76714355230686,
-                      ),
-                      radius: 500,
+                      center: coordinates,
+                      radius: radius.toDouble(),
                       fillColor: Colors.red.withOpacity(0.5),
-                      strokeWidth: 5,
+                      strokeWidth: 2,
                     ),
                   },
                 ),
-                ),
+              ),
             ],
           ),
         ),
