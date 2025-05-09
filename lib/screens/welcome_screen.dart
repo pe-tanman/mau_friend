@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:mau_friend/screens/authGate.dart';
+import 'package:mau_friend/themes/app_theme.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const routeName = '/welcome';
@@ -22,11 +27,29 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.dispose();
   }
 
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome to Mau Friend'),
+        title: Text('Welcome to mau'),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -41,7 +64,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         children: [
           _buildAboutTab(),
           _buildFeaturesTab(),
-          _buildSupportTab(),
+          _buildLoginTab(),
         ],
       ),
     );
@@ -54,7 +77,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'About Mau Friend',
+            'About mau',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 16),
@@ -88,7 +111,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  Widget _buildSupportTab() {
+  Widget _buildLoginTab() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -99,6 +122,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 16),
+          primaryButton('Get Started', () {
+            // Navigate to the login screen
+            Navigator.pushNamed(context, AuthGate.routeName);
+          }),
           //add login button
         ],
       ),
