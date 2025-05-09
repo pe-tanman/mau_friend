@@ -8,16 +8,17 @@ import 'firebase_options.dart';
 import 'package:mau_friend/screens/home_screen.dart';
 import 'package:mau_friend/screens/myaccount_screen.dart';
 import 'package:mau_friend/themes/app_theme.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+   await dotenv.load(fileName: '.env');
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
+   MyApp({super.key});
   @override
   State<MyApp> createState() => _MyAppState();
 }

@@ -9,6 +9,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AddLocationScreen extends StatefulWidget {
   static const routeName = 'add-location-screen';
@@ -26,9 +27,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   EmojiData? icon;
   int radius = 0;
   LatLng coordinates = Statics.initLocation;
-  Completer<GoogleMapController> _googleMapController =
-    Completer<GoogleMapController>();
-  );
 
   final _formKey = GlobalKey<FormState>();
 
@@ -42,6 +40,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
 
   MapLocationPicker _buildMapLocationPicker() {
     return MapLocationPicker(
+      apiKey: dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '',
       backButton: IconButton(
         onPressed: () {
           Navigator.pop(context);
@@ -50,7 +49,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
       ),
       borderRadius: BorderRadius.all(Radius.circular(500)),
       bottomCardIcon: Icon(Icons.arrow_circle_right_rounded, size: 40),
-      apiKey: 'AIzaSyCjW1ujz7fEpUKNuRo_anFBWt5xtgEmVk4',
+
       popOnNextButtonTaped: true,
       currentLatLng: Statics.initLocation,
       debounceDuration: const Duration(milliseconds: 0),
@@ -257,7 +256,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                     target: coordinates,
                     zoom: 50,
                   ),
-,
                   markers: {
                     Marker(
                       markerId: MarkerId('selected-location'),
