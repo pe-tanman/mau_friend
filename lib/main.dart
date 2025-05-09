@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:mau_friend/screens/add_location_screen.dart';
 import 'package:mau_friend/screens/authGate.dart';
 import 'package:mau_friend/screens/welcome_screen.dart';
 import 'firebase_options.dart';
 import 'package:mau_friend/screens/home_screen.dart';
 import 'package:mau_friend/screens/myaccount_screen.dart';
-import 'package:mau_friend/screens/map_screen.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 
 Future<void> main() async {
@@ -45,7 +45,7 @@ class _MyAppState extends State<MyApp> {
         HomeScreen.routeName: (context) => HomeScreen(),
         AuthGate.routeName: (context) => AuthGate(),
         MyAccountScreen.routeName: (context) => MyAccountScreen(),
-        MapScreen.routeName: (context) => MapScreen(),
+        AddLocationScreen.routeName: (context) => AddLocationScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );
