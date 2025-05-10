@@ -134,6 +134,35 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
       ),
     );
   }
+  void deleteLocaition() {
+    MyLocationDatabaseHelper().deleteData(name);
+      var result = RegisteredLocation('delete', icon!.char, coordinates, radius);
+    Navigator.pop(context, result);
+  }
+
+  void saveLocation() {
+    icon ??= EmojiData(
+      id: '',
+      char: '📍',
+      unified: '',
+      category: 'Smileys & Emotion',
+      name: '',
+      skin: 1,
+    );
+
+    if(argument != null && argument!.name != name) {
+      MyLocationDatabaseHelper().deleteData(argument!.name);
+    }
+
+    var result = RegisteredLocation(name, icon!.char, coordinates, radius);
+    MyLocationDatabaseHelper().insertData(
+      name,
+      icon!.char,
+      coordinates,
+      radius,
+    );
+    Navigator.pop(context, result);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -158,10 +187,18 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
       isInit = false;
     }
 
+   
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Location'),
         actions: [
+          IconButton(
+            onPressed: () {
+              deleteLocaition();
+            },
+            icon: Icon(Icons.delete),
+          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.themeColor,
@@ -169,28 +206,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
             ),
             onPressed: () {
               if (_formKey.currentState!.validate()) {
-                icon ??= EmojiData(
-                  id: '',
-                  char: '📍',
-                  unified: '',
-                  category: 'Smileys & Emotion',
-                  name: '',
-                  skin: 1,
-                );
-
-                var result = RegisteredLocation(
-                  name,
-                  icon!.char,
-                  coordinates,
-                  radius,
-                );
-                MyLocationDatabaseHelper().insertData(
-                  name,
-                  icon!.char,
-                  coordinates,
-                  radius,
-                );
-                Navigator.pop(context, result);
+                saveLocation();
               }
             },
             child: Text('Save'),

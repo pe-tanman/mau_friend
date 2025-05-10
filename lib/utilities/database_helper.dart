@@ -96,9 +96,9 @@ class MyLocationDatabaseHelper {
     return await db!.query('my_location_table');
   }
 
-  Future<int> deleteData(int id) async {
+  Future<int> deleteData(String name) async {
     final Database? db = await database;
-    return await db!.delete('question_table', where: 'id = ?', whereArgs: [id]);
+    return await db!.delete('my_location_table', where: 'name = ?', whereArgs: [name]);
   }
 
   Future<void> deleteAllData() async {

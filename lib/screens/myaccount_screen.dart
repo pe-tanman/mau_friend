@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mau_friend/screens/setting_screen.dart';
 import 'package:mau_friend/statics.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:map_location_picker/map_location_picker.dart';
@@ -117,14 +118,19 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           Navigator.pushNamed(
             context,
             AddLocationScreen.routeName,
-            arguments: {
-              registeredLocations[index]
-            },
+            arguments: {registeredLocations[index]},
           ).then((value) {
             if (value != null) {
-              setState(() {
-                registeredLocations[index] = value as RegisteredLocation;
-              });
+              var location = value as RegisteredLocation;
+              if (location.name == 'delete') {
+                setState(() {
+                  registeredLocations.removeAt(index);
+                });
+              } else {
+                setState(() {
+                  registeredLocations[index] = location;
+                });
+              }
             }
           });
         },
@@ -135,6 +141,17 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('My Account'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.menu),
+            onPressed: () {
+              Navigator.pushNamed(context, SettingScreen.routeName);
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,

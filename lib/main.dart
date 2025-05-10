@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mau_friend/screens/add_location_screen.dart';
 import 'package:mau_friend/screens/authGate.dart';
+import 'package:mau_friend/screens/profile_setting_screen.dart';
+import 'package:mau_friend/screens/setting_screen.dart';
 import 'package:mau_friend/screens/welcome_screen.dart';
 import 'firebase_options.dart';
 import 'package:mau_friend/screens/home_screen.dart';
@@ -51,6 +53,9 @@ class _MyAppState extends State<MyApp> {
         AuthGate.routeName: (context) => AuthGate(),
         MyAccountScreen.routeName: (context) => MyAccountScreen(),
         AddLocationScreen.routeName: (context) => AddLocationScreen(),
+        SettingScreen.routeName: (context) => SettingScreen(),
+        ProfileSettingScreen.routeName: (context) =>
+            ProfileSettingScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

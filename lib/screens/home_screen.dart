@@ -25,7 +25,6 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     
     return Scaffold(
-      appBar: AppBar(title: const Text('🐈 mau')),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const [
