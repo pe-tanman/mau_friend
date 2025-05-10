@@ -10,6 +10,7 @@ import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mau_friend/utilities/database_helper.dart';
 
 class AddLocationScreen extends StatefulWidget {
   static const routeName = 'add-location-screen';
@@ -22,11 +23,17 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   final TextEditingController iconController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   String? autocompletePlace;
-  String address = "";
+  String? address;
   String name = '';
   EmojiData? icon;
   int radius = 0;
+  bool isInit = true;
   LatLng coordinates = Statics.initLocation;
+
+  RegisteredLocation? argument;
+  var arguments;
+
+  late GoogleMapController mapController;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -40,7 +47,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
 
   MapLocationPicker _buildMapLocationPicker() {
     return MapLocationPicker(
-      apiKey: dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '',
+      apiKey: dotenv.env['Google_Map_API'] ?? '',
       backButton: IconButton(
         onPressed: () {
           Navigator.pop(context);
@@ -57,7 +64,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
         if (result != null) {
           setState(() {
             address = result.formattedAddress ?? "";
-            convertAddressToLatLng(address);
+            convertAddressToLatLng(address!);
           });
         }
       },
@@ -77,13 +84,80 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
     if (locations.isNotEmpty) {
       setState(() {
         coordinates = LatLng(locations[0].latitude, locations[0].longitude);
+        _moveCameraToPosition(coordinates);
       });
       print('Coordinates: ${coordinates.latitude}, ${coordinates.longitude}');
     }
   }
 
+  Future<void> convertLatLngToAdress(LatLng coordinates) async {
+    // sometimes  "PlatformException(IO_ERROR" will emerge. It is caused by ratelimit. Hang on a minute.
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      coordinates.latitude,
+      coordinates.longitude,
+    );
+    String address = '';
+    if (placemarks.isNotEmpty) {
+      // Concatenate non-null components of the address
+      var streets = placemarks.reversed
+          .map((placemark) => placemark.street)
+          .where((street) => street != null);
+
+      // Filter out unwanted parts
+      streets = streets.where(
+        (street) =>
+            street!.toLowerCase() !=
+            placemarks.reversed.last.locality!.toLowerCase(),
+      ); // Remove city names
+      streets = streets.where(
+        (street) => !street!.contains('+'),
+      ); // Remove street codes
+
+      address += streets.join(', ');
+
+      address += ', ${placemarks.reversed.last.subLocality ?? ''}';
+      address += ', ${placemarks.reversed.last.locality ?? ''}';
+      address += ', ${placemarks.reversed.last.subAdministrativeArea ?? ''}';
+      address += ', ${placemarks.reversed.last.administrativeArea ?? ''}';
+      address += ', ${placemarks.reversed.last.postalCode ?? ''}';
+      address += ', ${placemarks.reversed.last.country ?? ''}';
+    }
+    setState(() {
+      this.address = address;
+    });
+  }
+
+  void _moveCameraToPosition(LatLng position) {
+    mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: position, zoom: 14),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isInit) {
+      arguments = ModalRoute.of(context)!.settings.arguments;
+      if (arguments != null) {
+        argument = arguments.first;
+        convertLatLngToAdress(argument!.coordinates);
+        coordinates = argument!.coordinates;
+        radius = argument!.radius;
+        name = argument!.name;
+        icon = EmojiData(
+          id: '',
+          char: argument!.icon,
+          unified: '',
+          category: 'Smileys & Emotion',
+          name: '',
+          skin: 1,
+        );
+        name = argument!.name;
+      }
+      isInit = false;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Location'),
@@ -110,9 +184,13 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                   coordinates,
                   radius,
                 );
-
+                MyLocationDatabaseHelper().insertData(
+                  name,
+                  icon!.char,
+                  coordinates,
+                  radius,
+                );
                 Navigator.pop(context, result);
-                //save on db here}
               }
             },
             child: Text('Save'),
@@ -160,6 +238,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                   SizedBox(
                     width: 250,
                     child: TextFormField(
+                      initialValue: name,
                       validator:
                           (value) =>
                               (value == null || value.isEmpty)
@@ -222,6 +301,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                   SizedBox(
                     width: 100,
                     child: TextFormField(
+                      initialValue: radius.toString(),
                       keyboardType: TextInputType.phone,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -231,8 +311,8 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                             int.parse(value) <= 0) {
                           return 'Please enter a valid number';
                         }
-                        if (int.parse(value) >= 200) {
-                          return 'Limit in 200m';
+                        if (int.parse(value) >= 2000) {
+                          return 'Limit in 2km';
                         }
                         return null;
                       },
@@ -249,12 +329,14 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                 ],
               ),
               SizedBox(height: 30),
+
               SizedBox(
                 height: 300,
                 child: GoogleMap(
+                  onMapCreated: (controller) => mapController = controller,
                   initialCameraPosition: CameraPosition(
                     target: coordinates,
-                    zoom: 50,
+                    zoom: 16,
                   ),
                   markers: {
                     Marker(

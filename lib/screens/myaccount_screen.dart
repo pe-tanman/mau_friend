@@ -5,6 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/screens/add_location_screen.dart';
+import 'package:mau_friend/utilities/database_helper.dart';
 
 class RegisteredLocation {
   final String name;
@@ -26,9 +27,17 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   String address = "";
   String autocompletePlace = "";
   LatLng coordinates = Statics.initLocation;
+  bool isLoading = true;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Load initial data
+    loadRegisteredLocations();
   }
 
   Future<String> convertLatLngToAdress(LatLng coordinates) async {
@@ -65,6 +74,64 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     return address;
   }
 
+  Future<void> loadRegisteredLocations() async {
+    // Simulate loading data from a database or API
+    final myLocationsMap = await MyLocationDatabaseHelper().getAllData();
+
+    registeredLocations =
+        myLocationsMap.map((location) {
+          return RegisteredLocation(
+            location['name'],
+            location['icon'],
+            LatLng(location['latitude'], location['longitude']),
+            location['radius'],
+          );
+        }).toList();
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Widget _buildListCard(int index) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 5,
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        leading: CircleAvatar(
+          radius: 30,
+          child: Text(
+            registeredLocations[index].icon,
+            style: TextStyle(fontSize: 25),
+          ),
+          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
+        ),
+        title: Text(
+          registeredLocations[index].name,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            AddLocationScreen.routeName,
+            arguments: {
+              registeredLocations[index]
+            },
+          ).then((value) {
+            if (value != null) {
+              setState(() {
+                registeredLocations[index] = value as RegisteredLocation;
+              });
+            }
+          });
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,56 +156,14 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
             SizedBox(height: 20),
             Divider(),
 
-            ListView.builder(
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  elevation: 5,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
-                    leading: CircleAvatar(
-                      radius: 30,
-                      child: Text(
-                        registeredLocations[index].icon,
-                        style: TextStyle(fontSize: 25),
-                      ),
-                      backgroundColor: Theme.of(
-                        context,
-                      ).primaryColor.withOpacity(0.2),
-                    ),
-                    title: Text(
-                      registeredLocations[index].name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios,
-                      size: 16,
-                      color: Colors.grey,
-                    ),
-                    onTap: () {
-                      // Handle location tap
-                      // Replace print with logging framework
-                      debugPrint(
-                        'Coordinates: ${registeredLocations[index].coordinates}',
-                      );
-                      debugPrint('Icon: ${registeredLocations[index].icon}');
-                      debugPrint('Name: ${registeredLocations[index].name}');
-                    },
-                  ),
-                );
-              },
-              itemCount: registeredLocations.length,
-              shrinkWrap: true,
-            ),
+            if (!isLoading)
+              ListView.builder(
+                itemBuilder: (context, index) {
+                  return _buildListCard(index);
+                },
+                itemCount: registeredLocations.length,
+                shrinkWrap: true,
+              ),
             TextButton.icon(
               label: Text('Add Location'),
               icon: Icon(Icons.add),

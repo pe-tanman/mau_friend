@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mau_friend/screens/home_screen.dart';
 
 
@@ -20,7 +20,7 @@ class AuthGate extends StatelessWidget {
             providers: [
               GoogleProvider(
                   clientId:
-                      "540379093695-qton3ddp4tfd6fd14odl29phsj41s84r.apps.googleusercontent.com"),
+                      dotenv.env['Auth_Google_client_id'] ?? ''),
             ],
           );
         }
