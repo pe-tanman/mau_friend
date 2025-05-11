@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mau_friend/screens/authGate.dart';
 import 'package:mau_friend/screens/profile_setting_screen.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -46,7 +48,11 @@ class _SettingScreenState extends State<SettingScreen> {
               leading: Icon(Icons.logout),
               title: Text('Log Out'),
               onTap: () {
-                // Handle log out
+                FirebaseAuth.instance.signOut();
+                Navigator.pushReplacementNamed(
+                  context,
+                  AuthGate.routeName,
+                );
               },
             ),
           ],
