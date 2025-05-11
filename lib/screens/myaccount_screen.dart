@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/setting_screen.dart';
 import 'package:mau_friend/statics.dart';
 import 'package:geocoding/geocoding.dart';
@@ -7,6 +8,7 @@ import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/screens/add_location_screen.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; 
 
 class RegisteredLocation {
   final String name;
@@ -16,13 +18,13 @@ class RegisteredLocation {
   RegisteredLocation(this.name, this.icon, this.coordinates, this.radius);
 }
 
-class MyAccountScreen extends StatefulWidget {
+class MyAccountScreen extends ConsumerStatefulWidget {
   @override
   static const routeName = 'my-account-screen';
   _MyAccountScreenState createState() => _MyAccountScreenState();
 }
 
-class _MyAccountScreenState extends State<MyAccountScreen> {
+class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   late GoogleMapController mapController;
   List<RegisteredLocation> registeredLocations = [];
   String address = "";
@@ -140,6 +142,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profile = ref.watch(profileProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text('My Account'),
@@ -157,15 +160,15 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 20),
-            CircleAvatar(radius: 50),
+            CircleAvatar(radius: 50, backgroundImage: NetworkImage(profile['iconLink']??'https://images.pexels.com/photos/2071882/pexels-photo-2071882.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500))',)),// a cat image
             SizedBox(height: 10),
             Text(
-              'Username',
+              profile['username'] ?? 'Username',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 5),
             Text(
-              'Bio goes here...',
+              profile['bio'] ?? 'Bio',
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             SizedBox(height: 20),

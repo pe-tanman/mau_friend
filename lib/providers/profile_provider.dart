@@ -12,13 +12,19 @@ class ProfileProvider extends Notifier<Map<String, dynamic>> {
   Future<void> loadUsersProfile (
     String userUID
   ) async{
+
+    if(userUID == '') {
+      return;
+    }
     
     //get user data from firebase
     var profile = await FirestoreHelper().getUserProfile(userUID);
+
     //save to riverpod
     state = profile;
   }
-  final profileProvider = NotifierProvider<ProfileProvider, Map<String, dynamic>>(
-    ProfileProvider.new,
-  );
+  
 }
+final profileProvider = NotifierProvider<ProfileProvider, Map<String, dynamic>>(
+  ProfileProvider.new,
+);
