@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "540379093695",
+    "firebase_url": "https://mau-friend-new-default-rtdb.firebaseio.com",
     "project_id": "mau-friend-new",
     "storage_bucket": "mau-friend-new.firebasestorage.app"
   },
@@ -12,7 +13,12 @@
           "package_name": "com.example.mau_friend"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "540379093695-hd6mcgi6mghhmgd2un2t33so3fpn7945.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDvSSDDGO6-Qw_JRaQr7KXp6_pkowSsyiQ"
@@ -20,7 +26,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "540379093695-hd6mcgi6mghhmgd2un2t33so3fpn7945.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "540379093695-qton3ddp4tfd6fd14odl29phsj41s84r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mauFriend"
+              }
+            }
+          ]
         }
       }
     }

@@ -19,7 +19,6 @@ class HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    print(_selectedIndex);
   }
 
   Widget build(BuildContext context) {

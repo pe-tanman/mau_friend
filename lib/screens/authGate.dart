@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/home_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mau_friend/screens/profile_setting_screen.dart';
 
 
 class AuthGate extends ConsumerWidget {
@@ -26,10 +27,9 @@ class AuthGate extends ConsumerWidget {
             ],
           );
         }
-        ref.read(profileProvider.notifier).loadUsersProfile(
-            FirebaseAuth.instance.currentUser?.uid ?? '');
+
         return HomeScreen();
-      },
+      }
     );
   }
 }

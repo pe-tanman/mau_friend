@@ -9,22 +9,20 @@ class ProfileProvider extends Notifier<Map<String, dynamic>> {
   Map<String, dynamic> build() => {};
 
   //keep user's basic profile
-  Future<void> loadUsersProfile (
-    String userUID
-  ) async{
-
-    if(userUID == '') {
-      return;
+  Future<String> loadUsersProfile(String userUID) async {
+    if (userUID == '') {
+      return 'no data';
     }
-    
+
     //get user data from firebase
     var profile = await FirestoreHelper().getUserProfile(userUID);
 
     //save to riverpod
     state = profile;
+    return 'success';
   }
-  
 }
+
 final profileProvider = NotifierProvider<ProfileProvider, Map<String, dynamic>>(
   ProfileProvider.new,
 );

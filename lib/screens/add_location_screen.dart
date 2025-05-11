@@ -6,11 +6,11 @@ import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/screens/myaccount_screen.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
+import 'package:mau_friend/providers/locations_provider.dart';
 
 class AddLocationScreen extends StatefulWidget {
   static const routeName = 'add-location-screen';

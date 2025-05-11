@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mau_friend/screens/authGate.dart';
+import 'package:mau_friend/screens/current_location_screen.dart';
 import 'package:mau_friend/screens/profile_setting_screen.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -42,6 +43,16 @@ class _SettingScreenState extends State<SettingScreen> {
               title: Text('Security Settings'),
               onTap: () {
                 // Navigate to security settings screen
+              },
+            ),
+            ListTile(
+              title: Text('Current Location'),
+              leading: Icon(Icons.location_on_outlined),
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  CurrentLocationScreen.routeName,
+                );
               },
             ),
             ListTile(

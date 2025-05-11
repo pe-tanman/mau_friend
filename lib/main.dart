@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/screens/add_location_screen.dart';
 import 'package:mau_friend/screens/authGate.dart';
+import 'package:mau_friend/screens/current_location_screen.dart';
 import 'package:mau_friend/screens/profile_setting_screen.dart';
 import 'package:mau_friend/screens/setting_screen.dart';
 import 'package:mau_friend/screens/welcome_screen.dart';
@@ -52,6 +54,9 @@ class _MyAppState extends ConsumerState<MyApp> {
     ref
         .watch(profileProvider.notifier)
         .loadUsersProfile(FirebaseAuth.instance.currentUser?.uid ?? '');
+        ref
+        .watch(locationsProvider.notifier)
+        .loadLocations();
     return MaterialApp(
       title: 'Flutter Demo',
       theme: appTheme(),
@@ -63,6 +68,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         AddLocationScreen.routeName: (context) => AddLocationScreen(),
         SettingScreen.routeName: (context) => SettingScreen(),
         ProfileSettingScreen.routeName: (context) => ProfileSettingScreen(),
+        CurrentLocationScreen .routeName: (context) => CurrentLocationScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

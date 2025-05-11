@@ -1,7 +1,11 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
+import 'package:firebase_database/firebase_database.dart';
+
 
 class FirestoreHelper {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -107,4 +111,17 @@ class StorageHelper {
       rethrow;
     }
   }
+}
+class RealtimeDatabaseHelper {
+   FirebaseDatabase database = FirebaseDatabase.instance;
+
+  Future<void> updateStatus(status) async{
+    var userUID = FirebaseAuth.instance.currentUser!.uid;
+    await database.ref('users/$userUID').set({
+      'status': status,
+    });
+
+  }
+
+
 }

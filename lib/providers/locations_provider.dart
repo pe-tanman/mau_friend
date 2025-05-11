@@ -1,0 +1,46 @@
+import 'package:map_location_picker/map_location_picker.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mau_friend/utilities/database_helper.dart';
+
+class RegisteredLocation {
+  final String name;
+  final String icon;
+  final LatLng coordinates;
+  final int radius;
+  RegisteredLocation(this.name, this.icon, this.coordinates, this.radius);
+}
+
+@riverpod
+class LocationsProvider extends Notifier<List<RegisteredLocation>> {
+  @override
+  List<RegisteredLocation> build() => [];
+
+  //keep user's basic profile
+  Future<void> loadLocations() async {
+    MyLocationDatabaseHelper dbHelper = MyLocationDatabaseHelper();
+
+    var result = await dbHelper.getAllData();
+    var output = <RegisteredLocation>[];
+    if (result.isNotEmpty) {
+      result.forEach((element) {
+        var coordinates = LatLng(
+          element['latitude'],
+          element['longitude'],
+        );
+        var name = element['name'];
+        var icon = element['icon'];
+        var radius = element['radius'];
+    
+        output.add(RegisteredLocation(name, icon, coordinates, radius));
+      });
+      state = output;
+    } else {
+      state = [];
+    }
+  }
+}
+
+final locationsProvider = NotifierProvider<LocationsProvider, List<RegisteredLocation>>(
+  LocationsProvider.new,
+);
