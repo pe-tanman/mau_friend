@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:mau_friend/utilities/location_helper.dart';
 
 
 class FirestoreHelper {
@@ -115,10 +116,11 @@ class StorageHelper {
 class RealtimeDatabaseHelper {
    FirebaseDatabase database = FirebaseDatabase.instance;
 
-  Future<void> updateStatus(status) async{
+  Future<void> updateStatus(UserStatus status) async{
     var userUID = FirebaseAuth.instance.currentUser!.uid;
     await database.ref('users/$userUID').set({
-      'status': status,
+      'icon': status.icon,
+      'status': status.status,
     });
 
   }

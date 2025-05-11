@@ -140,6 +140,9 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                   registeredLocations[index] = location;
                 });
               }
+              ref.read(locationsProvider.notifier).updateLocations(
+                    registeredLocations,
+                  );
             }
           });
         },
@@ -205,14 +208,24 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
               child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+
                 Text(
-                ref.watch(myStatusProvider),
+                ref.watch(myStatusProvider).icon,
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).primaryColor,
                 ),
                 ),
+                SizedBox(width: 10),
+                Text(
+                    ref.watch(myStatusProvider).status,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
               ],
               ),
             ),
@@ -240,6 +253,9 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                   if (value != null) {
                     setState(() {
                       registeredLocations.add(value as RegisteredLocation);
+                      ref.read(locationsProvider.notifier).updateLocations(
+                        registeredLocations,
+                      );
                     });
                   }
                 });

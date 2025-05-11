@@ -161,6 +161,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
       coordinates,
       radius,
     );
+
     Navigator.pop(context, result);
   }
 

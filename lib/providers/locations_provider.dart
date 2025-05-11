@@ -17,6 +17,12 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
   List<RegisteredLocation> build() => [];
 
   //keep user's basic profile
+  Future<void> updateLocations(
+    List<RegisteredLocation> locations,
+  ) async {
+    //save to riverpod
+    state = locations;
+  }
   Future<void> loadLocations() async {
     MyLocationDatabaseHelper dbHelper = MyLocationDatabaseHelper();
 
@@ -39,6 +45,7 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
       state = [];
     }
   }
+
 }
 
 final locationsProvider = NotifierProvider<LocationsProvider, List<RegisteredLocation>>(

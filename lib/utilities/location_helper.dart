@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:map_location_picker/map_location_picker.dart';
@@ -9,16 +10,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
-class UserStatus{
+
+class UserStatus {
   String status;
   String icon;
-  UserStatus(this.status, this.icon);
+  UserStatus(this.icon, this.status);
 }
+
 class LocationHelper {
   late StreamSubscription<Position> positionStream;
   var prevPosition;
   var velocityList = <double>[];
-  var prevStatus = '🔴 Offline';
+  var prevStatus = UserStatus('🔴', 'offline');
 
   final LocationSettings locationSettings = const LocationSettings(
     accuracy: LocationAccuracy.high,
@@ -58,23 +61,21 @@ class LocationHelper {
 
       if (prevPosition != null) {
         velocityList.add(velocity(prevPosition, position));
-        print(
-          'currentLocation: ${currentLocation.latitude}, ${currentLocation.longitude}',
-        );
-        print(
-          'prevPosition: ${prevPosition.latitude}, ${prevPosition.longitude}',
-        );
       }
 
       List<RegisteredLocation> myLocations = ref.read(locationsProvider);
       //save in firebase and riverpod
       userStatus(currentLocation, myLocations).then((value) {
-        if(value == prevStatus) {
+        if (value.icon == prevStatus.icon &&
+            value.status == prevStatus.status) {
           return;
         }
-        RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
-        dbHelper.updateStatus(value);
-        ref.watch(myStatusProvider.notifier).updateMyStatus(value);
+        else{
+           RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
+          dbHelper.updateStatus(value);
+          ref.watch(myStatusProvider.notifier).updateMyStatus(value);
+        }
+       
 
         prevStatus = value;
       });
@@ -87,13 +88,13 @@ class LocationHelper {
     positionStream.cancel();
   }
 
-  Future<String> userStatus(
+  Future<UserStatus> userStatus(
     LatLng currentLocation,
     List<RegisteredLocation> myLocations,
   ) async {
     if (currentLocation.latitude == Statics.initLocation.latitude &&
         currentLocation.longitude == Statics.initLocation.longitude) {
-      return '🔴 Offline';
+      return UserStatus('🔴', 'offline');
     }
     for (var location in myLocations) {
       double distance = Geolocator.distanceBetween(
@@ -103,19 +104,22 @@ class LocationHelper {
         location.coordinates.longitude,
       );
       if (distance < location.radius) {
-        return location.name; //in the future, we will use "status"
+        return UserStatus(
+          location.icon,
+          location.name,
+        ); //in the future, we will use "status"
       }
     }
     if (averageVelocityKmPerHour() > 60) {
-      return '🚃 Moving';
+      return UserStatus('🚃', 'Moving');
     } else if (averageVelocityKmPerHour() > 20) {
-      return '🚗 Moving';
+      return UserStatus('🚗', 'Moving');
     } else if (averageVelocityKmPerHour() > 5) {
-      return '🚵‍♀️ Moving';
+      return UserStatus('🚴‍♂️', 'Moving');
     } else if (averageVelocityKmPerHour() > 0.5) {
-      return '🚶‍♂️ Moving';
+      return UserStatus('🚶‍♂️', 'Moving');
     }
-    return '🟢 Online';
+    return UserStatus('🔴', 'offline');
   }
 
   double velocity(Position previousPosition, Position currentPosition) {
