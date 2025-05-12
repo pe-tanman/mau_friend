@@ -57,34 +57,38 @@ class FirestoreHelper {
     }
   }
 
+
+  Future<void> updatePassword(String userUID, String password) async {
+      await _firestore.collection('userPasswords').doc(userUID).set({'password': password});
+}
+
+Future<String> getPassword(String userUID) async {
+    try {
+      final passwordDoc = await _firestore.collection('userPasswords').doc(userUID).get();
+      return passwordDoc.data()?['password'] ?? '';
+    } catch (e) {
+      print('Error getting password: $e');
+      rethrow;
+    }
+  }
+
   // Update a document in a collection
   Future<void> updateDocument(
     String collectionPath,
-    String docId,
+    String documentId,
     Map<String, dynamic> data,
   ) async {
     try {
-      await _firestore.collection(collectionPath).doc(docId).update(data);
+      await _firestore
+          .collection(collectionPath)
+          .doc(documentId)
+          .update(data);
     } catch (e) {
       print('Error updating document: $e');
       rethrow;
     }
   }
 
-  // Delete a document from a collection
-  Future<void> deleteDocument(String collectionPath, String docId) async {
-    try {
-      await _firestore.collection(collectionPath).doc(docId).delete();
-    } catch (e) {
-      print('Error deleting document: $e');
-      rethrow;
-    }
-  }
-
-  // Listen to real-time updates in a collection
-  Stream<QuerySnapshot> listenToCollection(String collectionPath) {
-    return _firestore.collection(collectionPath).snapshots();
-  }
 }
 
 class StorageHelper {

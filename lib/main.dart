@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
+import 'package:mau_friend/screens/add_friend_screen.dart';
 import 'package:mau_friend/screens/add_location_screen.dart';
 import 'package:mau_friend/screens/authGate.dart';
 import 'package:mau_friend/screens/current_location_screen.dart';
@@ -69,6 +70,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         SettingScreen.routeName: (context) => SettingScreen(),
         ProfileSettingScreen.routeName: (context) => ProfileSettingScreen(),
         CurrentLocationScreen .routeName: (context) => CurrentLocationScreen(),
+        AddFriendScreen.routeName : (context) => AddFriendScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

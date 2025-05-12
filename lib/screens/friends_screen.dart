@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mau_friend/screens/add_friend_screen.dart';
 
 class FriendsScreen extends ConsumerStatefulWidget {
   const FriendsScreen({Key? key}) : super(key: key);
@@ -9,7 +10,6 @@ class FriendsScreen extends ConsumerStatefulWidget {
 }
 
 class _FriendsScreenState extends ConsumerState<FriendsScreen> {
-
   List locationList = [];
   String userState = 'offline';
 
@@ -27,8 +27,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               const SizedBox(height: 50),
               const SizedBox(height: 50),
               ElevatedButton(
-                onPressed: () {
-                },
+                onPressed: () {},
                 child: const Text('Add location'),
               ),
             ],
@@ -37,9 +36,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, AddFriendScreen.routeName);
+        },
       ),
     );
   }
-
 }
