@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'dart:io';
 
@@ -66,12 +66,17 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
       var targetSize = 300000; //300KB
       if (originalSize > targetSize) {
         var quality = ((targetSize / originalSize) * 100).toInt();
-        File compressedImage = await FlutterNativeImage.compressImage(
-          originalIconImage.path,
-          percentage: quality,
-        );
-
-        iconImage = compressedImage;
+        List<int> compressedImage = (await FlutterImageCompress.compressWithFile(
+          path,
+          minWidth: 500,
+          minHeight: 500,
+          quality: quality,
+        )) as List<int>;
+        iconImage = File(path)..writeAsBytesSync(compressedImage);
+        Directory appDocDir = await getApplicationDocumentsDirectory();
+        String compressedPath = '${appDocDir.path}/compressed_icon.png';
+        await File(compressedPath).writeAsBytes(compressedImage);
+        iconImage = File(compressedPath);
       } else {
         iconImage = originalIconImage;
       }

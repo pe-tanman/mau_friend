@@ -6,6 +6,7 @@ import 'package:mau_friend/screens/add_friend_screen.dart';
 import 'package:mau_friend/screens/add_location_screen.dart';
 import 'package:mau_friend/screens/authGate.dart';
 import 'package:mau_friend/screens/current_location_screen.dart';
+import 'package:mau_friend/screens/friend_profile_screen.dart';
 import 'package:mau_friend/screens/profile_setting_screen.dart';
 import 'package:mau_friend/screens/setting_screen.dart';
 import 'package:mau_friend/screens/welcome_screen.dart';
@@ -16,6 +17,7 @@ import 'package:mau_friend/themes/app_theme.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mau_friend/screens/notification_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,6 +73,8 @@ class _MyAppState extends ConsumerState<MyApp> {
         ProfileSettingScreen.routeName: (context) => ProfileSettingScreen(),
         CurrentLocationScreen .routeName: (context) => CurrentLocationScreen(),
         AddFriendScreen.routeName : (context) => AddFriendScreen(),
+        FriendProfileScreen.routeName : (context) => FriendProfileScreen(),
+        NotificationScreen.routeName : (context) => NotificationScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

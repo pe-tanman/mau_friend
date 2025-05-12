@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mau_friend/screens/capture_qr_screen.dart';
 import 'package:mau_friend/screens/my_qr_screen.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
@@ -18,7 +19,7 @@ class AddFriendScreen extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  Center(child: Text('This is the Scan QR tab')),
+                  CaptureQrScreen(),
                   MyQrScreen(),
                 ],
               ),

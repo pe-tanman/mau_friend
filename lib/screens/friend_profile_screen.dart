@@ -1,0 +1,74 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mau_friend/themes/app_theme.dart';
+import 'package:mau_friend/utilities/firestore_helper.dart';
+
+class FriendProfileScreen extends ConsumerStatefulWidget {
+  @override
+  static const routeName = 'friend-profile-screen';
+  _FriendProfileScreenState createState() => _FriendProfileScreenState();
+}
+
+class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
+
+late Map<String, dynamic> profile;
+bool isLoading = true;
+  Future<void> loadFriendProfile() async {
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    final String friendUID = arguments! as String;
+    final friendProfile = await FirestoreHelper().getUserProfile(friendUID);
+    setState(() {
+      profile = friendProfile;
+      isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      loadFriendProfile();
+    }
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Friend Profile'),
+      ),
+      body: isLoading? Center(child: CircularProgressIndicator()): Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 20),
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: NetworkImage(
+                profile['iconLink'] ??
+                    'https://images.pexels.com/photos/2071882/pexels-photo-2071882.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500))',
+              ),
+            ), // a cat image
+            SizedBox(height: 10),
+            Text(
+              profile['username'] ?? 'Username',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 5),
+            Text(
+              profile['bio'] ?? 'Bio',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            SizedBox(height: 60),
+            primaryButton('Add', (){
+              // Add friend logic here
+              FirestoreHelper().addFriendList(profile['userUID']);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Friend added successfully!')),
+              );
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            })
+          ],
+        ),
+      ),
+    );
+  }
+}

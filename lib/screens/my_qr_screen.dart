@@ -32,14 +32,14 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
 
   @override
   void dispose() {
-    FirestoreHelper().updatePassword(ref.read(profileProvider)['userUID'], '');
+    FirestoreHelper().updatePassword(ref.read(profileProvider).userUID, '');
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     if(isInit){
- myUID = ref.read(profileProvider)['userUID'];
+ myUID = ref.read(profileProvider).userUID;
 isInit = false;
     }
     
@@ -50,7 +50,6 @@ isInit = false;
         const SizedBox(height: 70),
         SizedBox(width: 300, height:300, child: PrettyQrView.data(data: getMyQRData(myUID), decoration: const PrettyQrDecoration(
           shape:  PrettyQrSmoothSymbol(roundFactor: 0),
-          image: PrettyQrDecorationImage(image: AssetImage('lib/assets/images/mau.png')),
         ))),
         const SizedBox(height: 40),
         const Text(

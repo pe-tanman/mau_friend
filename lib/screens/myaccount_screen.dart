@@ -175,22 +175,22 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
             CircleAvatar(
               radius: 50,
               backgroundImage: NetworkImage(
-                profile['iconLink'] ??
+                profile.iconLink ??
                     'https://images.pexels.com/photos/2071882/pexels-photo-2071882.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500))',
               ),
             ), // a cat image
             SizedBox(height: 10),
             Text(
-              profile['username'] ?? 'Username',
+              profile.name ?? 'Username',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 5),
             Text(
-              profile['bio'] ?? 'Bio',
+              profile.bio ?? 'Bio',
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             SizedBox(height: 5),
-            if (profile['username'] == null)
+            if (profile.name == null)
               TextButton.icon(
                 label: Text('Complete your profile'),
                 icon: Icon(Icons.edit),
