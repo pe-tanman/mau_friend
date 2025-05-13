@@ -22,6 +22,7 @@ class LocationHelper {
   var prevPosition;
   var velocityList = <double>[];
   var prevStatus = UserStatus('🔴', 'offline');
+  final container = ProviderContainer();
 
   final LocationSettings locationSettings = const LocationSettings(
     accuracy: LocationAccuracy.high,
@@ -50,7 +51,7 @@ class LocationHelper {
     }
   }
 
-  Future<void> trackLocation(WidgetRef ref) async {
+  Future<void> trackLocation() async {
     positionStream = Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen((Position? position) {
@@ -63,7 +64,7 @@ class LocationHelper {
         velocityList.add(velocity(prevPosition, position));
       }
 
-      List<RegisteredLocation> myLocations = ref.read(locationsProvider);
+      List<RegisteredLocation> myLocations = container.read(locationsProvider);
       //save in firebase and riverpod
       userStatus(currentLocation, myLocations).then((value) {
         if (value.icon == prevStatus.icon &&
@@ -73,18 +74,19 @@ class LocationHelper {
         else{
            RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
           dbHelper.updateStatus(value);
-          ref.watch(myStatusProvider.notifier).updateMyStatus(value);
+          container.read(myStatusProvider.notifier).updateMyStatus(value);
         }
        
 
         prevStatus = value;
       });
-
+      
       prevPosition = position;
     });
   }
 
   void dispose() {
+    container.dispose();
     positionStream.cancel();
   }
 

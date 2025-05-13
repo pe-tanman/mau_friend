@@ -30,6 +30,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   bool isInit = true;
   LatLng coordinates = Statics.initLocation;
 
+//Todo: locations are lincked to device. link to user account
   RegisteredLocation? argument;
   var arguments;
 

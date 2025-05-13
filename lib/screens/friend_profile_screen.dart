@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mau_friend/providers/notification_provider.dart';
+import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 
@@ -65,6 +67,13 @@ bool isLoading = true;
               );
               Navigator.of(context).pop();
               Navigator.of(context).pop();
+               ref
+                          .read(friendProfilesProvider.notifier)
+                          .loadFriendProfiles();
+                          final newFriendName = profile['username'];
+                          final newFriendIconLink = profile['iconLink'];
+              ref.read(notificationProvider.notifier).addNotification('$newFriendName is now your friend.', newFriendIconLink);
+          
             })
           ],
         ),

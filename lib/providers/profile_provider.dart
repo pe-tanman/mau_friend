@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 class Profile {
   String userUID;
   String? name;
@@ -17,22 +17,21 @@ class MyProfileProvider extends Notifier<Profile> {
   Profile build() => Profile(userUID: '', name: '', bio: '', iconLink: '');
 
   //keep user's basic profile
-  Future<String> loadUsersProfile(String userUID) async {
-    if (userUID == '') {
-      return 'no data';
-    }
+  Future<void> loadMyProfile() async {
+    final myUID = FirebaseAuth.instance.currentUser?.uid;
 
     //get user data from firebase
-    var profile = await FirestoreHelper().getUserProfile(userUID);
-
+    var profile = await FirestoreHelper().getUserProfile(myUID!);
+print('iconLink: ${profile['iconLink']}');
+print('name: ${profile['username']}');
+    print('bio: ${profile['bio']}');
     //save to riverpod
     state = Profile(
-      userUID: userUID,
-      name: profile['name'],
-      bio: profile['name'],
+      userUID: myUID,
+      name: profile['username'],
+      bio: profile['bio'],
       iconLink: profile['iconLink'],
     );
-    return 'success';
   }
 }
 
@@ -40,27 +39,29 @@ final profileProvider = NotifierProvider<MyProfileProvider, Profile>(
   MyProfileProvider.new,
 );
 
-class FriendProfilesProvider extends Notifier<List<Profile>> {
+class FriendProfilesProvider extends Notifier<Map<String, Profile>> {
   @override
-  List<Profile> build() => [];
+  Map<String, Profile> build() => {};
 
   Future<void> loadFriendProfiles() async {
-
     var profilesMap = await FirestoreHelper().getFriendProfiles();
 
-    final profilesList = profilesMap.values.map((profile) {
-      return Profile(
-        userUID: profile['userUID'] ?? '',
-        name: profile['name'] ?? '',
-        bio: profile['bio'] ?? '',
-        iconLink: profile['iconLink'] ?? '',
-      );
-    }).toList();
+    Map<String, Profile> result = {};
 
-    state = profilesList;
+    profilesMap.values.map((profile) {
+      result[profile['userUID']] = Profile(
+        userUID: profile['userUID'],
+        name: profile['name'],
+        bio: profile['bio'],
+        iconLink: profile['iconLink'],
+      );
+    });
+
+    state = result;
   }
 }
+
 final friendProfilesProvider =
-    NotifierProvider<FriendProfilesProvider, List<Profile>>(
-  FriendProfilesProvider.new,
-);
+    NotifierProvider<FriendProfilesProvider, Map<String, Profile>>(
+      FriendProfilesProvider.new,
+    );

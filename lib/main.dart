@@ -54,9 +54,6 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    ref
-        .watch(profileProvider.notifier)
-        .loadUsersProfile(FirebaseAuth.instance.currentUser?.uid ?? '');
         ref
         .watch(locationsProvider.notifier)
         .loadLocations();

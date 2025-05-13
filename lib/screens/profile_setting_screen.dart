@@ -29,6 +29,15 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    final profile = ref.read(profileProvider);
+    _usernameController.text = profile.name ?? '';
+    _bioController.text = profile.bio ?? '';
+    _selectedIcon = profile.iconLink;
+  }
+
   Future<void> _saveProfileSettings() async {
     
     setState(() {
@@ -45,7 +54,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
 
     //save to firestore
     await FirestoreHelper().addUserProfile(userUID, username, bio, iconLink);
-    ref.read(profileProvider.notifier).loadUsersProfile(userUID);
+    ref.read(profileProvider.notifier).loadMyProfile();
     setState(() {
       isLoading = false;
     });
@@ -118,18 +127,20 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                     icon: Icon(Icons.add_a_photo_outlined),
                     label: Text('Choose Image'),
                   ),
-                  if (_selectedIcon != null) ...[
-                    SizedBox(width: 10),
-                    Text(
-                      _selectedIcon!,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
+                  
                 ],
               ),
+
+              if (_selectedIcon != null && !setImage) ...[
+              SizedBox(width: 10),
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: NetworkImage(
+                  _selectedIcon ??
+                      'https://images.pexels.com/photos/2071882/pexels-photo-2071882.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
+                ),
+              ), // a
+            ],
               if (setImage) ...[
                 SizedBox(width: 30),
 
@@ -146,7 +157,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                   ),
                 ),
               ],
-              SizedBox(height: 20),
+              SizedBox(height: 40),
               TextField(
                 controller: _bioController,
                 decoration: InputDecoration(

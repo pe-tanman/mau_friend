@@ -40,13 +40,16 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
 
   @override
   void initState() {
-    super.initState();
+      super.initState();
+    ref.read(profileProvider.notifier).loadMyProfile();
+    
     LocationHelper().initLocationSetting().then((_) {
-      LocationHelper().trackLocation(ref);
+      LocationHelper().trackLocation();
     }).catchError((error) {
       print('Error initializing location settings: $error');
     });
     loadRegisteredLocations();
+  
   }
 
   Future<String> convertLatLngToAdress(LatLng coordinates) async {

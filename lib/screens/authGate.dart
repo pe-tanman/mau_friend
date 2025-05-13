@@ -26,9 +26,10 @@ class AuthGate extends ConsumerWidget {
         if (!snapshot.hasData) {
           return SignInScreen(
             providers: [
-              GoogleProvider(
-                clientId:clientId,
-              ),
+              GoogleProvider(clientId: clientId),
+              
+              EmailAuthProvider(),
+              
             ],
           );
         }

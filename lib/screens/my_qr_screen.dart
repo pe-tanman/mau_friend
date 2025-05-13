@@ -1,11 +1,14 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/themes/app_theme.dart';
+
 
 class MyQrScreen extends ConsumerStatefulWidget {
   const MyQrScreen({Key? key}) : super(key: key);
@@ -17,6 +20,7 @@ class MyQrScreen extends ConsumerStatefulWidget {
 class _MyQrScreenState extends ConsumerState<MyQrScreen> {
   bool isInit = true;
   String myUID = '';
+
 
   String getMyQRData(String uid) {
     // Generate a random password
