@@ -68,12 +68,6 @@ bool isLoading = true;
               );
               Navigator.of(context).pop();
               Navigator.of(context).pop();
-               ref
-                          .read(friendProfilesProvider.notifier)
-                          .loadFriendProfiles();
-                          final newFriendName = profile['username'];
-                          final newFriendIconLink = profile['iconLink'];
-              ref.read(notificationProvider.notifier).addNotification('$newFriendName is now your friend.', newFriendIconLink);
           
             })
           ],

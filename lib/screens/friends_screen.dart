@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
+import 'package:mau_friend/screens/edit_friend_list_screen.dart';
 import 'package:mau_friend/screens/notification_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/add_friend_screen.dart';
@@ -172,6 +173,12 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       appBar: AppBar(
         title: const Text('Friends'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () {
+              Navigator.pushNamed(context, EditFriendListScreen.routeName);
+            },
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: buildNotificationButton(),

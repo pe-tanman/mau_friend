@@ -117,11 +117,11 @@ class FirestoreHelper {
   Future<void> removeFriend(String friendUID) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     try {
-      await _firestore.collection('friendList').doc('friendList').update({
-        myUID: FieldValue.arrayRemove([friendUID]),
+      await _firestore.collection('friendList').doc(myUID).update({
+        'friendList': FieldValue.arrayRemove([friendUID]),
       });
-      await _firestore.collection('friendList').doc('friendList').update({
-        friendUID: FieldValue.arrayRemove([myUID]),
+      await _firestore.collection('friendList').doc(friendUID).update({
+        'friendList': FieldValue.arrayRemove([myUID]),
       });
     } catch (e) {
       print('Error removing friend: $e');
@@ -140,6 +140,20 @@ class FirestoreHelper {
       return result;  
     } catch (e) {
       print('Error loading friend profiles: $e');
+      rethrow;
+    }
+  }
+  Future<void> removeFriendProfile(String friendUID) async {
+    var myUID = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await _firestore.collection('friendList').doc(myUID).update({
+        'profiles': {friendUID: FieldValue.delete()},
+      });
+       await _firestore.collection('friendList').doc(friendUID).update({
+        'profiles': {myUID: FieldValue.delete()},
+      });
+    } catch (e) {
+      print('Error removing friend profile: $e');
       rethrow;
     }
   }

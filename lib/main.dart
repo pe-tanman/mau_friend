@@ -6,6 +6,7 @@ import 'package:mau_friend/screens/add_friend_screen.dart';
 import 'package:mau_friend/screens/add_location_screen.dart';
 import 'package:mau_friend/screens/authGate.dart';
 import 'package:mau_friend/screens/current_location_screen.dart';
+import 'package:mau_friend/screens/edit_friend_list_screen.dart';
 import 'package:mau_friend/screens/friend_profile_screen.dart';
 import 'package:mau_friend/screens/profile_setting_screen.dart';
 import 'package:mau_friend/screens/setting_screen.dart';
@@ -71,6 +72,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         AddFriendScreen.routeName : (context) => AddFriendScreen(),
         FriendProfileScreen.routeName : (context) => FriendProfileScreen(),
         NotificationScreen.routeName : (context) => NotificationScreen(),
+        EditFriendListScreen.routeName : (context) => EditFriendListScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );
