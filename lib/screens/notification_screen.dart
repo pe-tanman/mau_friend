@@ -35,7 +35,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                 itemBuilder: (context, index) {
                 int backIndex = ref.watch(notificationProvider).length - 1 - index;
                 final notification = ref.watch(notificationProvider)[backIndex];
-                final shortenTimestamp = '${notification.timestamp.year.toString()}-${notification.timestamp.month.toString()}-${notification.timestamp.day.toString()} ${notification.timestamp.hour.toString()}:${notification.timestamp.minute.toString().padLeft(2, '0')}';
+                final shortenTimestamp = '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
 
                 return ListTile(
                 contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),

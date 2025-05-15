@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
+import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
@@ -26,6 +27,10 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
         ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
       });
     });
+    ref.read(notificationProvider.notifier).addNotification(
+      '${friendProfiles[friendUID]!.name} is removed from your friend list.',
+      friendProfiles[friendUID]!.iconLink!,
+    );
     Navigator.of(context).pop();
   }
 

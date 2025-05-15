@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:intl/intl.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +22,22 @@ class NotificationProvider extends Notifier<List<Notification>> {
     state = [...state, newNotification];
     ref.read(unreadNotificationProvider.notifier).addUnreadNotification();
   }
+
+  void loadNotification() {
+    NotificationDatabaseHelper().getAllData().then((value) {
+      List<Notification> result = [];
+      for (var element in value) {
+        var format = DateFormat('yyyy-M-d h:m');
+        result.add(
+          Notification(
+            element['message'],
+            element['iconLink'],
+            format.parse(element['timestamp']),),
+        );
+      }
+      state = result;
+    });
+  }
 }
 
 final notificationProvider =
@@ -36,10 +53,12 @@ class UnreadNotificationProvider extends Notifier<int> {
   void addUnreadNotification() {
     state = state + 1;
   }
+
   void resetUnreadNotification() {
     state = 0;
   }
 }
+
 final unreadNotificationProvider =
     NotifierProvider<UnreadNotificationProvider, int>(
       UnreadNotificationProvider.new,

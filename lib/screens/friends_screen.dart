@@ -11,8 +11,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/add_friend_screen.dart';
 import 'package:mau_friend/screens/profile_setting_screen.dart';
 import 'package:mau_friend/themes/app_color.dart';
+import 'package:mau_friend/utilities/database_helper.dart';
+import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FriendsScreen extends ConsumerStatefulWidget {
   const FriendsScreen({Key? key}) : super(key: key);
@@ -27,6 +30,63 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   String userState = 'offline';
   late StreamSubscription friendsSubscription;
 
+  Future<void> onUpdated(var snapshot) async {
+    print('onUpdated');
+    final prefs = await SharedPreferences.getInstance();
+    List<String>? localFriendList = prefs.getStringList('friendList');
+    print('localFriendList: $localFriendList');
+
+    if (localFriendList == null ||
+        snapshot.data()!['friendList'].length > localFriendList.length) {
+      await ref.read(friendListProvider.notifier).loadFriendList();
+      await prefs.setStringList(
+        'friendList',
+        snapshot.data()!['friendList'].cast<String>(),
+      );
+
+      final newFriend = snapshot.data()!['friendList'].last;
+      final newFriendProfile = snapshot.data()!['profiles'][newFriend];
+      final newFriendName = newFriendProfile['username'];
+      final newFriendIconLink = newFriendProfile['iconLink'];
+      final timestamp =
+          '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
+
+      //update notification
+      await NotificationDatabaseHelper().insertData(
+        timestamp,
+        '$newFriendName is now your friend.',
+        newFriendIconLink,
+      );
+      ref.read(notificationProvider.notifier).addNotification('$newFriendName is now your friend.', newFriendIconLink);
+      ref.read(notificationProvider.notifier).loadNotification();
+    } else if (snapshot.data()!['friendList'].length < localFriendList.length) {
+      //update local friend list
+
+      final oldFriend = localFriendList.last;
+      final oldFriendProfile = await FirestoreHelper().getUserProfile(
+        oldFriend,
+      );
+      final oldFriendName = oldFriendProfile['username'];
+      final oldFriendIconLink = oldFriendProfile['iconLink'];
+      final timestamp =
+          '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
+
+      //update local friend list
+      await ref.read(friendListProvider.notifier).loadFriendList();
+      await prefs.setStringList(
+        'friendList',
+        snapshot.data()!['friendList'].cast<String>(),
+      );
+      //update notification
+      await NotificationDatabaseHelper().insertData(
+        timestamp,
+        '$oldFriendName is removed from your friend list.',
+        oldFriendIconLink,
+      );
+      ref.read(notificationProvider.notifier).loadNotification();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -39,47 +99,12 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         .snapshots()
         .listen((snapshot) {
           if (snapshot.exists) {
-            if (snapshot.data()!['friendList'].length >
-                ref.read(friendListProvider).length) {
-              ref.read(friendListProvider.notifier).loadFriendList().then((_) {
-                //check if new friend added
-                //get the new friend
-                final newFriend = snapshot.data()!['friendList'].last;
-                final newFriendProfile =
-                    snapshot.data()!['profiles'][newFriend];
-                final newFriendName = newFriendProfile['username'];
-                final newFriendIconLink = newFriendProfile['iconLink'];
-                ref
-                    .read(notificationProvider.notifier)
-                    .addNotification(
-                      '$newFriendName is now your friend.',
-                      newFriendIconLink,
-                    );
-              });
-            } else if (snapshot.data()!['friendList'].length <
-                ref.read(friendListProvider).length) {
-              ref.read(friendListProvider.notifier).loadFriendList().then((_) {
-                //check if new friend added
-                //get the new friend
-                final newFriend = snapshot.data()!['friendList'].last;
-                final newFriendProfile =
-                    snapshot.data()!['profiles'][newFriend];
-                final newFriendName = newFriendProfile['username'];
-                final newFriendIconLink = newFriendProfile['iconLink'];
-                ref
-                    .read(notificationProvider.notifier)
-                    .addNotification(
-                      'You blocked $newFriendName',
-                      newFriendIconLink,
-                    );
-              });
-            }
+            onUpdated(snapshot);
           }
         });
   }
 
   Widget buildFriendCard(String friendUID) {
-    print('friendUID:$friendUID');
     final profile = ref.watch(friendProfilesProvider)[friendUID];
     return Card(
       color: AppColors.backgroundColor,

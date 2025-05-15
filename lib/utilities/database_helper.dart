@@ -108,3 +108,68 @@ class MyLocationDatabaseHelper {
   }
 }
 
+class NotificationDatabaseHelper {
+  static final NotificationDatabaseHelper _instance =
+      NotificationDatabaseHelper._internal();
+
+  factory NotificationDatabaseHelper() {
+    return _instance;
+  }
+
+  NotificationDatabaseHelper._internal();
+
+  static Database? _database;
+  Future<Database?> get database async {
+    if (_database != null) {
+      return _database;
+    }
+    _database = await initNotificationDatabase();
+
+    return _database;
+  }
+
+  Future<Database> initNotificationDatabase() async {
+    String path = join(await getDatabasesPath(), "notification_database.db");
+    var db = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (Database db, int version) async {
+        await db.execute('''
+          CREATE TABLE notification_table (
+            timestamp TEXT,
+            message TEXT,
+            iconLink TEXT,
+            PRIMARY KEY(timestamp)
+          )
+        ''');
+      },
+    );
+    return db;
+  }
+
+  Future<void> insertData(
+    String timestamp,
+    String message,
+    String iconLink,
+  ) async {
+    final Database? db = await database;
+
+    Map<String, dynamic> data = {
+      'timestamp': timestamp,
+      'message': message,
+      'iconLink': iconLink,
+    };
+
+    // Check if the data already exists
+    await db!.insert(
+      'notification_table',
+      data,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getAllData() async {
+    final Database? db = await database;
+    return await db!.query('notification_table');
+  }
+}

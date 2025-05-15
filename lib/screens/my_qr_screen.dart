@@ -37,7 +37,7 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
 
   @override
   void dispose() {
-    FirestoreHelper().updatePassword(ref.read(profileProvider).userUID, '');
+    FirestoreHelper().updatePassword(myUID, '');
     super.dispose();
   }
 
