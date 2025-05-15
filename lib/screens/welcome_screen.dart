@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -52,7 +53,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
 
       body: Column(
         children: [
@@ -92,7 +92,11 @@ SizedBox(height: 80,)
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 100,),
+          SizedBox(height: 30),
+            SvgPicture.asset(
+              'lib/assets/images/Group 11.svg',
+            ),
+            SizedBox(height: 50,),
             Text('Welcome to mau', style: appTheme().textTheme.titleMedium,),
             SizedBox(height:20),
             Text('')
@@ -106,17 +110,15 @@ SizedBox(height: 80,)
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(height: 100),
-          Text('Your location is never shared.', style: appTheme().textTheme.titleMedium),
-          SizedBox(height: 20,),
-          Text('mau is far Safer than location sharing apps',
-          style: appTheme().textTheme.headlineMedium,),
-          SizedBox(height: 20),
-          Text('Your data is processed and stored on your device.\nNo worry about stoking and privacy invasion.',
-          style: appTheme().textTheme.bodyLarge),
-          SizedBox(height: 50),
+          Text('Privacy and Peace', style: appTheme().textTheme.titleMedium),
+          SizedBox(height: 50,),
+          SvgPicture.asset(
+            'lib/assets/images/Group 10.svg',
+          ),
+          SizedBox(height: 70),
           Text('For more info about privacy,', style: appTheme().textTheme.bodyLarge),
           Link(
             // 開きたいWebページのURLを指定
@@ -126,7 +128,7 @@ SizedBox(height: 80,)
             builder: (BuildContext ctx, FollowLink? openLink) {
               return TextButton(
                 onPressed: openLink,
-                child: const Text('our Privacy Policy', style: TextStyle(fontSize: 16)),
+                child:  Text('our Privacy Policy', style: TextStyle(fontSize: 16, color: AppColors.linkTextColor, decoration: TextDecoration.underline)),
                 style: ButtonStyle(
                   padding: MaterialStateProperty.all(EdgeInsets.zero),
                   // minimumSize:
@@ -145,13 +147,13 @@ SizedBox(height: 80,)
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'Let\'s Get Started',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          SvgPicture.asset(
+            'lib/assets/images/Group 9.svg',
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 200),
           primaryButton('Get Started', () {
             // Navigate to the login screen
             Navigator.pushNamed(context, AuthGate.routeName);

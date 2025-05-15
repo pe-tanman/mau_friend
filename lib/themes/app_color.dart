@@ -8,6 +8,7 @@ class AppColors {
   //text color
   static const darkText1 = Colors.black;
   static const lightText1 = Colors.white;
+  static final linkTextColor = Colors.blue.shade900;
   static MaterialColor primarySwatch =
       const MaterialColor(0xFF183B4E, <int, Color>{
         50: Color(0xFFE6EBEF),
