@@ -3,7 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/setting_screen.dart';
-import 'package:mau_friend/statics.dart';
+import 'package:mau_friend/utilities/statics.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/themes/app_theme.dart';
@@ -177,9 +177,9 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
             SizedBox(height: 20),
             CircleAvatar(
               radius: 50,
-              backgroundImage: NetworkImage(
-                profile.iconLink ??
-                    'https://images.pexels.com/photos/2071882/pexels-photo-2071882.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500))',
+              backgroundImage: NetworkImage((profile.iconLink != null && profile.iconLink != '')
+                  ? profile.iconLink!
+                  : Statics.defaultIconLink
               ),
             ), // a cat image
             SizedBox(height: 10),

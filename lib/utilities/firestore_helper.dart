@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/utilities/location_helper.dart';
 
 class FirestoreHelper {
@@ -27,7 +28,7 @@ class FirestoreHelper {
     try {
       final userDoc =
           await _firestore.collection('userProfiles').doc(userUID).get();
-      
+
       return userDoc.data() ?? {};
     } catch (e) {
       print('Error getting documents: $e');
@@ -74,13 +75,24 @@ class FirestoreHelper {
 
   Future<void> addFriendList(String friendUID) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
+    final myProfile = await getUserProfile(myUID);
+    final friendProfile = await getUserProfile(friendUID);
+    //update my firestore
     try {
-      await _firestore.collection('friendList').doc('friendList').update({
-        myUID: FieldValue.arrayUnion([friendUID]),
-      });
-      await _firestore.collection('friendList').doc('friendList').update({
-        friendUID: FieldValue.arrayUnion([myUID]),
-      });
+      await _firestore.collection('friendList').doc(myUID).set({
+        'friendList': FieldValue.arrayUnion([friendUID]),
+      }, SetOptions(merge: true));
+      await _firestore.collection('friendList').doc(myUID).set({
+        'profiles': {friendUID: friendProfile},
+      }, SetOptions(merge: true));
+
+      //update friend's firestore
+      await _firestore.collection('friendList').doc(friendUID).set({
+        'friendList': FieldValue.arrayUnion([myUID]),
+      }, SetOptions(merge: true));
+      await _firestore.collection('friendList').doc(friendUID).set({
+        'profiles': {myUID: myProfile},
+      }, SetOptions(merge: true));
     } catch (e) {
       print('Error adding friend: $e');
       rethrow;
@@ -91,9 +103,9 @@ class FirestoreHelper {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     try {
       final friendListDoc =
-          await _firestore.collection('friendList').doc('friendList').get();
+          await _firestore.collection('friendList').doc(myUID).get();
       List<String> friendList = List<String>.from(
-        friendListDoc.data()?[myUID] ?? [],
+        friendListDoc.data()?['friendList'] ?? [],
       );
       return friendList;
     } catch (e) {
@@ -120,14 +132,12 @@ class FirestoreHelper {
   Future<Map> getFriendProfiles() async {
     try {
       String myUID = FirebaseAuth.instance.currentUser!.uid;
-        final friendDoc =
-            await _firestore.collection('friendList').doc(myUID).get();
-        if (friendDoc.exists) {
-          var data = friendDoc.data();
-          // Do something with the friend's data
-          return data!['profiles'];
-        }
-        return {};
+      final friendDoc =
+          await _firestore.collection('friendList').doc(myUID).get();
+      var data = friendDoc.data();
+      // Do something with the friend's data
+      var result = data!['profiles'];
+      return result;  
     } catch (e) {
       print('Error loading friend profiles: $e');
       rethrow;

@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:mau_friend/utilities/statics.dart';
 
 import 'dart:io';
 
@@ -137,7 +138,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                 radius: 50,
                 backgroundImage: NetworkImage(
                   _selectedIcon ??
-                      'https://images.pexels.com/photos/2071882/pexels-photo-2071882.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
+                      Statics.defaultIconLink, // default icon link
                 ),
               ), // a
             ],

@@ -3,12 +3,14 @@ import 'app_color.dart';
 
 ThemeData appTheme() => ThemeData(
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.scaffoldBackgroundColor,
+        backgroundColor: AppColors.scaffoldBackgroundColor
       ),
       useMaterial3: true,
       textTheme: const TextTheme(
         titleMedium: TextStyle(
+          color: AppColors.themeColor,
           fontSize: 32,
+          fontWeight: FontWeight.bold
         ),
         headlineMedium: TextStyle(
           fontSize: 24,
@@ -16,6 +18,9 @@ ThemeData appTheme() => ThemeData(
         headlineSmall: TextStyle(
           fontSize: 20,
         ),
+        bodyLarge: TextStyle(
+          fontSize: 16,
+        )
       ),
       snackBarTheme: const SnackBarThemeData(showCloseIcon: true),
       cardTheme: CardTheme(
@@ -58,7 +63,7 @@ ThemeData appTheme() => ThemeData(
       ),
       scaffoldBackgroundColor: AppColors.scaffoldBackgroundColor,
       colorScheme:
-          ColorScheme.fromSwatch(primarySwatch: AppColors.themeColorPrimary)
+          ColorScheme.fromSwatch(primarySwatch: AppColors.primarySwatch)
               .copyWith(secondary: AppColors.accentColor),
     );
 

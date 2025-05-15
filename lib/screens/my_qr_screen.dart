@@ -9,7 +9,6 @@ import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 
-
 class MyQrScreen extends ConsumerStatefulWidget {
   const MyQrScreen({Key? key}) : super(key: key);
 
@@ -21,18 +20,20 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
   bool isInit = true;
   String myUID = '';
 
-
   String getMyQRData(String uid) {
     // Generate a random password
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     final random = Random();
-    final password = List.generate(10, (index) => chars[random.nextInt(chars.length)]).join();
+    final password =
+        List.generate(
+          10,
+          (index) => chars[random.nextInt(chars.length)],
+        ).join();
 
     FirestoreHelper().updatePassword(uid, password);
     return '$uid+$password';
   }
-
-  
 
   @override
   void dispose() {
@@ -42,23 +43,33 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if(isInit){
- myUID = ref.read(profileProvider).userUID;
-isInit = false;
+    if (isInit) {
+      ref.read(profileProvider.notifier).loadMyProfile().then((_) {
+        setState(() {
+          myUID = ref.read(profileProvider).userUID;
+          isInit = false;
+        });
+      });
     }
-    
 
-    return Column(
+    return isInit
+        ? Center(child: CircularProgressIndicator())
+        : Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         const SizedBox(height: 70),
-        SizedBox(width: 300, height:300, child: PrettyQrView.data(data: getMyQRData(myUID), decoration: const PrettyQrDecoration(
-          shape:  PrettyQrSmoothSymbol(roundFactor: 0),
-        ))),
-        const SizedBox(height: 40),
-        const Text(
-          'Keep this page until you successfully add friends',
+        SizedBox(
+          width: 300,
+          height: 300,
+          child: PrettyQrView.data(
+            data: getMyQRData(myUID),
+            decoration: const PrettyQrDecoration(
+              shape: PrettyQrSmoothSymbol(roundFactor: 0),
+            ),
+          ),
         ),
+        const SizedBox(height: 40),
+        const Text('Keep this page until you successfully add friends'),
       ],
     );
   }

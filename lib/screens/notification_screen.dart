@@ -32,15 +32,21 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
             )
           : ListView.builder(
               itemCount: ref.watch(notificationProvider).length,
-              itemBuilder: (context, index) {
-                int backIndex = ref.watch(notificationProvider).length -1 - index;
+                itemBuilder: (context, index) {
+                int backIndex = ref.watch(notificationProvider).length - 1 - index;
                 final notification = ref.watch(notificationProvider)[backIndex];
+                final shortenTimestamp = '${notification.timestamp.year.toString()}-${notification.timestamp.month.toString()}-${notification.timestamp.day.toString()} ${notification.timestamp.hour.toString()}:${notification.timestamp.minute.toString().padLeft(2, '0')}';
+
                 return ListTile(
-                  title: Text(notification.message),
-                  leading: Image.network(notification.iconLink, 
-                      width: 40, height: 40),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+                title: Text(notification.message),
+                subtitle: Text(shortenTimestamp),
+                leading: CircleAvatar(
+                  radius: 30,
+                  backgroundImage: NetworkImage(notification.iconLink),
+                ),
                 );
-              },
+                },
             ),
     );
   }

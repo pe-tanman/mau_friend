@@ -1,6 +1,6 @@
 import 'package:emoji_selector/emoji_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:mau_friend/statics.dart';
+import 'package:mau_friend/utilities/statics.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/themes/app_theme.dart';
@@ -81,7 +81,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
 
   Future<void> convertAddressToLatLng(String address) async {
     var locations = await locationFromAddress(address);
-    print('Locations: $locations');
     if (locations.isNotEmpty) {
       setState(() {
         coordinates = LatLng(locations[0].latitude, locations[0].longitude);

@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:map_location_picker/map_location_picker.dart';
-import 'package:mau_friend/statics.dart';
+import 'package:mau_friend/utilities/statics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';

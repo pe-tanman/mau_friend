@@ -4,6 +4,7 @@ import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
+import 'package:mau_friend/utilities/statics.dart';
 
 class FriendProfileScreen extends ConsumerStatefulWidget {
   @override
@@ -45,7 +46,7 @@ bool isLoading = true;
               radius: 50,
               backgroundImage: NetworkImage(
                 profile['iconLink'] ??
-                    'https://images.pexels.com/photos/2071882/pexels-photo-2071882.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500))',
+                    Statics.defaultIconLink, // default icon link
               ),
             ), // a cat image
             SizedBox(height: 10),

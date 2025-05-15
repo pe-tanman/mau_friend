@@ -61,6 +61,9 @@ dependencies:
   pretty_qr_code: ^3.4.0
   path_provider: ^2.1.5
   carousel_slider: ^5.0.0
+  page_view_dot_indicator: ^2.3.0
+  smooth_page_indicator: ^1.2.1
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

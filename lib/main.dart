@@ -47,7 +47,6 @@ class _MyAppState extends ConsumerState<MyApp> {
         isLoggedIn = user != null;
       });
     });
-    print('isLoggedIn: ${FirebaseAuth.instance.currentUser?.uid}');
      // Load user profile data
     // Load user profile data when the user is logged in)
   }

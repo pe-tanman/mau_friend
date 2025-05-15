@@ -6,7 +6,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:developer';
 
-import 'package:mau_friend/statics.dart';
+import 'package:mau_friend/utilities/statics.dart';
 
 class CurrentLocationScreen extends StatefulWidget {
   static const routeName = 'current-location-screen';

@@ -22,9 +22,6 @@ class MyProfileProvider extends Notifier<Profile> {
 
     //get user data from firebase
     var profile = await FirestoreHelper().getUserProfile(myUID!);
-print('iconLink: ${profile['iconLink']}');
-print('name: ${profile['username']}');
-    print('bio: ${profile['bio']}');
     //save to riverpod
     state = Profile(
       userUID: myUID,
@@ -48,14 +45,16 @@ class FriendProfilesProvider extends Notifier<Map<String, Profile>> {
 
     Map<String, Profile> result = {};
 
-    profilesMap.values.map((profile) {
+
+    profilesMap.forEach((key, profile) {
       result[profile['userUID']] = Profile(
         userUID: profile['userUID'],
-        name: profile['name'],
+        name: profile['username'],
         bio: profile['bio'],
         iconLink: profile['iconLink'],
       );
     });
+    
 
     state = result;
   }

@@ -9,6 +9,9 @@ import 'package:mau_friend/screens/notification_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/add_friend_screen.dart';
 import 'package:mau_friend/screens/profile_setting_screen.dart';
+import 'package:mau_friend/themes/app_color.dart';
+import 'package:mau_friend/utilities/statics.dart';
+import 'package:mau_friend/providers/friend_list_provider.dart';
 
 class FriendsScreen extends ConsumerStatefulWidget {
   const FriendsScreen({Key? key}) : super(key: key);
@@ -27,7 +30,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   void initState() {
     super.initState();
     final myUID = FirebaseAuth.instance.currentUser?.uid;
-
     ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
 
     friendsSubscription = FirebaseFirestore.instance
@@ -36,49 +38,73 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         .snapshots()
         .listen((snapshot) {
           if (snapshot.exists) {
-            print('Friend list updated');
-            ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
-            friendList = snapshot.data()!['friendsList'];
-            final newFriend = snapshot.data()!['friendsList'].last;
-
-            final newFriendProfile = snapshot.data()!['profiles'][newFriend];
-            final newFriendName = newFriendProfile['name'];
-            final newFriendIconLink = newFriendProfile['iconLink'];
-            ref
-                .read(notificationProvider.notifier)
-                .addNotification(
-                  '$newFriendName is now your friend.',
-                  newFriendIconLink,
-                );
+            if (snapshot.data()!['friendList'].length >
+                ref.read(friendListProvider).length) {
+              ref.read(friendListProvider.notifier).loadFriendList().then((_) {
+                //check if new friend added
+                //get the new friend
+                final newFriend = snapshot.data()!['friendList'].last;
+                final newFriendProfile =
+                    snapshot.data()!['profiles'][newFriend];
+                final newFriendName = newFriendProfile['username'];
+                final newFriendIconLink = newFriendProfile['iconLink'];
+                ref
+                    .read(notificationProvider.notifier)
+                    .addNotification(
+                      '$newFriendName is now your friend.',
+                      newFriendIconLink,
+                    );
+              });
+            } else if (snapshot.data()!['friendList'].length <
+                ref.read(friendListProvider).length) {
+              ref.read(friendListProvider.notifier).loadFriendList().then((_) {
+                //check if new friend added
+                //get the new friend
+                final newFriend = snapshot.data()!['friendList'].last;
+                final newFriendProfile =
+                    snapshot.data()!['profiles'][newFriend];
+                final newFriendName = newFriendProfile['username'];
+                final newFriendIconLink = newFriendProfile['iconLink'];
+                ref
+                    .read(notificationProvider.notifier)
+                    .addNotification(
+                      'You blocked $newFriendName',
+                      newFriendIconLink,
+                    );
+              });
+            }
           }
         });
   }
 
   Widget buildFriendCard(String friendUID) {
+    print('friendUID:$friendUID');
     final profile = ref.watch(friendProfilesProvider)[friendUID];
     return Card(
+      color: AppColors.backgroundColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
       elevation: 3.0,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 20),
           CircleAvatar(
             radius: 50,
             backgroundImage: NetworkImage(
-              profile?.iconLink ??
-                  'https://images.pexels.com/photos/2071882/pexels-photo-2071882.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500))',
+              profile?.iconLink ?? Statics.defaultIconLink, // default icon link
             ),
           ), // a cat image
-          SizedBox(height: 10),
+          SizedBox(height: 20),
           Text(
             profile?.name ?? 'Username',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 5),
+          SizedBox(height: 10),
           Text(
             profile?.bio ?? 'Bio',
             style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
-          SizedBox(height: 5),
+          SizedBox(height: 60),
 
           //status
           Container(
@@ -116,8 +142,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   }
 
   Widget buildNotificationButton() {
-    if (ref.watch(unreadNotificationProvider) > 0){
-return Badge.count(
+    if (ref.watch(unreadNotificationProvider) > 0) {
+      return Badge.count(
         count: ref.watch(unreadNotificationProvider),
         child: IconButton(
           icon: const Icon(Icons.notifications_outlined),
@@ -129,9 +155,7 @@ return Badge.count(
           },
         ),
       );
-    }
-      
-    else {
+    } else {
       return IconButton(
         icon: const Icon(Icons.notifications_outlined),
         onPressed: () {
@@ -143,26 +167,36 @@ return Badge.count(
 
   @override
   Widget build(BuildContext context) {
+    friendList = ref.watch(friendListProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Friends'), actions: [
-         buildNotificationButton()
+      appBar: AppBar(
+        title: const Text('Friends'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: buildNotificationButton(),
+          ),
         ],
       ),
       //horizontal scroll
-      body: friendList.isEmpty
-          ? Center(child: Text("Let's add friends by pressing + button"))
-          : PageView.builder(
-          physics: const BouncingScrollPhysics(),
-          controller: PageController(viewportFraction: 0.8),
-          itemCount: friendList.length,
-          itemBuilder: (context, index) {
-            final friendUID = friendList[index];
-            return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: buildFriendCard(friendUID),
-            );
-          },
-        ),
+      body:
+          friendList.isEmpty
+              ? Center(child: Text("Let's add friends by pressing + button"))
+              : PageView.builder(
+                physics: const BouncingScrollPhysics(),
+                controller: PageController(viewportFraction: 0.8),
+                itemCount: friendList.length,
+                itemBuilder: (context, index) {
+                  final friendUID = friendList[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 80,
+                    ),
+                    child: buildFriendCard(friendUID),
+                  );
+                },
+              ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
@@ -171,6 +205,4 @@ return Badge.count(
       ),
     );
   }
-
-  
 }
