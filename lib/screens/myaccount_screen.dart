@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/setting_screen.dart';
+import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:map_location_picker/map_location_picker.dart';
@@ -175,68 +176,85 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 20),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage((profile.iconLink != null && profile.iconLink != '')
-                  ? profile.iconLink!
-                  : Statics.defaultIconLink
-              ),
-            ), // a cat image
-            SizedBox(height: 10),
-            Text(
-              profile.name ?? 'Username',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 5),
-            Text(
-              profile.bio ?? 'Bio',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            SizedBox(height: 5),
-            if (profile.name == null)
-              TextButton.icon(
-                label: Text('Complete your profile'),
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  Navigator.pushNamed(context, ProfileSettingScreen.routeName);
-                },
-              ),
-            //status
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-
-                Text(
-                ref.watch(myStatusProvider).icon,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
-                ),
-                ),
-                SizedBox(width: 10),
-                Text(
-                    ref.watch(myStatusProvider).status,
-                    style: TextStyle(
+            Card(
+              color: AppColors.backgroundColor,
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              elevation: 3,
+              child: Column(
+                children: [
+                  SizedBox(height: 20),
+                  CircleAvatar(
+                  radius: 50,
+                  backgroundImage: NetworkImage(
+                    (profile.iconLink != null && profile.iconLink != '')
+                      ? profile.iconLink!
+                      : Statics.defaultIconLink,
+                  ),
+                  ), // a cat image
+                  SizedBox(height: 10),
+                  Text(
+                  profile.name ?? 'Username',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                  profile.bio ?? 'Bio',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  SizedBox(height: 5),
+                  if (profile.name == null)
+                  TextButton.icon(
+                    label: Text('Complete your profile'),
+                    icon: Icon(Icons.edit),
+                    onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      ProfileSettingScreen.routeName,
+                    );
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                    Text(
+                      ref.watch(myStatusProvider).icon,
+                      style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      ref.watch(myStatusProvider).status,
+                      style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).primaryColor,
+                      ),
                     ),
+                    ],
                   ),
-              ],
-              ),
+                  ),
+                  SizedBox(height: 20),
+                ],
+                
+              )
             ),
+            
             //Tofo:add cute and informative icons
 
             //location list
             SizedBox(height: 20),
-            Divider(),
 
             if (!isLoading)
               ListView.builder(

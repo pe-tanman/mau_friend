@@ -26,7 +26,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   String? address;
   String name = '';
   EmojiData? icon;
-  int radius = 0;
+  int radius = 10;
   bool isInit = true;
   LatLng coordinates = Statics.initLocation;
 
@@ -198,181 +198,169 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
             onPressed: () {
               deleteLocaition();
             },
-            icon: Icon(Icons.delete),
+            icon: Icon(Icons.delete_outlined),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.themeColor,
-              foregroundColor: Colors.white,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.themeColor,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  saveLocation();
+                }
+              },
+              child: Text('Save'),
             ),
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                saveLocation();
-              }
-            },
-            child: Text('Save'),
           ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text('Add Icon'),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                EmojiSelector(
-                                  onSelected: (value) {
-                                    setState(() {
-                                      icon = value;
-                                    });
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child:
-                        (icon == null)
-                            ? Icon(Icons.add_reaction, size: 25)
-                            : Text(icon!.char, style: TextStyle(fontSize: 25)),
-                  ),
-                  SizedBox(
-                    width: 250,
-                    child: TextFormField(
-                      initialValue: name,
-                      validator:
-                          (value) =>
-                              (value == null || value.isEmpty)
-                                  ? 'Please enter a name'
-                                  : null,
-                      decoration: InputDecoration(
-                        labelText: 'Name',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (value) {
-                        name = value;
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 20),
-
-              Text('Address', style: appTheme().textTheme.headlineMedium),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 300,
-                    child: TextFormField(
-                      readOnly: true,
-                      controller: TextEditingController(
-                        text: autocompletePlace ?? address,
-                      ),
-                      decoration: InputDecoration(border: null),
-                      validator:
-                          (value) =>
-                              (value == null || value.isEmpty)
-                                  ? 'Please pick a position'
-                                  : null,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
                           builder: (context) {
-                            return _buildMapLocationPicker();
+                            return AlertDialog(
+                              title: Text('Add Icon'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  EmojiSelector(
+                                    onSelected: (value) {
+                                      setState(() {
+                                        icon = value;
+                                      });
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
                           },
+                        );
+                      },
+                      child:
+                          (icon == null)
+                              ? Icon(Icons.add_reaction, size: 25)
+                              : Text(icon!.char, style: TextStyle(fontSize: 25)),
+                    ),
+                    SizedBox(
+                      width: 250,
+                      child: TextFormField(
+                        initialValue: name,
+                        validator:
+                            (value) =>
+                                (value == null || value.isEmpty)
+                                    ? 'Please enter a name'
+                                    : null,
+                        decoration: InputDecoration(
+                          labelText: 'Name',
+                          border: OutlineInputBorder(),
                         ),
-                      );
-                    },
-                    icon: Icon(Icons.map),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              Text('Radius', style: appTheme().textTheme.headlineMedium),
-              SizedBox(height: 10),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 100,
-                    child: TextFormField(
-                      initialValue: radius.toString(),
-                      keyboardType: TextInputType.phone,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a radius';
-                        }
-                        if (int.tryParse(value) == null ||
-                            int.parse(value) <= 0) {
-                          return 'Please enter a valid number';
-                        }
-                        if (int.parse(value) >= 2000) {
-                          return 'Limit in 2km';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(border: OutlineInputBorder()),
-                      onChanged: (value) {
-                        setState(() {
-                          radius = int.tryParse(value) ?? 0;
-                        });
-                      },
+                        onChanged: (value) {
+                          name = value;
+                        },
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 10),
-                  Text('m', style: TextStyle(fontSize: 20)),
-                ],
-              ),
-              SizedBox(height: 30),
-
-              SizedBox(
-                height: 300,
-                child: GoogleMap(
-                  onMapCreated: (controller) => mapController = controller,
-                  initialCameraPosition: CameraPosition(
-                    target: coordinates,
-                    zoom: 16,
-                  ),
-                  markers: {
-                    Marker(
-                      markerId: MarkerId('selected-location'),
-                      position: coordinates,
-                    ),
-                  },
-                  circles: {
-                    Circle(
-                      circleId: const CircleId('circle_1'),
-                      center: coordinates,
-                      radius: radius.toDouble(),
-                      fillColor: Colors.red.withOpacity(0.5),
-                      strokeWidth: 2,
-                    ),
-                  },
+                  ],
                 ),
-              ),
-            ],
+            
+                SizedBox(height: 20),
+            
+                Text('Address', style: appTheme().textTheme.headlineMedium),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 300,
+                      child: TextFormField(
+                        readOnly: true,
+                        controller: TextEditingController(
+                          text: autocompletePlace ?? address,
+                        ),
+                        decoration: InputDecoration(border: null),
+                        validator:
+                            (value) =>
+                                (value == null || value.isEmpty)
+                                    ? 'Please pick a position'
+                                    : null,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return _buildMapLocationPicker();
+                            },
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.map),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 30),
+                Text('Radius', style: appTheme().textTheme.headlineMedium),
+                SizedBox(height: 10),
+                SizedBox(
+                  width: 100,
+                  child: Slider(
+                    inactiveColor: AppColors.backgroundColor,
+                    value: radius.toDouble(),
+                    min: 1,
+                    max: 2000,
+                    divisions: 1999,
+                    label: '$radius m',
+                    onChanged: (value) {
+                    setState(() {
+                      radius = value.toInt();
+                    });
+                    },
+                  ),
+                ),  
+                SizedBox(height: 30),
+            
+                SizedBox(
+                  height: 300,
+                  child: GoogleMap(
+                    onMapCreated: (controller) => mapController = controller,
+                    initialCameraPosition: CameraPosition(
+                      target: coordinates,
+                      zoom: 16,
+                    ),
+                    markers: {
+                      Marker(
+                        markerId: MarkerId('selected-location'),
+                        position: coordinates,
+                      ),
+                    },
+                    circles: {
+                      Circle(
+                        circleId: const CircleId('circle_1'),
+                        center: coordinates,
+                        radius: radius.toDouble(),
+                        fillColor: Colors.red.withOpacity(0.5),
+                        strokeWidth: 2,
+                      ),
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

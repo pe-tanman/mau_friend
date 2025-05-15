@@ -91,13 +91,15 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   void initState() {
     super.initState();
     final myUID = FirebaseAuth.instance.currentUser?.uid;
-    ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
+    
 
     friendsSubscription = FirebaseFirestore.instance
         .collection('friendList')
         .doc(myUID)
         .snapshots()
         .listen((snapshot) {
+          ref.read(friendListProvider.notifier).loadFriendList();
+          ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
           if (snapshot.exists) {
             onUpdated(snapshot);
           }

@@ -63,9 +63,6 @@ bool isLoading = true;
             primaryButton('Add', (){
               // Add friend logic here
               FirestoreHelper().addFriendList(profile['userUID']);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Friend added successfully!')),
-              );
               Navigator.of(context).pop();
               Navigator.of(context).pop();
           
