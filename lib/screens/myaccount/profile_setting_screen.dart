@@ -95,7 +95,6 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,6 +165,40 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
+              ),
+              SizedBox(height: 30),
+              Center(
+                child: TextButton(
+                  onPressed: (){
+                    showDialog(context: context, builder: (context) {
+                      return AlertDialog(
+                        title: Text('Delete Account'),
+                        content: Text('All data including your profile, friends, and locations might be deleted.', style: TextStyle(fontWeight: FontWeight.bold),),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              final userCredential = await FirebaseAuth.instance
+                                  .currentUser!.delete();
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Delete', style: TextStyle(color: Colors.red),
+                          ),)
+                        ],
+                      );
+                    });
+                  },
+                  child: Text('Delete Account'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                ),
               ),
             
           ],

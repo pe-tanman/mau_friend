@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:mau_friend/screens/authGate.dart';
+import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/utilities/location_helper.dart';
@@ -158,11 +158,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         children: [
           SizedBox(height: 100),
           Text('Precise Location', style: appTheme().textTheme.titleMedium),
-          SvgPicture.asset('lib/assets/images/Map.svg'),
+            SvgPicture.asset(
+            'lib/assets/images/Map.svg',
+            height: 400,
+            ),
           SizedBox(height: 10),
           Text('To use main features, you need to allow location access.'),
           SizedBox(height: 20),
-          primaryButton('Allow location access', () {
+          primaryButton('Allow Permission', () {
             LocationHelper().initLocationSetting();
           }),
         ],

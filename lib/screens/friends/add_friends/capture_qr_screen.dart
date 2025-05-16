@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
-import 'package:mau_friend/screens/friend_profile_screen.dart';
+import 'package:mau_friend/screens/friends/friend_profile_screen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

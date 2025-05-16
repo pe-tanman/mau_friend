@@ -6,7 +6,7 @@ import 'package:mau_friend/utilities/statics.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/themes/app_theme.dart';
-import 'package:mau_friend/screens/myaccount_screen.dart';
+import 'package:mau_friend/screens/myaccount/myaccount_screen.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';

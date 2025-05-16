@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
-import 'package:mau_friend/screens/setting_screen.dart';
+import 'package:mau_friend/screens/settings/setting_screen.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/themes/app_theme.dart';
-import 'package:mau_friend/screens/add_location_screen.dart';
+import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mau_friend/screens/profile_setting_screen.dart';
+import 'package:mau_friend/screens/myaccount/profile_setting_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mau_friend/utilities/location_helper.dart';
 import 'dart:async';
@@ -258,13 +258,13 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
 
             if (!isLoading)
               ListView.builder(
+                physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   return _buildListCard(index);
                 },
                 itemCount: registeredLocations.length,
-                shrinkWrap: true,
               ),
-            TextButton.icon(
+            TextButton.icon( 
               label: Text('Add Location'),
               icon: Icon(Icons.add),
               onPressed: () {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mau_friend/screens/friends_screen.dart';
-import 'package:mau_friend/screens/myaccount_screen.dart';
+import 'package:mau_friend/screens/friends/friends_screen.dart';
+import 'package:mau_friend/screens/myaccount/myaccount_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

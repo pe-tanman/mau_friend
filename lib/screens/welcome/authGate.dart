@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
+import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mau_friend/screens/home_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,7 +29,7 @@ class AuthGate extends ConsumerWidget {
           return SignInScreen(
             providers: [
               GoogleProvider(clientId: clientId),
-              
+              AppleProvider(),
               EmailAuthProvider(),
               
             ],
