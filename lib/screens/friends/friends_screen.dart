@@ -144,8 +144,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+
                 Text(
-                  ref.watch(myStatusProvider).icon,
+                  ref.watch(myStatusIconProvider), //mystatus じゃないあ要変更
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -154,7 +155,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                 ),
                 SizedBox(width: 10),
                 Text(
-                  ref.watch(myStatusProvider).status,
+                  ref.watch(myStatusTextProvider),
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

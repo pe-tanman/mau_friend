@@ -195,5 +195,6 @@ class RealtimeDatabaseHelper {
       'icon': status.icon,
       'status': status.status,
     });
+    
   }
 }

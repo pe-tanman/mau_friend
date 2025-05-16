@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:map_location_picker/map_location_picker.dart';
@@ -37,9 +38,7 @@ class LocationHelper {
       throw Exception('Location services are disabled.');
     }
     if (permission == LocationPermission.denied) {
-      print('asking permission');
       permission = await Geolocator.requestPermission();
-      print('asked permission');
       if (permission != LocationPermission.denied) {
         throw Exception('Location permissions are denied.');
       }
@@ -51,36 +50,37 @@ class LocationHelper {
     }
   }
 
-  Future<void> trackLocation() async {
+  Future<void> trackLocation(WidgetRef ref) async {
     positionStream = Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen((Position? position) {
       if (position == null) {
         return;
       }
+
       var currentLocation = LatLng(position.latitude, position.longitude);
 
       if (prevPosition != null) {
         velocityList.add(velocity(prevPosition, position));
       }
 
-      List<RegisteredLocation> myLocations = container.read(locationsProvider);
+      List<RegisteredLocation> myLocations = ref.read(locationsProvider);
       //save in firebase and riverpod
       userStatus(currentLocation, myLocations).then((value) {
         if (value.icon == prevStatus.icon &&
             value.status == prevStatus.status) {
           return;
+        } else {
+          RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
+          dbHelper.updateStatus(value).then((_) {
+            ref.read(myStatusTextProvider.notifier).updateMyStatus(value);
+            ref.read(myStatusIconProvider.notifier).updateMyStatus(value);
+          });
         }
-        else{
-           RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
-          dbHelper.updateStatus(value);
-          container.read(myStatusProvider.notifier).updateMyStatus(value);
-        }
-       
 
         prevStatus = value;
       });
-      
+
       prevPosition = position;
     });
   }
@@ -98,6 +98,7 @@ class LocationHelper {
         currentLocation.longitude == Statics.initLocation.longitude) {
       return UserStatus('🔴', 'offline');
     }
+
     for (var location in myLocations) {
       double distance = Geolocator.distanceBetween(
         currentLocation.latitude,
@@ -116,12 +117,12 @@ class LocationHelper {
       return UserStatus('🚃', 'Moving');
     } else if (averageVelocityKmPerHour() > 20) {
       return UserStatus('🚗', 'Moving');
-    } else if (averageVelocityKmPerHour() > 5) {
+    } else if (averageVelocityKmPerHour() > 6) {
       return UserStatus('🚴‍♂️', 'Moving');
-    } else if (averageVelocityKmPerHour() > 0.5) {
+    } else if (averageVelocityKmPerHour() > 2) {
       return UserStatus('🚶‍♂️', 'Moving');
     }
-    return UserStatus('🔴', 'offline');
+    return UserStatus('🟢', 'online');
   }
 
   double velocity(Position previousPosition, Position currentPosition) {

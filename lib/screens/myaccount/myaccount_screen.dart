@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
@@ -17,8 +18,6 @@ import 'package:mau_friend/utilities/location_helper.dart';
 import 'dart:async';
 import 'package:mau_friend/providers/locations_provider.dart';
 
-
-
 class MyAccountScreen extends ConsumerStatefulWidget {
   @override
   static const routeName = 'my-account-screen';
@@ -33,8 +32,6 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   LatLng coordinates = Statics.initLocation;
   bool isLoading = true;
 
- 
-
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -42,15 +39,17 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   @override
   void initState() {
     loadRegisteredLocations();
-      super.initState();
+    super.initState();
     ref.read(profileProvider.notifier).loadMyProfile();
-    
-    LocationHelper().initLocationSetting().then((_) {
-      LocationHelper().trackLocation();
-    }).catchError((error) {
-      print('Error initializing location settings: $error');
-    });
-  
+
+    LocationHelper()
+        .initLocationSetting()
+        .then((_) {
+          LocationHelper().trackLocation(ref);
+        })
+        .catchError((error) {
+          print('Error initializing location settings: $error');
+        });
   }
 
   Future<String> convertLatLngToAdress(LatLng coordinates) async {
@@ -104,10 +103,8 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     setState(() {
       isLoading = false;
     });
-    print('Registered locations: $registeredLocations');
   }
 
-  
   Widget _buildListCard(int index) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -145,9 +142,9 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                   registeredLocations[index] = location;
                 });
               }
-              ref.read(locationsProvider.notifier).updateLocations(
-                    registeredLocations,
-                  );
+              ref
+                  .read(locationsProvider.notifier)
+                  .updateLocations(registeredLocations);
             }
           });
         },
@@ -155,11 +152,10 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(profileProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('My Account'),
@@ -180,78 +176,79 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
             Card(
               color: AppColors.backgroundColor,
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
               elevation: 3,
               child: Column(
                 children: [
                   SizedBox(height: 30),
                   CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage(
-                    (profile.iconLink != null && profile.iconLink != '')
-                      ? profile.iconLink!
-                      : Statics.defaultIconLink,
-                  ),
+                    radius: 50,
+                    backgroundImage: NetworkImage(
+                      (profile.iconLink != null && profile.iconLink != '')
+                          ? profile.iconLink!
+                          : Statics.defaultIconLink,
+                    ),
                   ), // a cat image
                   SizedBox(height: 10),
                   Text(
-                  profile.name ?? 'Username',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    profile.name ?? 'Username',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 5),
                   Text(
-                  profile.bio ?? 'Bio',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                    profile.bio ?? 'Bio',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   SizedBox(height: 5),
                   if (profile.name == null)
-                  TextButton.icon(
-                    label: Text('Complete your profile'),
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      ProfileSettingScreen.routeName,
-                    );
-                    },
-                  ),
+                    TextButton.icon(
+                      label: Text('Complete your profile'),
+                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          ProfileSettingScreen.routeName,
+                        );
+                      },
+                    ),
                   SizedBox(height: 20),
                   Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                    Text(
-                      ref.watch(myStatusProvider).icon,
-                      style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                      ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    margin: EdgeInsets.symmetric(horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    SizedBox(width: 10),
-                    Text(
-                      ref.watch(myStatusProvider).status,
-                      style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          ref.watch(myStatusIconProvider),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          ref.watch(myStatusTextProvider),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ],
                     ),
-                    ],
-                  ),
                   ),
                   SizedBox(height: 20),
                 ],
-                
-              )
+              ),
             ),
-            
+
             //Tofo:add cute and informative icons
             //location list
             SizedBox(height: 20),
@@ -265,7 +262,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                 },
                 itemCount: registeredLocations.length,
               ),
-            TextButton.icon( 
+            TextButton.icon(
               label: Text('Add Location'),
               icon: Icon(Icons.add),
               onPressed: () {
@@ -275,9 +272,9 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                   if (value != null) {
                     setState(() {
                       registeredLocations.add(value as RegisteredLocation);
-                      ref.read(locationsProvider.notifier).updateLocations(
-                        registeredLocations,
-                      );
+                      ref
+                          .read(locationsProvider.notifier)
+                          .updateLocations(registeredLocations);
                     });
                   }
                 });
