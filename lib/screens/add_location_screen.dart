@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:emoji_selector/emoji_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:mau_friend/utilities/statics.dart';
@@ -11,14 +13,15 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AddLocationScreen extends StatefulWidget {
+class AddLocationScreen extends ConsumerStatefulWidget {
   static const routeName = 'add-location-screen';
   @override
   _AddLocationScreenState createState() => _AddLocationScreenState();
 }
 
-class _AddLocationScreenState extends State<AddLocationScreen> {
+class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController iconController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
@@ -29,8 +32,10 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   int radius = 10;
   bool isInit = true;
   LatLng coordinates = Statics.initLocation;
+  Set<Marker> markers = {};
+  bool isLoadingMarkers = true;
 
-//Todo: locations are lincked to device. link to user account
+  //Todo: locations are lincked to device. link to user account
   RegisteredLocation? argument;
   var arguments;
 
@@ -86,6 +91,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
         coordinates = LatLng(locations[0].latitude, locations[0].longitude);
         _moveCameraToPosition(coordinates);
       });
+      createMyMarkers();
       print('Coordinates: ${coordinates.latitude}, ${coordinates.longitude}');
     }
   }
@@ -134,9 +140,10 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
       ),
     );
   }
+
   void deleteLocaition() {
     MyLocationDatabaseHelper().deleteData(name);
-      var result = RegisteredLocation('delete', icon!.char, coordinates, radius);
+    var result = RegisteredLocation('delete', icon!.char, coordinates, radius);
     Navigator.pop(context, result);
   }
 
@@ -150,7 +157,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
       skin: 1,
     );
 
-    if(argument != null && argument!.name != name) {
+    if (argument != null && argument!.name != name) {
       MyLocationDatabaseHelper().deleteData(argument!.name);
     }
 
@@ -165,9 +172,124 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
     Navigator.pop(context, result);
   }
 
+  Future<BitmapDescriptor> createEmojiMarker(String emoji) async {
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+
+    // Create a Text widget with the emoji
+    textPainter.text = TextSpan(
+      text: emoji,
+      style: const TextStyle(
+        fontSize: 50, // Adjust size as needed
+      ),
+    );
+
+    textPainter.layout();
+    final pictureRecorder = ui.PictureRecorder();
+    final canvas = Canvas(pictureRecorder);
+
+    // Add padding and calculate size
+    const double padding = 20.0;
+    final double size =
+        (textPainter.width > textPainter.height
+            ? textPainter.width
+            : textPainter.height) +
+        padding * 2;
+
+    // Add a white circle background
+    final paint = Paint()..color = Colors.white;
+    canvas.drawCircle(Offset(size / 2, size / 2), size / 2, paint);
+
+    // Add an outline around the circle
+    final outlinePaint =
+        Paint()
+          ..color = AppColors.themeColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.0;
+    canvas.drawCircle(Offset(size / 2, size / 2), size / 2, outlinePaint);
+
+    // Draw the emoji on top of the circle
+    textPainter.paint(
+      canvas,
+      Offset((size - textPainter.width) / 2, (size - textPainter.height) / 2),
+    );
+
+    final picture = pictureRecorder.endRecording();
+    final image = await picture.toImage(size.toInt(), size.toInt());
+
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final uint8List = byteData!.buffer.asUint8List();
+
+    return BitmapDescriptor.fromBytes(uint8List);
+  }
+
+  Future<void> createMyMarkers() async {
+    
+    final mylocations = ref.watch(locationsProvider);
+    markers = {};
+    for (var location in mylocations) {
+      final marker = Marker(
+        markerId: MarkerId(location.name),
+        position: LatLng(
+          location.coordinates.latitude,
+          location.coordinates.longitude,
+        ),
+        icon: await createEmojiMarker(location.icon),
+        infoWindow: InfoWindow(title: location.name),
+      );
+      markers.add(marker);
+    }
+    markers.add(
+      Marker(
+        icon: await createEmojiMarker(icon?.char ?? '📍'),
+        markerId: const MarkerId('selected-location'),
+        position: coordinates,
+        infoWindow: InfoWindow(
+          title: 'Current Location',
+          snippet:
+              'Latitude: ${coordinates.latitude}, Longitude: ${coordinates.longitude}',
+        ),
+      ),
+    );
+    setState(() {
+      isLoadingMarkers = false;
+    });
+  }
+
+  Set<Circle> createMyPolygons() {
+    final mylocations = ref.watch(locationsProvider);
+    ;
+    Set<Circle> polygons = {};
+    for (var location in mylocations) {
+      final polygon = Circle(
+        radius: location.radius.toDouble(),
+        circleId: CircleId(location.name),
+        center: LatLng(
+          location.coordinates.latitude,
+          location.coordinates.longitude,
+        ),
+        strokeColor: AppColors.accentColor,
+        fillColor: AppColors.accentColor.withOpacity(0.2),
+        strokeWidth: 2,
+      );
+      polygons.add(polygon);
+    }
+    polygons.add(
+      Circle(
+        radius: radius.toDouble(),
+        circleId: const CircleId('selected-location'),
+        center: coordinates,
+        strokeColor: Colors.red,
+        fillColor: Colors.red.withOpacity(0.2),
+        strokeWidth: 2,
+      ),
+    );
+    return polygons;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isInit) {
+      createMyMarkers();
       arguments = ModalRoute.of(context)!.settings.arguments;
       if (arguments != null) {
         argument = arguments.first;
@@ -187,8 +309,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
       }
       isInit = false;
     }
-
-   
 
     return Scaffold(
       appBar: AppBar(
@@ -239,6 +359,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                                 children: [
                                   EmojiSelector(
                                     onSelected: (value) {
+                                      createMyMarkers();
                                       setState(() {
                                         icon = value;
                                       });
@@ -254,7 +375,10 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                       child:
                           (icon == null)
                               ? Icon(Icons.add_reaction, size: 25)
-                              : Text(icon!.char, style: TextStyle(fontSize: 25)),
+                              : Text(
+                                icon!.char,
+                                style: TextStyle(fontSize: 25),
+                              ),
                     ),
                     SizedBox(
                       width: 250,
@@ -270,15 +394,16 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                           border: OutlineInputBorder(),
                         ),
                         onChanged: (value) {
+                          createMyMarkers();
                           name = value;
                         },
                       ),
                     ),
                   ],
                 ),
-            
+
                 SizedBox(height: 20),
-            
+
                 Text('Address', style: appTheme().textTheme.headlineMedium),
                 SizedBox(height: 10),
                 Row(
@@ -326,38 +451,30 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                     divisions: 1999,
                     label: '$radius m',
                     onChanged: (value) {
-                    setState(() {
-                      radius = value.toInt();
-                    });
+                      createMyMarkers();
+                      setState(() {
+                        radius = value.toInt();
+                      });
                     },
                   ),
-                ),  
+                ),
                 SizedBox(height: 30),
-            
+
                 SizedBox(
                   height: 300,
-                  child: GoogleMap(
-                    onMapCreated: (controller) => mapController = controller,
-                    initialCameraPosition: CameraPosition(
-                      target: coordinates,
-                      zoom: 16,
-                    ),
-                    markers: {
-                      Marker(
-                        markerId: MarkerId('selected-location'),
-                        position: coordinates,
-                      ),
-                    },
-                    circles: {
-                      Circle(
-                        circleId: const CircleId('circle_1'),
-                        center: coordinates,
-                        radius: radius.toDouble(),
-                        fillColor: Colors.red.withOpacity(0.5),
-                        strokeWidth: 2,
-                      ),
-                    },
-                  ),
+                  child:
+                      isLoadingMarkers
+                          ? Center(child: CircularProgressIndicator())
+                          : GoogleMap(
+                            onMapCreated:
+                                (controller) => mapController = controller,
+                            initialCameraPosition: CameraPosition(
+                              target: coordinates,
+                              zoom: 16,
+                            ),
+                            markers: markers,
+                            circles: createMyPolygons(),
+                          ),
                 ),
               ],
             ),

@@ -4,11 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mau_friend/providers/locations_provider.dart';
+import 'package:mau_friend/themes/app_color.dart';
 import 'dart:developer';
 
 import 'package:mau_friend/utilities/statics.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
-class CurrentLocationScreen extends StatefulWidget {
+class CurrentLocationScreen extends ConsumerStatefulWidget {
   static const routeName = 'current-location-screen';
   const CurrentLocationScreen({Key? key}) : super(key: key);
 
@@ -16,7 +21,7 @@ class CurrentLocationScreen extends StatefulWidget {
   _CurrentLocationScreenState createState() => _CurrentLocationScreenState();
 }
 
-class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
+class _CurrentLocationScreenState extends ConsumerState<CurrentLocationScreen> {
   bool isLoading = true;
   bool isInit = true;
   LatLng currentLocation = Statics.initLocation;
@@ -25,6 +30,8 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
     distanceFilter: 1,
   );
   late StreamSubscription<Position> positionStream;
+  Set<Marker> markers = {};
+  bool isLoadingMarkers = true;
 
   Future<LatLng> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -55,17 +62,123 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
     positionStream = Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen((Position? position) {
-      if(position == null) {
+      if (position == null) {
         return;
       }
       setState(() {
-        currentLocation = LatLng(
-          position.latitude,
-          position.longitude,
-        );
+        currentLocation = LatLng(position.latitude, position.longitude);
       });
     });
     super.initState();
+  }
+
+  Future<BitmapDescriptor> createEmojiMarker(String emoji) async {
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+
+    // Create a Text widget with the emoji
+    textPainter.text = TextSpan(
+      text: emoji,
+      style: const TextStyle(
+        fontSize: 50, // Adjust size as needed
+      ),
+    );
+
+    textPainter.layout();
+    final pictureRecorder = ui.PictureRecorder();
+    final canvas = Canvas(pictureRecorder);
+
+    // Add padding and calculate size
+    const double padding = 20.0;
+    final double size = (textPainter.width > textPainter.height
+            ? textPainter.width
+            : textPainter.height) +
+        padding * 2;
+
+    // Add a white circle background
+    final paint = Paint()..color = Colors.white;
+    canvas.drawCircle(
+      Offset(size / 2, size / 2),
+      size / 2,
+      paint,
+    );
+
+    // Add an outline around the circle
+    final outlinePaint = Paint()
+      ..color = AppColors.themeColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.0;
+    canvas.drawCircle(
+      Offset(size / 2, size / 2),
+      size / 2,
+      outlinePaint,
+    );
+
+    // Draw the emoji on top of the circle
+    textPainter.paint(
+      canvas,
+      Offset((size - textPainter.width) / 2, (size - textPainter.height) / 2),
+    );
+
+    final picture = pictureRecorder.endRecording();
+    final image = await picture.toImage(
+      size.toInt(),
+      size.toInt(),
+    );
+
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final uint8List = byteData!.buffer.asUint8List();
+
+    return BitmapDescriptor.fromBytes(uint8List);
+  }
+
+  Future<void> createMyMarkers() async {
+    final mylocations = ref.watch(locationsProvider);
+    for (var location in mylocations) {
+      final marker = Marker(
+        markerId: MarkerId(location.name),
+        position: LatLng(
+          location.coordinates.latitude,
+          location.coordinates.longitude,
+        ),
+        icon: await createEmojiMarker(location.icon),
+        infoWindow: InfoWindow(title: location.name),
+      );
+      markers.add(marker);
+    }
+    markers.add(
+      Marker(
+        markerId: const MarkerId('currentLocation'),
+        position: currentLocation,
+        infoWindow: InfoWindow(
+          title: 'Current Location',
+          snippet:
+              'Latitude: ${currentLocation.latitude}, Longitude: ${currentLocation.longitude}',
+        ),
+      ),
+    );
+    setState(() {
+      isLoadingMarkers = false;
+    });
+  }
+
+  Set<Circle> createMyPolygons() {
+    final mylocations = ref.watch(locationsProvider);
+    Set<Circle> polygons = {};
+    for (var location in mylocations) {
+      final polygon = Circle(
+        radius: location.radius.toDouble(),
+        circleId: CircleId(location.name),
+        center: LatLng(
+          location.coordinates.latitude,
+          location.coordinates.longitude,
+        ),
+        strokeColor: AppColors.accentColor,
+        fillColor: AppColors.accentColor.withOpacity(0.2),
+        strokeWidth: 2,
+      );
+      polygons.add(polygon);
+    }
+    return polygons;
   }
 
   @override
@@ -77,12 +190,12 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   @override
   Widget build(BuildContext context) {
     if (isInit) {
+      createMyMarkers();
       _getCurrentLocation()
           .then((value) {
             setState(() {
               currentLocation = value;
               isLoading = false;
-              
             });
           })
           .catchError((error) {
@@ -91,33 +204,22 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
               isLoading = false;
             });
           });
-          print('Current location: $currentLocation');
+      print('Current location: $currentLocation');
       isInit = false;
     }
-
-    
 
     return Scaffold(
       appBar: AppBar(title: const Text('Current Location')),
       body:
-          isLoading
+          (isLoading && isLoadingMarkers)
               ? Center(child: CircularProgressIndicator())
               : GoogleMap(
                 initialCameraPosition: CameraPosition(
                   target: Statics.initLocation, // Placeholder position
                   zoom: 2,
                 ),
-                markers: {
-                  Marker(
-                    markerId: const MarkerId('currentLocation'),
-                    position: currentLocation,
-                    infoWindow: InfoWindow(
-                      title: 'Current Location',
-                      snippet:
-                          'Latitude: ${currentLocation.latitude}, Longitude: ${currentLocation.longitude}',
-                    ),
-                  ),
-                },
+                circles: createMyPolygons(),
+                markers: markers,
               ),
     );
   }
