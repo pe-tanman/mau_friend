@@ -41,6 +41,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
 
   @override
   void initState() {
+    loadRegisteredLocations();
       super.initState();
     ref.read(profileProvider.notifier).loadMyProfile();
     
@@ -49,7 +50,6 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     }).catchError((error) {
       print('Error initializing location settings: $error');
     });
-    loadRegisteredLocations();
   
   }
 
@@ -104,6 +104,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     setState(() {
       isLoading = false;
     });
+    print('Registered locations: $registeredLocations');
   }
 
   
@@ -252,13 +253,13 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
             ),
             
             //Tofo:add cute and informative icons
-
             //location list
             SizedBox(height: 20),
 
             if (!isLoading)
               ListView.builder(
                 physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
                 itemBuilder: (context, index) {
                   return _buildListCard(index);
                 },

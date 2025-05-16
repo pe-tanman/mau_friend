@@ -70,6 +70,7 @@ dependencies:
   flutter_svg: ^2.1.0
   sign_in_with_apple: ^7.0.1
   firebase_ui_oauth_apple: ^1.3.1
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
@@ -125,3 +126,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_icons:
+  ios: true
+  image_path: "lib/assets/images/mau_new.png"
+  android: true
+  adaptive_icon_background: "#f3f3e0"
+  adaptive_icon_foreground: "lib/assets/images/mau_char.png"
