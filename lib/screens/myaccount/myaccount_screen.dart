@@ -225,7 +225,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          ref.watch(myStatusIconProvider),
+                          ref.watch(myStatusProvider).icon,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -234,7 +234,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          ref.watch(myStatusTextProvider),
+                          ref.watch(myStatusProvider).status,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
