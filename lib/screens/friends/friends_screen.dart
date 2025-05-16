@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
@@ -29,6 +30,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   List profileList = [Profile];
   String userState = 'offline';
   late StreamSubscription friendsSubscription;
+  late DatabaseReference dbRef;
+  Map statusMap = {};
+  bool isLoading = true;
 
   Future<void> onUpdated(var snapshot) async {
     print('onUpdated');
@@ -57,7 +61,12 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         '$newFriendName is now your friend.',
         newFriendIconLink,
       );
-      ref.read(notificationProvider.notifier).addNotification('$newFriendName is now your friend.', newFriendIconLink);
+      ref
+          .read(notificationProvider.notifier)
+          .addNotification(
+            '$newFriendName is now your friend.',
+            newFriendIconLink,
+          );
       ref.read(notificationProvider.notifier).loadNotification();
     } else if (snapshot.data()!['friendList'].length < localFriendList.length) {
       //update local friend list
@@ -91,8 +100,16 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   void initState() {
     super.initState();
     final myUID = FirebaseAuth.instance.currentUser?.uid;
-    
-
+    dbRef = FirebaseDatabase.instance.ref('users');
+    dbRef.onValue.listen((event) {
+      final map = event.snapshot.value;
+      if (map != null) {
+        statusMap = map as Map;
+        setState(() {
+          isLoading = false;
+        });
+      }
+    });
     friendsSubscription = FirebaseFirestore.instance
         .collection('friendList')
         .doc(myUID)
@@ -141,29 +158,32 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               color: Theme.of(context).primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-
-                Text(
-                  ref.watch(myStatusIconProvider), //mystatus じゃないあ要変更
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Text(
-                  ref.watch(myStatusTextProvider),
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ],
-            ),
+            child:
+                isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          statusMap[friendUID]['icon'] ??
+                              '🔴', //mystatus じゃないあ要変更 TODO:
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          statusMap[friendUID]['status'] ?? 'offline',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
           ),
         ],
       ),
