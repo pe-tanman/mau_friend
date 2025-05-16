@@ -38,13 +38,7 @@ class _SettingScreenState extends State<SettingScreen> {
             );
               },
             ),
-            ListTile(
-              leading: Icon(Icons.lock_outlined),
-              title: Text('Security Settings'),
-              onTap: () {
-                // Navigate to security settings screen
-              },
-            ),
+            
             ListTile(
               title: Text('Current Location'),
               leading: Icon(Icons.location_on_outlined),
