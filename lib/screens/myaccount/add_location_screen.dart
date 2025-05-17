@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:ui' as ui;
 
 import 'package:emoji_selector/emoji_selector.dart';
@@ -16,6 +17,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:math';
 
 class AddLocationScreen extends ConsumerStatefulWidget {
   static const routeName = 'add-location-screen';
@@ -31,11 +33,12 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
   String? address;
   String name = '';
   EmojiData? icon;
-  int radius = 10;
+  int radius = 100;
   bool isInit = true;
   LatLng coordinates = Statics.initLocation;
   Set<Marker> markers = {};
   bool isLoadingMarkers = true;
+  double _sliderValue = log(100);
 
   //Todo: locations are lincked to device. link to user account
   RegisteredLocation? argument;
@@ -284,7 +287,6 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
   }
 ]''';
 
-
   @override
   void dispose() {
     nameController.dispose();
@@ -295,25 +297,33 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
 
   MapLocationPicker _buildMapLocationPicker() {
     return MapLocationPicker(
-      mapStyle: (isDarkMode(context)? darkStyle: null),
+      mapStyle: (isDarkMode(context) ? darkStyle : null),
       apiKey: dotenv.env['Google_Map_API'] ?? '',
+
       backButton: IconButton(
         onPressed: () {
           Navigator.pop(context);
         },
         icon: Icon(Icons.arrow_back),
       ),
+      searchHintText: '',
+
       borderRadius: BorderRadius.all(Radius.circular(500)),
       bottomCardIcon: Icon(Icons.arrow_circle_right_rounded, size: 40),
 
       popOnNextButtonTaped: true,
-      currentLatLng: Statics.initLocation,
+      currentLatLng: coordinates,
       debounceDuration: const Duration(milliseconds: 0),
       onNext: (GeocodingResult? result) {
         if (result != null) {
           setState(() {
+            coordinates = LatLng(
+              result.geometry.location.lat,
+              result.geometry.location.lng,
+            );
+            _moveCameraToPosition(coordinates);
+            createMyMarkers();
             address = result.formattedAddress ?? "";
-            convertAddressToLatLng(address!);
           });
         }
       },
@@ -326,22 +336,10 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
       },
     );
   }
-  Future<void> updateStatus() async{
+
+  Future<void> updateStatus() async {
     final currentPosition = await LocationHelper().getCurrentPosition();
-    ref.read(myStatusProvider.notifier).updateMyStatus(
-     currentPosition
-    );
-  }
-  Future<void> convertAddressToLatLng(String address) async {
-    var locations = await locationFromAddress(address);
-    if (locations.isNotEmpty) {
-      setState(() {
-        coordinates = LatLng(locations[0].latitude, locations[0].longitude);
-        _moveCameraToPosition(coordinates);
-      });
-      createMyMarkers();
-      print('Coordinates: ${coordinates.latitude}, ${coordinates.longitude}');
-    }
+    ref.read(myStatusProvider.notifier).updateMyStatus(currentPosition);
   }
 
   Future<void> convertLatLngToAdress(LatLng coordinates) async {
@@ -469,9 +467,12 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
 
     return BitmapDescriptor.fromBytes(uint8List);
   }
+  double radiusToZoom() {
+    double zoom = 24.593 * pow(radius, -0.085); //this function is just based on instinciton
+    return zoom;
+  }
 
   Future<void> createMyMarkers() async {
-    
     final mylocations = ref.watch(locationsProvider);
     markers = {};
     for (var location in mylocations) {
@@ -544,6 +545,8 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
         convertLatLngToAdress(argument!.coordinates);
         coordinates = argument!.coordinates;
         radius = argument!.radius;
+        _sliderValue = log(radius);
+        print("init e^slider${pow(e, _sliderValue)}");
         name = argument!.name;
         icon = EmojiData(
           id: '',
@@ -648,7 +651,10 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
 
                 SizedBox(height: 20),
 
-                Text('Address', style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  'Address',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 SizedBox(height: 10),
                 Row(
                   children: [
@@ -683,39 +689,45 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                   ],
                 ),
                 SizedBox(height: 30),
-                Text('Radius', style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  'Radius',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 SizedBox(height: 10),
+
+                //to set radius more precisely, we use radius = exp(_sliderValue)
                 SizedBox(
                   width: 100,
                   child: Slider(
                     inactiveColor: AppColors.backgroundColor,
-                    value: radius.toDouble(),
-                    min: 1,
-                    max: 2000,
+                    value: _sliderValue,
+                    min: log(5),
+                    max: log(2000),
                     divisions: 1999,
                     label: '$radius m',
                     onChanged: (value) {
                       createMyMarkers();
                       setState(() {
-                        radius = value.toInt();
+                        print("result e^slider${pow(e, _sliderValue)}");
+                        _sliderValue = value;
+                        radius = pow(e, value).round();
                       });
                     },
                   ),
                 ),
                 SizedBox(height: 30),
-
                 SizedBox(
                   height: 300,
                   child:
                       isLoadingMarkers
                           ? Center(child: CircularProgressIndicator())
                           : GoogleMap(
-                            style: isDarkMode(context)? darkStyle: null,
+                            style: isDarkMode(context) ? darkStyle : null,
                             onMapCreated:
                                 (controller) => mapController = controller,
                             initialCameraPosition: CameraPosition(
                               target: coordinates,
-                              zoom: 16,
+                              zoom: isInit ? 8 : radiusToZoom(),
                             ),
                             markers: markers,
                             circles: createMyPolygons(),
