@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
 import 'package:mau_friend/screens/myaccount/profile_setting_screen.dart';
 import 'package:mau_friend/themes/app_color.dart';
+import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
@@ -126,7 +127,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   Widget buildFriendCard(String friendUID) {
     final profile = ref.watch(friendProfilesProvider)[friendUID];
     return Card(
-      color: AppColors.backgroundColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
       elevation: 3.0,
       child: Column(
@@ -170,17 +170,12 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
                           ),
                         ),
                         SizedBox(width: 10),
                         Text(
                           statusMap[friendUID]['status'] ?? 'offline',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium,
                         ),
                       ],
                     ),

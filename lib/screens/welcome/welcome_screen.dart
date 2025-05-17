@@ -53,6 +53,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       body: Column(
         children: [
           Expanded(
@@ -163,9 +164,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             height: 400,
             ),
           SizedBox(height: 10),
-          Text('To use main features, you need to allow location access.'),
+          Text('To use main features, you need to allow location access.', style:TextStyle(color:AppColors.darkText1)),
           SizedBox(height: 20),
-          primaryButton('Allow Permission', () {
+          OutlinedButton(child: Text('Allow Permission', style: appTheme().textTheme.labelLarge), onPressed: (){
             LocationHelper().initLocationSetting();
           }),
         ],
@@ -181,11 +182,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SvgPicture.asset('lib/assets/images/Group 9.svg'),
-          SizedBox(height: 200),
-          primaryButton('Get Started', () {
+          SizedBox(height: 300),
+          ElevatedButton(style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.themeColor)), onPressed: () {
             // Navigate to the login screen
             Navigator.pushNamed(context, AuthGate.routeName);
-          }),
+          }, child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Text('Get Started', style: TextStyle(fontSize:20, fontWeight: FontWeight.bold, color: AppColors.lightText1),),
+          )),
           //add login button
         ],
       ),

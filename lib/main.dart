@@ -39,6 +39,7 @@ class MyApp extends ConsumerStatefulWidget {
 
 class _MyAppState extends ConsumerState<MyApp> {
   bool isLoggedIn = false;
+  ThemeMode mode = ThemeMode.system; // Define the mode variable
 
   @override
   void initState() {
@@ -60,6 +61,8 @@ class _MyAppState extends ConsumerState<MyApp> {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: appTheme(),
+      darkTheme: darkTheme(),
+      themeMode: mode, 
       routes: {
         WelcomeScreen.routeName: (context) => WelcomeScreen(),
         HomeScreen.routeName: (context) => HomeScreen(),

@@ -60,7 +60,7 @@ bool isLoading = true;
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             SizedBox(height: 60),
-            primaryButton('Add', (){
+            ElevatedButton(child:Text('Add'), onPressed: (){
               // Add friend logic here
               FirestoreHelper().addFriendList(profile['userUID']);
               Navigator.of(context).pop();

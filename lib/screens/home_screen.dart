@@ -26,6 +26,7 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Theme.of(context).colorScheme.primary,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Friends'),
           BottomNavigationBarItem(
@@ -41,3 +42,4 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+ 

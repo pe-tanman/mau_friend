@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
+import 'package:mau_friend/themes/app_color.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
@@ -58,13 +59,18 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         const SizedBox(height: 70),
-        SizedBox(
-          width: 300,
-          height: 300,
-          child: PrettyQrView.data(
-            data: getMyQRData(myUID),
-            decoration: const PrettyQrDecoration(
-              shape: PrettyQrSmoothSymbol(roundFactor: 0),
+        Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(30)), color: AppColors.backgroundColor),
+          width: 350,
+          height: 350,
+          child: Padding(
+            padding: const EdgeInsets.all(25.0),
+            child: PrettyQrView.data(
+              data: getMyQRData(myUID),
+              decoration: const PrettyQrDecoration(
+            
+                shape: PrettyQrSmoothSymbol(roundFactor: 0, color: AppColors.themeColor),
+              ),
             ),
           ),
         ),

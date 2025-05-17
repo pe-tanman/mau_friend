@@ -107,6 +107,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
 
   Widget _buildListCard(int index) {
     return Card(
+      color: Theme.of(context).colorScheme.surface,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 5,
@@ -174,7 +175,6 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
           children: [
             SizedBox(height: 20),
             Card(
-              color: AppColors.backgroundColor,
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
@@ -235,11 +235,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                         SizedBox(width: 10),
                         Text(
                           ref.watch(myStatusProvider).status,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium,
                         ),
                       ],
                     ),

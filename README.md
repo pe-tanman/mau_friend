@@ -39,7 +39,7 @@ Mau Friend is a Flutter application designed to share what you're doing based on
 - firebase_options.dart (Firebase configuration)
 - credential.env (API-related)
 
-Build-related files are mostly default files of flutter. I can share you several configuration files if you contact us.
+Build-related files are mostly default files of flutter. We can share several configuration files with you if you contact us.
 
 ## Tested Devices
 - iPhone 16 (emulator)
@@ -53,6 +53,8 @@ Contributions are welcome! Please follow these steps:
 2. Create a new branch for your feature or bug fix.
 3. Commit your changes and push them to your fork.
 4. Submit a pull request.
+
+`Make sure you fix bug and submit a pull request, add issue to the repository!`
 
 ## Shipping the app
 This app will be available in Appstore and Google Play. Please tell us any bugs or errors and your device info.
