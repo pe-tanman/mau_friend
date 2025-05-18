@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -58,11 +60,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         children: [
           Expanded(
             child: PageView(
-              onPageChanged: (index){
-                if(index == 2){
-                  LocationHelper().initLocationSetting();
-                }
-              },
+              physics: NeverScrollableScrollPhysics(),
               controller: _pageController,
               children: [
                 _buildAboutTab(),
@@ -99,6 +97,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           SvgPicture.asset('lib/assets/images/Group 11.svg'),
           SizedBox(height: 50),
           Text('Welcome to mau', style: appTheme().textTheme.titleMedium),
+          SizedBox(height: 30),
+          primaryButton('Continue', () {
+            _pageController.nextPage(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          }),
         ],
       ),
     );
@@ -135,22 +140,35 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   //     MaterialStateProperty.all(Size.zero),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: Text(
-                  'our Privacy Policy',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.linkTextColor,
-                    decoration: TextDecoration.underline,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.open_in_new, color: AppColors.linkTextColor),
+                    Text(
+                      'our Privacy Policy',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.linkTextColor,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
           ),
+          SizedBox(height: 30,),
+          primaryButton('Accept and Continue', () {
+            _pageController.nextPage(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          }),
         ],
       ),
     );
   }
- 
+
   Widget _buildPermissionTab() {
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -159,21 +177,34 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         children: [
           SizedBox(height: 100),
           Text('Precise Location', style: appTheme().textTheme.titleMedium),
-            SvgPicture.asset(
-            'lib/assets/images/Map.svg',
-            height: 400,
-            ),
+          SvgPicture.asset('lib/assets/images/Map.svg', height: 400),
           SizedBox(height: 10),
-          Text('To use main features, you need to allow location access.', style:TextStyle(color:AppColors.darkText1)),
+          Text(
+            "Your Location is used to determine your status.",
+            style: TextStyle(color: AppColors.darkText1),
+          ),
           SizedBox(height: 20),
-          OutlinedButton(child: Text('Allow Permission', style: appTheme().textTheme.labelLarge), onPressed: (){
-            LocationHelper().initLocationSetting();
+          OutlinedButton(
+            child: Text(
+              'Allow Permission',
+              style: appTheme().textTheme.labelLarge,
+            ),
+            onPressed: () {
+              LocationHelper().initLocationSetting();
+            },
+          ),
+          primaryButton('Continue', () {
+            LocationHelper().initLocationSetting().then((_) {
+              _pageController.nextPage(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            });
           }),
         ],
       ),
     );
   }
-
   Widget _buildLoginTab() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -183,16 +214,32 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         children: [
           SvgPicture.asset('lib/assets/images/Group 9.svg'),
           SizedBox(height: 300),
-          ElevatedButton(style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.themeColor)), onPressed: () {
-            // Navigate to the login screen
+          primaryButton('Get Started', (){
             Navigator.pushNamed(context, AuthGate.routeName);
-          }, child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Text('Get Started', style: TextStyle(fontSize:20, fontWeight: FontWeight.bold, color: AppColors.lightText1),),
-          )),
+          })
           //add login button
         ],
       ),
     );
   }
+}
+
+Widget primaryButton(String text, VoidCallback onPressed) {
+  return ElevatedButton(
+    style: ButtonStyle(
+      backgroundColor: MaterialStateProperty.all(AppColors.themeColor),
+    ),
+    onPressed: onPressed,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: AppColors.lightText1,
+        ),
+      ),
+    ),
+  );
 }
