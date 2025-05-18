@@ -12,7 +12,7 @@ import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mau_friend/screens/myaccount/profile_setting_screen.dart';
+import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mau_friend/utilities/location_helper.dart';
 import 'dart:async';

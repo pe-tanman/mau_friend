@@ -8,7 +8,7 @@ import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/screens/settings/current_location_screen.dart';
 import 'package:mau_friend/screens/friends/edit_friend_list_screen.dart';
 import 'package:mau_friend/screens/friends/friend_profile_screen.dart';
-import 'package:mau_friend/screens/myaccount/profile_setting_screen.dart';
+import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
 import 'package:mau_friend/screens/settings/setting_screen.dart';
 import 'package:mau_friend/screens/welcome/welcome_screen.dart';
 import 'firebase_options.dart';

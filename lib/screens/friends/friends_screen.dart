@@ -10,7 +10,7 @@ import 'package:mau_friend/screens/friends/edit_friend_list_screen.dart';
 import 'package:mau_friend/screens/friends/notification_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
-import 'package:mau_friend/screens/myaccount/profile_setting_screen.dart';
+import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/utilities/database_helper.dart';

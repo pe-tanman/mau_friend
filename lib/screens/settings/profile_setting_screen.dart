@@ -54,11 +54,10 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     String iconLink = '';
 
     if (iconImage != null) {
-       iconLink = await StorageHelper().uploadFile(
-        uploadPath,
-        iconImage!,
-      );
-    }// TODO: icon を変更しなかった時にリセットされる
+      iconLink = await StorageHelper().uploadFile(uploadPath, iconImage!);
+    } else {
+      iconLink = _selectedIcon ?? '';
+    }
     //save to firestore
     await FirestoreHelper().addUserProfile(userUID, username, bio, iconLink);
     ref.read(profileProvider.notifier).loadMyProfile();
@@ -173,12 +172,15 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                   height: 100,
                   width: 100,
                   child: ClipOval(
-                    child: (iconImage != null)?Image.file(
-                      iconImage!,
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ) : null,
+                    child:
+                        (iconImage != null)
+                            ? Image.file(
+                              iconImage!,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            )
+                            : null,
                   ),
                 ),
               ],
