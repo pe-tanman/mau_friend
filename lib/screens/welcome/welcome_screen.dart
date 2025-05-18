@@ -91,13 +91,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
+        
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: 30),
-          SvgPicture.asset('lib/assets/images/Group 11.svg'),
-          SizedBox(height: 50),
-          Text('Welcome to mau', style: appTheme().textTheme.titleMedium),
-          SizedBox(height: 30),
+          SvgPicture.asset('lib/assets/images/Group 11.svg'),  
+          Text('Welcome to mau', style: appTheme().textTheme.titleMedium),        
+          SizedBox(height: 40),
           primaryButton('Continue', () {
             _pageController.nextPage(
               duration: Duration(milliseconds: 300),
@@ -115,15 +114,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: 100),
+          SizedBox(height: 80),
           Text('Privacy and Peace', style: appTheme().textTheme.titleMedium),
-          SizedBox(height: 50),
+          SizedBox(height: 30),
           SvgPicture.asset('lib/assets/images/Group 10.svg'),
-          SizedBox(height: 70),
-          Text(
-            'For more info about privacy,',
-            style: appTheme().textTheme.bodyLarge,
-          ),
+          SizedBox(height: 50),
           Link(
             // 開きたいWebページのURLを指定
             uri: Uri.parse(
@@ -145,7 +140,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   children: [
                     Icon(Icons.open_in_new, color: AppColors.linkTextColor),
                     Text(
-                      'our Privacy Policy',
+                      'Our Privacy Policy',
                       style: TextStyle(
                         fontSize: 16,
                         color: AppColors.linkTextColor,
@@ -183,16 +178,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             "Your Location is used to determine your status.",
             style: TextStyle(color: AppColors.darkText1),
           ),
-          SizedBox(height: 20),
-          OutlinedButton(
-            child: Text(
-              'Allow Permission',
-              style: appTheme().textTheme.labelLarge,
-            ),
-            onPressed: () {
-              LocationHelper().initLocationSetting();
-            },
-          ),
+          SizedBox(height: 40),
           primaryButton('Continue', () {
             LocationHelper().initLocationSetting().then((_) {
               _pageController.nextPage(
@@ -231,7 +217,7 @@ Widget primaryButton(String text, VoidCallback onPressed) {
     ),
     onPressed: onPressed,
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
       child: Text(
         text,
         style: TextStyle(

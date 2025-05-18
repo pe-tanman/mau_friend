@@ -26,7 +26,7 @@ class AuthGate extends ConsumerWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return SignInScreen(
+          return  SignInScreen(
             providers: [
               GoogleProvider(clientId: clientId),
               AppleProvider(),

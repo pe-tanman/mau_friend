@@ -4,7 +4,6 @@ import 'package:map_location_picker/map_location_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 
-
 class UserStatus {
   String status;
   String icon;
@@ -24,12 +23,17 @@ class LocationHelper {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission = await Geolocator.checkPermission();
     if (!serviceEnabled) {
-      throw Exception('Location services are disabled.');
+      return Future.error(
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
     if (permission == LocationPermission.denied) {
+      print('asking permission');
       permission = await Geolocator.requestPermission();
       if (permission != LocationPermission.denied) {
-        throw Exception('Location permissions are denied.');
+        return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.',
+        );
       }
     }
     if (permission == LocationPermission.deniedForever) {

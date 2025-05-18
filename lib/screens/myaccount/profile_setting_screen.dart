@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mau_friend/providers/friend_list_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
+import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
@@ -20,7 +22,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   String? _selectedIcon;
-  late File iconImage;
+  File? iconImage;
   bool setImage = false;
   bool isLoading = false;
   @override
@@ -40,7 +42,6 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
   }
 
   Future<void> _saveProfileSettings() async {
-    
     setState(() {
       isLoading = true;
     });
@@ -50,9 +51,14 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
 
     //upload icon image
     String uploadPath = 'users/$userUID/icon.png';
+    String iconLink = '';
 
-    String iconLink = await StorageHelper().uploadFile(uploadPath, iconImage);
-
+    if (iconImage != null) {
+       iconLink = await StorageHelper().uploadFile(
+        uploadPath,
+        iconImage!,
+      );
+    }// TODO: icon を変更しなかった時にリセットされる
     //save to firestore
     await FirestoreHelper().addUserProfile(userUID, username, bio, iconLink);
     ref.read(profileProvider.notifier).loadMyProfile();
@@ -76,12 +82,14 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
       var targetSize = 300000; //300KB
       if (originalSize > targetSize) {
         var quality = ((targetSize / originalSize) * 100).toInt();
-        List<int> compressedImage = (await FlutterImageCompress.compressWithFile(
-          path,
-          minWidth: 500,
-          minHeight: 500,
-          quality: quality,
-        )) as List<int>;
+        List<int> compressedImage =
+            (await FlutterImageCompress.compressWithFile(
+                  path,
+                  minWidth: 500,
+                  minHeight: 500,
+                  quality: quality,
+                ))
+                as List<int>;
         iconImage = File(path)..writeAsBytesSync(compressedImage);
         Directory appDocDir = await getApplicationDocumentsDirectory();
         String compressedPath = '${appDocDir.path}/compressed_icon.png';
@@ -95,20 +103,38 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
       });
     }
   }
+
+  Future<void> deleteAccount() async {
+    final userUID = FirebaseAuth.instance.currentUser!.uid;
+    final friendList = ref.read(friendListProvider);
+    for (var uid in friendList) {
+      FirestoreHelper().removeFriend(uid);
+    }
+    FirestoreHelper().deleteUserProfile(userUID);
+    RealtimeDatabaseHelper().deleteStatus();
+    FirestoreHelper().deleteFriendList();
+
+    await FirebaseAuth.instance.currentUser!.delete();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile Settings'),
         actions: [
-          ElevatedButton(onPressed: _saveProfileSettings, child: isLoading? CircularProgressIndicator() :Text('Save')),
+          ElevatedButton(
+            onPressed: _saveProfileSettings,
+            child: isLoading ? CircularProgressIndicator() : Text('Save'),
+          ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               SizedBox(height: 20),
               TextField(
                 controller: _usernameController,
@@ -127,20 +153,19 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                     icon: Icon(Icons.add_a_photo_outlined),
                     label: Text('Choose Image'),
                   ),
-                  
                 ],
               ),
 
               if (_selectedIcon != null && !setImage) ...[
-              SizedBox(width: 10),
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: NetworkImage(
-                  _selectedIcon ??
-                      Statics.defaultIconLink, // default icon link
-                ),
-              ), // a
-            ],
+                SizedBox(width: 10),
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: NetworkImage(
+                    _selectedIcon ??
+                        Statics.defaultIconLink, // default icon link
+                  ),
+                ), // a
+              ],
               if (setImage) ...[
                 SizedBox(width: 30),
 
@@ -148,12 +173,12 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                   height: 100,
                   width: 100,
                   child: ClipOval(
-                    child: Image.file(
-                      iconImage,
+                    child: (iconImage != null)?Image.file(
+                      iconImage!,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,
-                    ),
+                    ) : null,
                   ),
                 ),
               ],
@@ -169,39 +194,46 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
               SizedBox(height: 30),
               Center(
                 child: TextButton(
-                  onPressed: (){
-                    showDialog(context: context, builder: (context) {
-                      return AlertDialog(
-                        title: Text('Delete Account'),
-                        content: Text('All data including your profile, friends, and locations might be deleted.', style: TextStyle(fontWeight: FontWeight.bold),),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Cancel'),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text('Delete Account'),
+                          content: Text(
+                            'All data including your profile, friends, and locations will be deleted.',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          TextButton(
-                            onPressed: () async {
-                              final userCredential = await FirebaseAuth.instance
-                                  .currentUser!.delete();
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Delete', style: TextStyle(color: Colors.red),
-                          ),)
-                        ],
-                      );
-                    });
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                deleteAccount();
+                                Navigator.of(
+                                  context,
+                                ).pushNamed(AuthGate.routeName);
+                              },
+                              child: Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   child: Text('Delete Account'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
                 ),
               ),
-            
-          ],
+            ],
+          ),
         ),
       ),
     );

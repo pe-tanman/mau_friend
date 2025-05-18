@@ -38,9 +38,9 @@ class FirestoreHelper {
 
   Future<void> addUserProfile(
     String userUID,
-    String username,
-    String bio,
-    String iconLink,
+    String? username,
+    String? bio,
+    String? iconLink,
   ) async {
     try {
       var data = {
@@ -54,6 +54,10 @@ class FirestoreHelper {
       print('Error adding user profile: $e');
       rethrow;
     }
+  }
+
+  Future<void> deleteUserProfile(String userUID) async {
+    await _firestore.collection('userProfiles').doc(userUID).delete;
   }
 
   Future<void> updatePassword(String userUID, String password) async {
@@ -114,6 +118,11 @@ class FirestoreHelper {
     }
   }
 
+  Future<void> deleteFriendList() async {
+    var myUID = FirebaseAuth.instance.currentUser!.uid;
+    await _firestore.collection('friendList').doc(myUID).delete();
+  }
+
   Future<void> removeFriend(String friendUID) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     try {
@@ -135,21 +144,21 @@ class FirestoreHelper {
       final friendDoc =
           await _firestore.collection('friendList').doc(myUID).get();
       var data = friendDoc.data();
-      // Do something with the friend's data
       var result = data!['profiles'];
-      return result;  
+      return result;
     } catch (e) {
       print('Error loading friend profiles: $e');
       rethrow;
     }
   }
+
   Future<void> removeFriendProfile(String friendUID) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     try {
       await _firestore.collection('friendList').doc(myUID).update({
         'profiles': {friendUID: FieldValue.delete()},
       });
-       await _firestore.collection('friendList').doc(friendUID).update({
+      await _firestore.collection('friendList').doc(friendUID).update({
         'profiles': {myUID: FieldValue.delete()},
       });
     } catch (e) {
@@ -195,6 +204,10 @@ class RealtimeDatabaseHelper {
       'icon': status.icon,
       'status': status.status,
     });
-    
+  }
+
+  Future<void> deleteStatus() async {
+    var userUID = FirebaseAuth.instance.currentUser!.uid;
+    await database.ref('users/$userUID').remove();
   }
 }
