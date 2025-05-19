@@ -16,7 +16,8 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
   @override
   List<RegisteredLocation> build() => [];
 
-  //keep user's basic profile
+
+  //riverpod
   Future<void> updateLocations(
     List<RegisteredLocation> locations,
   ) async {

@@ -4,7 +4,6 @@ import 'dart:ui' as ui;
 import 'package:emoji_selector/emoji_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
-import 'package:mau_friend/utilities/location_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/themes/app_color.dart';
@@ -338,8 +337,9 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
   }
 
   Future<void> updateStatus() async {
-    final currentPosition = await LocationHelper().getCurrentPosition();
-    ref.read(myStatusProvider.notifier).updateMyStatus(currentPosition);
+    final currentPosition = await MyStatusProvider().getCurrentPosition();
+    final myLocations = ref.read(locationsProvider);
+    ref.read(myStatusProvider.notifier).updateMyStatus(currentPosition, myLocations);
   }
 
   Future<void> convertLatLngToAdress(LatLng coordinates) async {
@@ -467,8 +467,11 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
 
     return BitmapDescriptor.fromBytes(uint8List);
   }
+
   double radiusToZoom() {
-    double zoom = 24.593 * pow(radius, -0.085); //this function is just based on instinciton
+    double zoom =
+        24.593 *
+        pow(radius, -0.085); //this function is just based on instinciton
     return zoom;
   }
 

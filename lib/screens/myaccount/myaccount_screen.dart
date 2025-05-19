@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart' as loc;
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/settings/setting_screen.dart';
@@ -14,7 +14,7 @@ import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:mau_friend/utilities/location_helper.dart';
+
 import 'dart:async';
 import 'package:mau_friend/providers/locations_provider.dart';
 
@@ -31,7 +31,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   String autocompletePlace = "";
   LatLng coordinates = Statics.initLocation;
   bool isLoading = true;
-
+  bool isInit = true;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -41,17 +41,6 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   void initState() {
     loadRegisteredLocations();
     super.initState();
-    ref.read(profileProvider.notifier).loadMyProfile();
-
-
-    LocationHelper()
-        .initLocationSetting()
-        .then((_) {
-          LocationHelper().trackLocation(ref);
-        })
-        .catchError((error) {
-          print('Error initializing location settings: $error');
-        });
   }
 
   Future<String> convertLatLngToAdress(LatLng coordinates) async {
@@ -157,7 +146,33 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+   
     final profile = ref.watch(profileProvider);
+    if (isInit) {
+       isInit = false;
+      ref.read(profileProvider.notifier).loadMyProfile();
+      final myLocations = ref.watch(locationsProvider);
+      final statusNotifier = ref.read(myStatusProvider.notifier);
+
+     statusNotifier
+          .initLocationSetting()
+          .then((_) {
+            loc.Location location = new loc.Location();
+            location.onLocationChanged.listen((
+              loc.LocationData currentLocation,
+            ) {
+              print(
+                'latitude ${currentLocation.latitude}, longtitude ${currentLocation.longitude}',
+              );
+              print('speed${currentLocation.speed}');
+             statusNotifier
+                  .updateMyStatus(currentLocation, myLocations);
+            });
+          })
+          .catchError((error) {
+            print('Error initializing location settings: $error');
+          });
+    }
 
     return Scaffold(
       appBar: AppBar(
