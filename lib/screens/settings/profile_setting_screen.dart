@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
+import 'package:mau_friend/screens/welcome/welcome_screen.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
@@ -11,6 +13,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:mau_friend/utilities/statics.dart';
 
 import 'dart:io';
+
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class ProfileSettingScreen extends ConsumerStatefulWidget {
   static const routeName = '/profile-setting';
@@ -25,6 +29,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
   File? iconImage;
   bool setImage = false;
   bool isLoading = false;
+  bool isDeleteLoading = false;
   @override
   void dispose() {
     _usernameController.dispose();
@@ -113,7 +118,48 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     RealtimeDatabaseHelper().deleteStatus();
     FirestoreHelper().deleteFriendList();
 
-    await FirebaseAuth.instance.currentUser!.delete();
+    User? user = FirebaseAuth.instance.currentUser;
+    var credential;
+    if (user != null) {
+      for (final providerProfile in user.providerData) {
+        switch (providerProfile.providerId) {
+          case 'google.com':
+            final googleUser = await GoogleSignIn().signIn();
+            final googleAuth = await googleUser!.authentication;
+            credential = GoogleAuthProvider.credential(
+              accessToken: googleAuth.accessToken,
+              idToken: googleAuth.idToken,
+            );
+            break;
+          case 'password':
+            credential = EmailAuthProvider.credential(
+              email: user.email!,
+              password:
+                  'user-password-here', // Prompt the user for their password
+            );
+            break;
+          case 'apple.com':
+            final appleCredential = await SignInWithApple.getAppleIDCredential(
+              scopes: [
+                AppleIDAuthorizationScopes.email,
+                AppleIDAuthorizationScopes.fullName,
+              ],
+            );
+            credential = OAuthProvider(
+              "apple.com",
+            ).credential(idToken: appleCredential.identityToken);
+            break;
+        }
+      }
+    }
+    if (credential != null) {
+      await user!.reauthenticateWithCredential(credential);
+    }
+    setState(() {
+      isDeleteLoading = true;
+    });
+    await user!.delete();
+    isDeleteLoading = false;
   }
 
   @override
@@ -202,9 +248,17 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                       builder: (context) {
                         return AlertDialog(
                           title: Text('Delete Account'),
-                          content: Text(
-                            'All data including your profile, friends, and locations will be deleted.',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          content: (isDeleteLoading)?Center(child: CircularProgressIndicator(),):Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'All data including your profile, friends, and locations will be deleted.',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 10),
+                              Text('You may be required to sign-in again.'),
+                            ],
                           ),
                           actions: [
                             TextButton(
@@ -215,7 +269,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                             ),
                             TextButton(
                               onPressed: () async {
-                                deleteAccount();
+                                await deleteAccount();
                                 Navigator.of(
                                   context,
                                 ).pushNamed(AuthGate.routeName);

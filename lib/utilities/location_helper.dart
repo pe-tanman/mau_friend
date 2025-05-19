@@ -1,4 +1,5 @@
-import 'package:geolocator/geolocator.dart';
+
+import 'package:geolocator/geolocator.dart' ;
 import 'dart:async';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ class UserStatus {
   UserStatus(this.icon, this.status);
 }
 
+
 class LocationHelper {
   late StreamSubscription<Position> positionStream;
 
@@ -17,6 +19,7 @@ class LocationHelper {
     accuracy: LocationAccuracy.high,
     distanceFilter: 1,
   );
+ 
 
   //this is temporary; in the future, we will use the background locaition
   Future<void> initLocationSetting() async {
@@ -48,11 +51,13 @@ class LocationHelper {
     return currentPosition;
   }
 
+  bool _isDisposed = false;
+
   Future<void> trackLocation(WidgetRef ref) async {
     positionStream = Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen((Position? position) {
-      if (position == null) {
+      if (_isDisposed || position == null) {
         return;
       }
       ref.read(myStatusProvider.notifier).updateMyStatus(position);
@@ -60,6 +65,7 @@ class LocationHelper {
   }
 
   void dispose() {
+    _isDisposed = true;
     positionStream.cancel();
   }
 }

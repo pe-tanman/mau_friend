@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
@@ -32,6 +32,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   LatLng coordinates = Statics.initLocation;
   bool isLoading = true;
 
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -41,6 +42,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     loadRegisteredLocations();
     super.initState();
     ref.read(profileProvider.notifier).loadMyProfile();
+
 
     LocationHelper()
         .initLocationSetting()

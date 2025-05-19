@@ -50,3 +50,31 @@ def onUserProfileChanged(event: firestore_fn.Event[firestore_fn.DocumentSnapshot
             }])
         }, merge=True)
 
+@firestore_fn.on_document_deleted(
+    document="friendList/{uid}",
+)
+def onUserProfileDeleted(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None]) -> None:
+    print("onUserProfileDeleted")
+    firestore_client = firestore.client()
+
+    if event.data is None:
+        return
+    try:
+        
+        userUID = event.params['uid']
+        print("deleted", userUID)
+        
+    except KeyError:
+        return
+
+    friend_list_dict = event.data.before.to_dict()
+
+    if friend_list_dict.exists:
+        friend_list_data = friend_list_dict.get("friendList", [])
+    else:
+        friend_list_data = []
+
+    for friend_uid in friend_list_data:
+        firestore_client.collection("friendList").document(friend_uid).update({
+            "profiles": firestore.ArrayRemove([{userUID: firestore.DELETE_FIELD}])
+        })
