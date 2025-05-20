@@ -113,12 +113,22 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 80),
           Text('Privacy and Peace', style: appTheme().textTheme.titleMedium),
-          SizedBox(height: 30),
-          SvgPicture.asset('lib/assets/images/Group 10.svg'),
-          SizedBox(height: 50),
+          SizedBox(height: 100),
+          Text('Your location, friends, and places are stored only on your device— never shared, not even with us.', style: TextStyle(color: AppColors.themeColor, fontSize: 16,),),
+            SizedBox(height: 10),
+            Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              'ー Our Promise to You',
+              style: TextStyle(
+                fontSize: 20,
+                color: AppColors.themeColor,
+            ),
+            ),),
+          SizedBox(height: 100),
           Link(
             // 開きたいWebページのURLを指定
             uri: Uri.parse(
@@ -170,15 +180,33 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: 100),
+          SizedBox(height: 70),
           Text('Location Access', style: appTheme().textTheme.titleMedium),
-          SvgPicture.asset('lib/assets/images/Map.svg', height: 400),
-          SizedBox(height: 10),
+          SvgPicture.asset('lib/assets/images/Map.svg', height: 300),
           Text(
-            "Your Location is used to determine your status.",
+            "To successfully share your status with your friends:",
             style: TextStyle(color: AppColors.darkText1),
           ),
-          SizedBox(height: 40),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   Text(
+                    "✅ Precise location",
+                    style: appTheme().textTheme.headlineSmall,
+                  ),
+                  Text(
+                    "✅ Always allowed",
+                    style: appTheme().textTheme.headlineSmall,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 60),
           primaryButton('Continue', () {
             MyStatusProvider().initLocationSetting().then((_) {
               _pageController.nextPage(

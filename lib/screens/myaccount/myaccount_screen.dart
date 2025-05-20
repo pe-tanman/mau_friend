@@ -151,11 +151,21 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     if (isInit) {
        isInit = false;
       ref.read(profileProvider.notifier).loadMyProfile();
+      ref.read(locationsProvider.notifier).loadLocations();
       final statusNotifier = ref.read(myStatusProvider.notifier);
-      statusNotifier.startTrackingLocation();
+      statusNotifier.initLocationSetting();
+    
+      statusNotifier.getCurrentPosition().then((position) {
+        statusNotifier.updateMyStatus(
+          position,
+          registeredLocations
+        );
+      });
       
-    }
+      statusNotifier.startTrackingLocation();
+      MyLocationDatabaseHelper().initMyLocationDatabase();
 
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('My Account'),

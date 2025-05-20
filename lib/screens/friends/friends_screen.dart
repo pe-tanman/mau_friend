@@ -100,15 +100,18 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   @override
   void initState() {
     super.initState();
+    NotificationDatabaseHelper().initNotificationDatabase();
     final myUID = FirebaseAuth.instance.currentUser?.uid;
     dbRef = FirebaseDatabase.instance.ref('users');
     dbRef.onValue.listen((event) {
       final map = event.snapshot.value;
       if (map != null) {
         statusMap = map as Map;
-        setState(() {
-          isLoading = false;
-        });
+        if(isLoading){
+          setState(() {
+            isLoading = false;
+          });
+        }
       }
     });
     friendsSubscription = FirebaseFirestore.instance

@@ -67,7 +67,7 @@ ThemeData darkTheme() => ThemeData(
       fontSize: 32,
       fontWeight: FontWeight.bold,
     ),
-    headlineMedium: TextStyle(fontSize: 24),
+    headlineMedium: TextStyle(fontSize: 24, ),
     headlineSmall: TextStyle(fontSize: 20),
     bodyLarge: TextStyle(fontSize: 16),
     labelMedium: TextStyle(color: AppColors.darkThemeColor, fontSize: 20, fontWeight: FontWeight.bold),

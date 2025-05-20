@@ -16,14 +16,12 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
   @override
   List<RegisteredLocation> build() => [];
 
-
   //riverpod
-  Future<void> updateLocations(
-    List<RegisteredLocation> locations,
-  ) async {
+  Future<void> updateLocations(List<RegisteredLocation> locations) async {
     //save to riverpod
     state = locations;
   }
+
   Future<void> loadLocations() async {
     MyLocationDatabaseHelper dbHelper = MyLocationDatabaseHelper();
 
@@ -31,14 +29,11 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
     var output = <RegisteredLocation>[];
     if (result.isNotEmpty) {
       result.forEach((element) {
-        var coordinates = LatLng(
-          element['latitude'],
-          element['longitude'],
-        );
+        var coordinates = LatLng(element['latitude'], element['longitude']);
         var name = element['name'];
         var icon = element['icon'];
         var radius = element['radius'];
-    
+
         output.add(RegisteredLocation(name, icon, coordinates, radius));
       });
       state = output;
@@ -46,9 +41,9 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
       state = [];
     }
   }
-
 }
 
-final locationsProvider = NotifierProvider<LocationsProvider, List<RegisteredLocation>>(
-  LocationsProvider.new,
-);
+final locationsProvider =
+    NotifierProvider<LocationsProvider, List<RegisteredLocation>>(
+      LocationsProvider.new,
+    );

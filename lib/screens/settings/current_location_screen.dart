@@ -25,19 +25,19 @@ class _CurrentLocationScreenState extends ConsumerState<CurrentLocationScreen> {
   bool isLoading = true;
   bool isInit = true;
   LatLng currentLocation = Statics.initLocation;
+  double speed = 0.0;
   final LocationSettings locationSettings = const LocationSettings(
     accuracy: LocationAccuracy.high,
     distanceFilter: 1,
   );
 
-
   late StreamSubscription<Position> positionStream;
   Set<Marker> markers = {};
   bool isLoadingMarkers = true;
 
-bool isDarkMode(BuildContext context) {
-  return MediaQuery.of(context).platformBrightness == Brightness.dark;
-}
+  bool isDarkMode(BuildContext context) {
+    return MediaQuery.of(context).platformBrightness == Brightness.dark;
+  }
 
   final darkStyle = '''
 [
@@ -274,28 +274,13 @@ bool isDarkMode(BuildContext context) {
   }
 ]''';
 
-  Future<LatLng> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (!serviceEnabled) {
-      throw Exception('Location services are disabled.');
-    }
-    if (permission == LocationPermission.denied) {
-      print('asking permission');
-      permission = await Geolocator.requestPermission();
-      print('asked permission');
-      if (permission != LocationPermission.denied) {
-        throw Exception('Location permissions are denied.');
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.',
-      );
-    }
-
+  Future<void> _getCurrentLocation() async {
     final currentPosition = await Geolocator.getCurrentPosition();
-    return LatLng(currentPosition.latitude, currentPosition.longitude);
+    currentLocation = LatLng(
+      currentPosition.latitude,
+      currentPosition.longitude,
+    );
+    speed = currentPosition.speed;
   }
 
   @override
@@ -308,6 +293,7 @@ bool isDarkMode(BuildContext context) {
       }
       setState(() {
         currentLocation = LatLng(position.latitude, position.longitude);
+        speed = position.speed;
       });
     });
     super.initState();
@@ -330,29 +316,23 @@ bool isDarkMode(BuildContext context) {
 
     // Add padding and calculate size
     const double padding = 20.0;
-    final double size = (textPainter.width > textPainter.height
+    final double size =
+        (textPainter.width > textPainter.height
             ? textPainter.width
             : textPainter.height) +
         padding * 2;
 
     // Add a white circle background
     final paint = Paint()..color = Colors.white;
-    canvas.drawCircle(
-      Offset(size / 2, size / 2),
-      size / 2,
-      paint,
-    );
+    canvas.drawCircle(Offset(size / 2, size / 2), size / 2, paint);
 
     // Add an outline around the circle
-    final outlinePaint = Paint()
-      ..color = AppColors.themeColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.0;
-    canvas.drawCircle(
-      Offset(size / 2, size / 2),
-      size / 2,
-      outlinePaint,
-    );
+    final outlinePaint =
+        Paint()
+          ..color = AppColors.themeColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.0;
+    canvas.drawCircle(Offset(size / 2, size / 2), size / 2, outlinePaint);
 
     // Draw the emoji on top of the circle
     textPainter.paint(
@@ -361,10 +341,7 @@ bool isDarkMode(BuildContext context) {
     );
 
     final picture = pictureRecorder.endRecording();
-    final image = await picture.toImage(
-      size.toInt(),
-      size.toInt(),
-    );
+    final image = await picture.toImage(size.toInt(), size.toInt());
 
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     final uint8List = byteData!.buffer.asUint8List();
@@ -393,7 +370,7 @@ bool isDarkMode(BuildContext context) {
         infoWindow: InfoWindow(
           title: 'Current Location',
           snippet:
-              'Latitude: ${currentLocation.latitude}, Longitude: ${currentLocation.longitude}',
+            'Latitude: ${currentLocation.latitude}, Longitude: ${currentLocation.longitude}, Speed: ${speed} km/h',
         ),
       ),
     );
@@ -433,20 +410,16 @@ bool isDarkMode(BuildContext context) {
     if (isInit) {
       createMyMarkers();
       _getCurrentLocation()
-          .then((value) {
+          .then((_) {
+print('Current location: $currentLocation');
+            isInit = false;
             setState(() {
-              currentLocation = value;
               isLoading = false;
             });
           })
           .catchError((error) {
             log('Error getting location: $error');
-            setState(() {
-              isLoading = false;
-            });
           });
-      print('Current location: $currentLocation');
-      isInit = false;
     }
 
     return Scaffold(
@@ -455,8 +428,8 @@ bool isDarkMode(BuildContext context) {
           (isLoading && isLoadingMarkers)
               ? Center(child: CircularProgressIndicator())
               : GoogleMap(
-                  style: isDarkMode(context)? darkStyle: null,
-                  initialCameraPosition: CameraPosition(
+                style: isDarkMode(context) ? darkStyle : null,
+                initialCameraPosition: CameraPosition(
                   target: Statics.initLocation, // Placeholder position
                   zoom: 2,
                 ),

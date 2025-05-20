@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:sqflite/sqflite.dart';
@@ -17,22 +18,20 @@ class MyLocationDatabaseHelper {
 
   static Database? _database;
   Future<Database?> get database async {
-    if (_database != null) {
-      return _database;
-    }
     _database = await initMyLocationDatabase();
 
     return _database;
   }
 
   Future<Database> initMyLocationDatabase() async {
-    String path = join(await getDatabasesPath(), "my_location_database.db");
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    String path = join(await getDatabasesPath(), "my_locations_database_$myUID.db");
     var db = await openDatabase(
       path,
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute('''
-          CREATE TABLE my_location_table (
+          CREATE TABLE my_locations_table_$myUID(
             name TEXT,
             icon TEXT,
             latitude REAL,
@@ -52,6 +51,7 @@ class MyLocationDatabaseHelper {
     LatLng? coordinates,
     int? radius,
   ) async {
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
     final Database? db = await database;
 
     final prevData = await getData(name);
@@ -72,16 +72,17 @@ class MyLocationDatabaseHelper {
     };
 
     await db!.insert(
-      'my_location_table',
+      'my_locations_table_$myUID',
       data,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
   Future<Map<String, dynamic>?> getData(String name) async {
+     final myUID = FirebaseAuth.instance.currentUser!.uid;
     final Database? db = await database;
     List<Map<String, dynamic>> maps = await db!.query(
-      'my_location_table',
+      'my_locations_table_$myUID',
       where: 'name = ?',
       whereArgs: [name],
     );
@@ -93,18 +94,21 @@ class MyLocationDatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getAllData() async {
     final Database? db = await database;
-    return await db!.query('my_location_table');
+     final myUID = FirebaseAuth.instance.currentUser!.uid;
+    return await db!.query('my_locations_table_$myUID');
   }
 
   Future<int> deleteData(String name) async {
     final Database? db = await database;
-    return await db!.delete('my_location_table', where: 'name = ?', whereArgs: [name]);
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    return await db!.delete('my_locations_table_$myUID', where: 'name = ?', whereArgs: [name]);
   }
 
   Future<void> deleteAllData() async {
     final Database? db = await database;
-    db!.delete('question_table');
-    db!.execute('DROP TABLE question_table');
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    db!.delete('my_locations_table_$myUID');
+    db!.execute('DROP TABLE my_locations_table_$myUID');
   }
 }
 
@@ -129,13 +133,14 @@ class NotificationDatabaseHelper {
   }
 
   Future<Database> initNotificationDatabase() async {
-    String path = join(await getDatabasesPath(), "notification_database.db");
+     final myUID = FirebaseAuth.instance.currentUser!.uid;
+    String path = join(await getDatabasesPath(), "notification_database_$myUID.db");
     var db = await openDatabase(
       path,
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute('''
-          CREATE TABLE notification_table (
+          CREATE TABLE notification_table_$myUID (
             timestamp TEXT,
             message TEXT,
             iconLink TEXT,
@@ -153,6 +158,7 @@ class NotificationDatabaseHelper {
     String iconLink,
   ) async {
     final Database? db = await database;
+     final myUID = FirebaseAuth.instance.currentUser!.uid;
 
     Map<String, dynamic> data = {
       'timestamp': timestamp,
@@ -162,14 +168,15 @@ class NotificationDatabaseHelper {
 
     // Check if the data already exists
     await db!.insert(
-      'notification_table',
+      'notification_table_$myUID',
       data,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
   Future<List<Map<String, dynamic>>> getAllData() async {
+     final myUID = FirebaseAuth.instance.currentUser!.uid;
     final Database? db = await database;
-    return await db!.query('notification_table');
+    return await db!.query('notification_table_$myUID');
   }
 }

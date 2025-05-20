@@ -33,7 +33,7 @@ class MyStatusProvider extends Notifier<UserStatus> {
     double speed,
     List<RegisteredLocation> myLocations,
   ) async {
-    double speedKmPH = speed * 10 / 36; //convert m/s -> km/h
+    double speedKmPH = speed; //speed maybe in km/h
 
     if (currentLocation.latitude == Statics.initLocation.latitude &&
         currentLocation.longitude == Statics.initLocation.longitude) {
@@ -94,21 +94,15 @@ class MyStatusProvider extends Notifier<UserStatus> {
       }
       final myLocations = ref.read(locationsProvider);
       updateMyStatus(position, myLocations);
-      print('Current position: ${position.latitude}, ${position.longitude}');
+      print('Current speed: ${position.speed}');
     });
   }
 
   Future<void> initLocationSetting() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     bool permission = await Permission.location.isGranted;
     bool permissionAlways = await Permission.locationAlways.isGranted;
     bool notificationPermission = await Permission.notification.isGranted;
 
-    if (!serviceEnabled) {
-      return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.',
-      );
-    }
     if (!permission) {
       print('asking permission');
       await Permission.location.request();

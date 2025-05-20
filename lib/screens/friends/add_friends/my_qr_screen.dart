@@ -56,7 +56,6 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
           });
       });
     }
-
     return isInit
         ? Center(child: CircularProgressIndicator())
         : Column(
