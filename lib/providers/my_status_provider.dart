@@ -1,16 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/utilities/statics.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
-
-import 'package:location/location.dart' as loc;
 
 class UserStatus {
   String status;
@@ -27,7 +27,6 @@ class MyStatusProvider extends Notifier<UserStatus> {
   }
 
   Position? prevPosition;
-  loc.Location location = loc.Location();
 
   Future<UserStatus> userStatus(
     LatLng currentLocation,
@@ -67,43 +66,77 @@ class MyStatusProvider extends Notifier<UserStatus> {
     return UserStatus('🟢', 'online');
   }
 
+  void startTrackingLocation()  {
+    LocationSettings locationSettings;
+    if (Platform.isAndroid) {
+      locationSettings = AndroidSettings(
+        accuracy: LocationAccuracy.high,
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationTitle: "Location Service is running",
+          notificationText: 'mau is updating your status',
+        ),
+      );
+    } else if (Platform.isIOS) {
+      locationSettings = AppleSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 100,
+        showBackgroundLocationIndicator: true,
+        allowBackgroundLocationUpdates: true,
+      );
+    } else {
+      throw UnsupportedError('Unsupported platform');
+    }
+
+     Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).listen((Position? position) {
+      if (position == null) {
+        return;
+      }
+      // final myLocations = r
+      // ef.read(locationsProvider);
+      // updateMyStatus(position, myLocations);
+      print('Current position: ${position.latitude}, ${position.longitude}');
+    });
+  }
+
   Future<void> initLocationSetting() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    LocationPermission permission = await Geolocator.checkPermission();
-    var backgroundPermission = await location.isBackgroundModeEnabled();
+    bool permission = await Permission.location.isGranted;
+    bool permissionAlways = await Permission.locationAlways.isGranted;
+    bool notificationPermission = await Permission.notification.isGranted;
 
     if (!serviceEnabled) {
       return Future.error(
         'Location permissions are permanently denied, we cannot request permissions.',
       );
     }
-    if (permission == LocationPermission.denied) {
+    if (!permission) {
       print('asking permission');
-      permission = await Geolocator.requestPermission();
+      await Permission.location.request();
     }
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.',
-      );
+    if (!permissionAlways) {
+      await Permission.locationAlways.request();
     }
+    if (!notificationPermission && Platform.isAndroid) {
+      await Permission.notification.request();
+    }
+
     // if (!backgroundPermission) {
     //   await location.enableBackgroundMode();
     // }
   }
 
-  Future<loc.LocationData> getCurrentPosition() async {
-    final currentPosition = await location.getLocation();
+  Future<Position> getCurrentPosition() async {
+    final currentPosition = await Geolocator.getCurrentPosition();
     return currentPosition;
   }
 
   //keep user's basic profile
-  void updateMyStatus(
-    loc.LocationData position,
-    List<RegisteredLocation> myLocations
-  ) {
-    final currentLocation = LatLng(position.latitude!, position.longitude!);
+  void updateMyStatus(Position position, List<RegisteredLocation> myLocations) {
+    final currentLocation = LatLng(position.latitude, position.longitude);
     //save in firebase and riverpod
-    userStatus(currentLocation, position.speed!, myLocations).then((value) {
+    userStatus(currentLocation, position.speed, myLocations).then((value) {
       if (value.icon == state.icon && value.status == state.status) {
         return;
       } else {

@@ -151,27 +151,9 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     if (isInit) {
        isInit = false;
       ref.read(profileProvider.notifier).loadMyProfile();
-      final myLocations = ref.watch(locationsProvider);
       final statusNotifier = ref.read(myStatusProvider.notifier);
-
-     statusNotifier
-          .initLocationSetting()
-          .then((_) {
-            loc.Location location = new loc.Location();
-            location.onLocationChanged.listen((
-              loc.LocationData currentLocation,
-            ) {
-              print(
-                'latitude ${currentLocation.latitude}, longtitude ${currentLocation.longitude}',
-              );
-              print('speed${currentLocation.speed}');
-             statusNotifier
-                  .updateMyStatus(currentLocation, myLocations);
-            });
-          })
-          .catchError((error) {
-            print('Error initializing location settings: $error');
-          });
+      statusNotifier.startTrackingLocation();
+      
     }
 
     return Scaffold(
