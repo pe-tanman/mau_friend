@@ -22,6 +22,7 @@ class MyQrScreen extends ConsumerStatefulWidget {
 class _MyQrScreenState extends ConsumerState<MyQrScreen> {
   bool isInit = true;
   String myUID = '';
+  
 
   String getMyQRData(String uid) {
     // Generate a random password
@@ -47,6 +48,7 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
   @override
   Widget build(BuildContext context) {
     if (isInit) {
+      print('qr');
       ref.read(profileProvider.notifier).loadMyProfile().then((_) {
           myUID = FirebaseAuth.instance.currentUser!.uid;
           isInit = false;

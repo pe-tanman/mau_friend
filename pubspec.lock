@@ -33,14 +33,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.12.0"
-  background_locator_2:
-    dependency: "direct main"
-    description:
-      name: background_locator_2
-      sha256: "145ef41767306052cbb2159478c0369b83c9800740f7acc656530c263d371695"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.6"
   baseflow_plugin_template:
     dependency: "direct main"
     description:
@@ -169,22 +161,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.15"
-  dio:
-    dependency: "direct main"
-    description:
-      name: dio
-      sha256: "253a18bbd4851fecba42f7343a1df3a9a4c1d31a2c1b37e221086b4fa8c8dbc9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.8.0+1"
-  dio_web_adapter:
-    dependency: transitive
-    description:
-      name: dio_web_adapter
-      sha256: "7586e476d70caecaf1686d21eee7247ea43ef5c345eab9e0cc3583ff13378d78"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.1"
   dropdown_search:
     dependency: transitive
     description:
