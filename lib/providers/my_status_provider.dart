@@ -79,7 +79,6 @@ class MyStatusProvider extends Notifier<UserStatus> {
     } else if (Platform.isIOS) {
       locationSettings = AppleSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 100,
         showBackgroundLocationIndicator: true,
         allowBackgroundLocationUpdates: true,
       );
@@ -93,9 +92,8 @@ class MyStatusProvider extends Notifier<UserStatus> {
       if (position == null) {
         return;
       }
-      // final myLocations = r
-      // ef.read(locationsProvider);
-      // updateMyStatus(position, myLocations);
+      final myLocations = ref.read(locationsProvider);
+      updateMyStatus(position, myLocations);
       print('Current position: ${position.latitude}, ${position.longitude}');
     });
   }
@@ -121,10 +119,6 @@ class MyStatusProvider extends Notifier<UserStatus> {
     if (!notificationPermission && Platform.isAndroid) {
       await Permission.notification.request();
     }
-
-    // if (!backgroundPermission) {
-    //   await location.enableBackgroundMode();
-    // }
   }
 
   Future<Position> getCurrentPosition() async {
