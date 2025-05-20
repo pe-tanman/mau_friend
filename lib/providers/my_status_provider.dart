@@ -85,7 +85,7 @@ class MyStatusProvider extends Notifier<UserStatus> {
     } else {
       throw UnsupportedError('Unsupported platform');
     }
-
+    
      Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen((Position? position) {
