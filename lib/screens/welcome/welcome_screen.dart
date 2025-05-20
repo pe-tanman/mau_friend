@@ -5,12 +5,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:mau_friend/providers/locations_provider.dart';
+import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/themes/app_theme.dart';
-import 'package:mau_friend/utilities/location_helper.dart';
 
-import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:url_launcher/link.dart';
 
@@ -171,7 +171,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(height: 100),
-          Text('Precise Location', style: appTheme().textTheme.titleMedium),
+          Text('Location Access', style: appTheme().textTheme.titleMedium),
           SvgPicture.asset('lib/assets/images/Map.svg', height: 400),
           SizedBox(height: 10),
           Text(
@@ -180,7 +180,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           ),
           SizedBox(height: 40),
           primaryButton('Continue', () {
-            LocationHelper().initLocationSetting().then((_) {
+            MyStatusProvider().initLocationSetting().then((_) {
               _pageController.nextPage(
                 duration: Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
@@ -191,6 +191,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
     );
   }
+  
+  
   Widget _buildLoginTab() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
