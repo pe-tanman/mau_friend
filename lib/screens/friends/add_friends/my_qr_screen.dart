@@ -51,7 +51,9 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
       print('qr');
       ref.read(profileProvider.notifier).loadMyProfile().then((_) {
           myUID = FirebaseAuth.instance.currentUser!.uid;
-          isInit = false;
+          setState(() {
+            isInit = false;
+          });
       });
     }
 
