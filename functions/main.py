@@ -66,14 +66,14 @@ def onUserProfileDeleted(event: firestore_fn.Event[firestore_fn.Change[firestore
     except KeyError:
         return
 
-    friend_list_dict = event.data.before.to_dict() #do not exist
+    friend_list_dict = event.data.to_dict() 
 
-    if friend_list_dict.exists:
+    if friend_list_dict is not None:
         friend_list_data = friend_list_dict.get("friendList", [])
     else:
         friend_list_data = []
 
     for friend_uid in friend_list_data:
         firestore_client.collection("friendList").document(friend_uid).update({
-            "profiles": firestore.ArrayRemove([{userUID: firestore.DELETE_FIELD}])
+            "profiles": firestore.ArrayRemove([userUID])
         })

@@ -227,6 +227,12 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     });
     await user!.delete();
     isDeleteLoading = false;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Account deleted successfully'),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
