@@ -55,8 +55,6 @@ post_install do |installer|
 
         'PERMISSION_NOTIFICATIONS=1',
 
-        'PERMISSION_MEDIA_LIBRARY=1',
-
       ]
 
     end

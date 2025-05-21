@@ -249,7 +249,6 @@ statusMap[friendUID] = map;
           ),
         ],
       ),
-      //horあizontal scroll
       body:
           friendList.isEmpty
               ? Center(child: Text("Let's add friends by pressing + button"))
