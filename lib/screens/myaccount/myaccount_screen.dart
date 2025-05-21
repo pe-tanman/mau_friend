@@ -166,6 +166,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('My Account'),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: Icon(Icons.menu),

@@ -235,6 +235,7 @@ statusMap[friendUID] = map;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Friends'),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
@@ -248,7 +249,7 @@ statusMap[friendUID] = map;
           ),
         ],
       ),
-      //horizontal scroll
+      //horあizontal scroll
       body:
           friendList.isEmpty
               ? Center(child: Text("Let's add friends by pressing + button"))
