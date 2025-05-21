@@ -109,6 +109,23 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     }
   }
 
+  // 全画面プログレスダイアログを表示する関数
+  void showProgressDialog(context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      transitionDuration: Duration.zero, // これを入れると遅延を入れなくて
+      barrierColor: Colors.black.withOpacity(0.5),
+      pageBuilder: (
+        BuildContext context,
+        Animation animation,
+        Animation secondaryAnimation,
+      ) {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
   Future<void> deleteAccount() async {
     final userUID = FirebaseAuth.instance.currentUser!.uid;
     final friendList = ref.read(friendListProvider);
@@ -222,11 +239,8 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     if (credential != null) {
       await user!.reauthenticateWithCredential(credential);
     }
-    setState(() {
-      isDeleteLoading = true;
-    });
+    showProgressDialog(context);
     await user!.delete();
-    isDeleteLoading = false;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Account deleted successfully'),

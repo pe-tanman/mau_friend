@@ -77,3 +77,6 @@ def onUserProfileDeleted(event: firestore_fn.Event[firestore_fn.Change[firestore
         firestore_client.collection("friendList").document(friend_uid).update({
             "profiles": firestore.ArrayRemove([userUID])
         })
+        firestore_client.collection("friendList").document(friend_uid).update({
+            "friendList": firestore.ArrayRemove([userUID])
+        })

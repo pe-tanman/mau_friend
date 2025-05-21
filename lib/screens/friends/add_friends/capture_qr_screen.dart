@@ -53,7 +53,7 @@ class _CaptureQrScreenState extends ConsumerState<CaptureQrScreen> {
 
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Invalid QR code!')),
+                    const SnackBar(content: Text('Invalid QR code. Try again.')),
                   );
                   Navigator.of(context).pop();
                 }

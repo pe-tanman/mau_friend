@@ -63,7 +63,6 @@ class MyLocationDatabaseHelper {
     final _coordinates =
         coordinates ?? LatLng(prevData!['latitude'], prevData!['longitude']);
     final _radius = radius ?? prevData!['radius'];
-
     Map<String, dynamic> data = {
       'name': name,
       'icon': _icon,

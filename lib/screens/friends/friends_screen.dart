@@ -104,10 +104,11 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     final myUID = FirebaseAuth.instance.currentUser?.uid;
     dbRef = FirebaseDatabase.instance.ref('users');
     dbRef.onValue.listen((event) {
+      print('firend profile updated');
       final map = event.snapshot.value;
       if (map != null) {
         statusMap = map as Map;
-        if(isLoading){
+        if (isLoading) {
           setState(() {
             isLoading = false;
           });
@@ -169,7 +170,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                       children: [
                         Text(
                           statusMap[friendUID]['icon'] ??
-                              '🔴', //mystatus じゃないあ要変更 TODO:
+                              '🔴', //mystatus じゃない要変更 TODO:
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
