@@ -78,6 +78,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   }
 
   Future<void> loadRegisteredLocations() async {
+    print('Loading registered locations...');
     // Simulate loading data from a database or API
     final myLocationsMap = await MyLocationDatabaseHelper().getAllData();
 
@@ -146,25 +147,21 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-   
     final profile = ref.watch(profileProvider);
     if (isInit) {
-       isInit = false;
       ref.read(profileProvider.notifier).loadMyProfile();
       ref.read(locationsProvider.notifier).loadLocations();
+      loadRegisteredLocations();
       final statusNotifier = ref.read(myStatusProvider.notifier);
       statusNotifier.initLocationSetting();
-    
+
       statusNotifier.getCurrentPosition().then((position) {
-        statusNotifier.updateMyStatus(
-          position,
-          registeredLocations
-        );
+        statusNotifier.updateMyStatus(position, registeredLocations);
       });
-      
+      isInit = false;
+
       statusNotifier.startTrackingLocation();
       MyLocationDatabaseHelper().initMyLocationDatabase();
-
     }
     return Scaffold(
       appBar: AppBar(

@@ -25,7 +25,10 @@ class MyLocationDatabaseHelper {
 
   Future<Database> initMyLocationDatabase() async {
     final myUID = FirebaseAuth.instance.currentUser!.uid;
-    String path = join(await getDatabasesPath(), "my_locations_database_$myUID.db");
+    String path = join(
+      await getDatabasesPath(),
+      "my_locations_database_$myUID.db",
+    );
     var db = await openDatabase(
       path,
       version: 1,
@@ -57,10 +60,8 @@ class MyLocationDatabaseHelper {
     final prevData = await getData(name);
 
     final _icon = icon ?? prevData!['icon'];
-    final _coordinates = coordinates ?? LatLng(
-      prevData!['latitude'],
-      prevData!['longitude']
-    );
+    final _coordinates =
+        coordinates ?? LatLng(prevData!['latitude'], prevData!['longitude']);
     final _radius = radius ?? prevData!['radius'];
 
     Map<String, dynamic> data = {
@@ -79,7 +80,7 @@ class MyLocationDatabaseHelper {
   }
 
   Future<Map<String, dynamic>?> getData(String name) async {
-     final myUID = FirebaseAuth.instance.currentUser!.uid;
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
     final Database? db = await database;
     List<Map<String, dynamic>> maps = await db!.query(
       'my_locations_table_$myUID',
@@ -94,14 +95,21 @@ class MyLocationDatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getAllData() async {
     final Database? db = await database;
-     final myUID = FirebaseAuth.instance.currentUser!.uid;
-    return await db!.query('my_locations_table_$myUID');
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    print('my_locations_table_$myUID');
+    final result = await db!.query('my_locations_table_$myUID');
+    print('result: $result');
+    return result;
   }
 
   Future<int> deleteData(String name) async {
     final Database? db = await database;
     final myUID = FirebaseAuth.instance.currentUser!.uid;
-    return await db!.delete('my_locations_table_$myUID', where: 'name = ?', whereArgs: [name]);
+    return await db!.delete(
+      'my_locations_table_$myUID',
+      where: 'name = ?',
+      whereArgs: [name],
+    );
   }
 
   Future<void> deleteAllData() async {
@@ -112,6 +120,7 @@ class MyLocationDatabaseHelper {
   }
 }
 
+//Notificationも継続的に表示されていない
 class NotificationDatabaseHelper {
   static final NotificationDatabaseHelper _instance =
       NotificationDatabaseHelper._internal();
@@ -133,8 +142,11 @@ class NotificationDatabaseHelper {
   }
 
   Future<Database> initNotificationDatabase() async {
-     final myUID = FirebaseAuth.instance.currentUser!.uid;
-    String path = join(await getDatabasesPath(), "notification_database_$myUID.db");
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    String path = join(
+      await getDatabasesPath(),
+      "notification_database_$myUID.db",
+    );
     var db = await openDatabase(
       path,
       version: 1,
@@ -158,7 +170,7 @@ class NotificationDatabaseHelper {
     String iconLink,
   ) async {
     final Database? db = await database;
-     final myUID = FirebaseAuth.instance.currentUser!.uid;
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
 
     Map<String, dynamic> data = {
       'timestamp': timestamp,
@@ -175,7 +187,7 @@ class NotificationDatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> getAllData() async {
-     final myUID = FirebaseAuth.instance.currentUser!.uid;
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
     final Database? db = await database;
     return await db!.query('notification_table_$myUID');
   }
