@@ -1,4 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
@@ -126,18 +131,29 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     );
   }
 
+  String generateNonce([int length = 32]) {
+    final charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
+  }
+
+  /// Returns the sha256 hash of [input] in hex notation.
+  String sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
   Future<void> deleteAccount() async {
     final userUID = FirebaseAuth.instance.currentUser!.uid;
     final friendList = ref.read(friendListProvider);
-    for (var uid in friendList) {
-      FirestoreHelper().removeFriend(uid);
-    }
-    FirestoreHelper().deleteUserProfile(userUID);
-    RealtimeDatabaseHelper().deleteStatus();
-    FirestoreHelper().deleteFriendList();
 
     User? user = FirebaseAuth.instance.currentUser;
-    var credential;
+    AuthCredential? credential;
     if (user != null) {
       for (final providerProfile in user.providerData) {
         switch (providerProfile.providerId) {
@@ -150,6 +166,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
             );
             break;
           case 'password':
+          /*
             String password = '';
 
             final _formKey = GlobalKey<FormState>();
@@ -220,27 +237,30 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
             credential = EmailAuthProvider.credential(
               email: user.email!,
               password: password, // Prompt the user for their password
-            );
+            );*/
             break;
           case 'apple.com':
-            final appleCredential = await SignInWithApple.getAppleIDCredential(
-              scopes: [
-                AppleIDAuthorizationScopes.email,
-                AppleIDAuthorizationScopes.fullName,
-              ],
+            await FirebaseAuth.instance.currentUser!.reauthenticateWithProvider(
+              AppleAuthProvider(),
             );
-            credential = OAuthProvider(
-              "apple.com",
-            ).credential(idToken: appleCredential.identityToken);
             break;
         }
       }
     }
     if (credential != null) {
-      await user!.reauthenticateWithCredential(credential);
+       await user!.reauthenticateWithCredential(credential);
     }
     showProgressDialog(context);
+    //delete
+    for (var uid in friendList) {
+      FirestoreHelper().removeFriend(uid);
+    }
+    FirestoreHelper().deleteUserProfile(userUID);
+    RealtimeDatabaseHelper().deleteStatus();
+    FirestoreHelper().deleteFriendList();
     await user!.delete();
+
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Account deleted successfully'),
