@@ -43,7 +43,6 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
 
 @override
   void initState() {
-    final myUID = FirebaseAuth.instance.currentUser?.uid;
     DatabaseReference dbRef = FirebaseDatabase.instance.ref('users');
     super.initState();
     

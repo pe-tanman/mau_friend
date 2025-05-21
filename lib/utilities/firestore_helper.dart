@@ -155,12 +155,22 @@ class FirestoreHelper {
   Future<void> removeFriendProfile(String friendUID) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     try {
-      await _firestore.collection('friendList').doc(myUID).update({
-        'profiles': {friendUID: FieldValue.delete()},
-      });
-      await _firestore.collection('friendList').doc(friendUID).update({
-        'profiles': {myUID: FieldValue.delete()},
-      });
+      //remove friend profile from my firestore
+      var docRef = _firestore.collection('friendList').doc(myUID);
+      var docSnapshot = await docRef.get();
+      if (docSnapshot.exists) {
+        Map profiles = docSnapshot.data()?['profiles'] ?? {};
+        profiles.remove(friendUID);
+        await docRef.update({'profiles': profiles});
+      }
+      //remove my profile from friend's firestore
+      var friendDocRef = _firestore.collection('friendList').doc(friendUID);
+      var friendDocSnapshot = await friendDocRef.get();
+      if (friendDocSnapshot.exists) {
+        Map profiles = friendDocSnapshot.data()?['profiles'] ?? {};
+        profiles.remove(myUID);
+        await friendDocRef.update({'profiles': profiles});
+      }
     } catch (e) {
       print('Error removing friend profile: $e');
       rethrow;

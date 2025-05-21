@@ -39,7 +39,6 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
   bool isLoadingMarkers = true;
   double _sliderValue = log(100);
 
-  //Todo: locations are lincked to device. link to user account
   RegisteredLocation? argument;
   var arguments;
 

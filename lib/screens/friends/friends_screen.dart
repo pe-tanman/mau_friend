@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,7 +36,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   Map statusMap = {};
   bool isLoading = true;
 
-  Future<void> onUpdated(var snapshot) async {
+  Future<void> updatePrefs(var snapshot) async {
+    //Save friend list to local storage from notifier
     print('onUpdated');
     final prefs = await SharedPreferences.getInstance();
     List<String>? localFriendList = prefs.getStringList('friendList');
@@ -49,6 +51,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         snapshot.data()!['friendList'].cast<String>(),
       );
 
+      //update notification
       final newFriend = snapshot.data()!['friendList'].last;
       final newFriendProfile = snapshot.data()!['profiles'][newFriend];
       final newFriendName = newFriendProfile['username'];
@@ -56,7 +59,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       final timestamp =
           '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
 
-      //update notification
       await NotificationDatabaseHelper().insertData(
         timestamp,
         '$newFriendName is now your friend.',
@@ -69,9 +71,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             newFriendIconLink,
           );
       ref.read(notificationProvider.notifier).loadNotification();
+      //when friend is removed
     } else if (snapshot.data()!['friendList'].length < localFriendList.length) {
-      //update local friend list
 
+//update local storage
       final oldFriend = localFriendList.last;
       final oldFriendProfile = await FirestoreHelper().getUserProfile(
         oldFriend,
@@ -97,6 +100,16 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     }
   }
 
+Future<void> updateFriendStatus(String friendUID) async {
+    final event = await FirebaseDatabase.instance.ref('users/$friendUID').once();
+    final map = event.snapshot.value;
+    if (map != null) {
+      setState(() {
+statusMap[friendUID] = map;
+      });
+      }
+    }
+
   @override
   void initState() {
     super.initState();
@@ -104,7 +117,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     final myUID = FirebaseAuth.instance.currentUser?.uid;
     dbRef = FirebaseDatabase.instance.ref('users');
     dbRef.onValue.listen((event) {
-      print('firend profile updated');
       final map = event.snapshot.value;
       if (map != null) {
         statusMap = map as Map;
@@ -115,6 +127,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         }
       }
     });
+
     friendsSubscription = FirebaseFirestore.instance
         .collection('friendList')
         .doc(myUID)
@@ -122,11 +135,14 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         .listen((snapshot) {
           ref.read(friendListProvider.notifier).loadFriendList();
           ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
+          final newFriendUID = snapshot.data()!['friendList'].last;
+          updateFriendStatus(newFriendUID);
           if (snapshot.exists) {
-            onUpdated(snapshot);
+            updatePrefs(snapshot);
           }
         });
   }
+
 
   Widget buildFriendCard(String friendUID) {
     final profile = ref.watch(friendProfilesProvider)[friendUID];

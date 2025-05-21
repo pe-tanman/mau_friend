@@ -18,20 +18,13 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
    Map<String, Profile> friendProfiles = {};
   List friendList = [];
 
-  void _removeFriend(String friendUID) {
-    setState(() {
-      FirestoreHelper().removeFriend(friendUID).then((_) {
-        ref.read(friendListProvider.notifier).loadFriendList();
-      });
-      FirestoreHelper().removeFriendProfile(friendUID).then((_) {
-        ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
-      });
-    });
+  void removeFriend(String friendUID) {
+      FirestoreHelper().removeFriend(friendUID);
+      FirestoreHelper().removeFriendProfile(friendUID);
     ref.read(notificationProvider.notifier).addNotification(
       '${friendProfiles[friendUID]!.name} is removed from your friend list.',
       friendProfiles[friendUID]!.iconLink!,
     );
-    Navigator.of(context).pop();
   }
 
   @override
@@ -65,7 +58,7 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
                 TextButton(
                 onPressed: () {
                   Navigator.of(ctx).pop();
-                  _removeFriend(friendUID);
+                  removeFriend(friendUID);
                 },
                 child:  Text('OK', style: TextStyle(color: Colors.red),
                 ))
