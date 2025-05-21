@@ -16,7 +16,6 @@ def onUserProfileChanged(event: firestore_fn.Event[firestore_fn.DocumentSnapshot
     if event.data is None:
         return
     try:
-        
         userUID = event.params['uid']
         profile_dict = event.data.after.to_dict() 
         bio = profile_dict['bio']
@@ -53,7 +52,7 @@ def onUserProfileChanged(event: firestore_fn.Event[firestore_fn.DocumentSnapshot
 @firestore_fn.on_document_deleted(
     document="friendList/{uid}",
 )
-def onUserProfileDeleted(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None]) -> None:
+def onUserProfileDeleted(event: firestore_fn.Event[firestore_fn.Change[firestore_fn.DocumentSnapshot | None]]) -> None:
     print("onUserProfileDeleted")
     firestore_client = firestore.client()
 
@@ -67,7 +66,7 @@ def onUserProfileDeleted(event: firestore_fn.Event[firestore_fn.DocumentSnapshot
     except KeyError:
         return
 
-    friend_list_dict = event.data.before.to_dict()
+    friend_list_dict = event.data.before.to_dict() #do not exist
 
     if friend_list_dict.exists:
         friend_list_data = friend_list_dict.get("friendList", [])

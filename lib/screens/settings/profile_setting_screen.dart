@@ -4,6 +4,7 @@ import 'package:mau_friend/providers/friend_list_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/screens/welcome/welcome_screen.dart';
+import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
@@ -132,10 +133,76 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
             );
             break;
           case 'password':
+            String password = '';
+
+            final _formKey = GlobalKey<FormState>();
+            String tempPassword = '';
+            await showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (context) {
+              return isDeleteLoading ? Center(child: CircularProgressIndicator()) : Container(
+                height: 700,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                  left: 25,
+                  right: 25,
+                  top: 50,
+                  ),
+                  child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                    Text('Re-authenticate', style:Theme.of(context).textTheme.headlineMedium),
+                    SizedBox(height: 25),
+                    TextField(
+                      enabled: false,
+                      controller: TextEditingController(text: user.email),
+                      decoration: InputDecoration(labelText: 'Email'),
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      obscureText: true,
+                      decoration: InputDecoration(labelText: 'Password'),
+                      validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                      },
+                      onChanged: (value) {
+                      tempPassword = value;
+                      },
+                    ),
+                    SizedBox(height: 30),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+
+                      ),
+                      onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        password = tempPassword;
+                        Navigator.of(context).pop();
+                      }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        child: Text('Sign In', style: TextStyle(fontSize: 16),
+                      ),
+                    ),)
+                    ],
+                  ),
+                  ),
+                ),
+              );
+              },
+            );
+
             credential = EmailAuthProvider.credential(
               email: user.email!,
-              password:
-                  'user-password-here', // Prompt the user for their password
+              password: password, // Prompt the user for their password
             );
             break;
           case 'apple.com':
