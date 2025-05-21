@@ -41,6 +41,8 @@
 	<string>This app needs camera access to scan QR codes.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs location access to update user's status and share it with the user's friends.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs location access to update user's status after the app is terminated.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs photos access to get user icon from photo library</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
