@@ -35,6 +35,7 @@ bool isLoading = true;
     return Scaffold(
       appBar: AppBar(
         title: Text('Friend Profile'),
+        automaticallyImplyLeading: false,
       ),
       body: isLoading? Center(child: CircularProgressIndicator()): Center(
         child: Column(

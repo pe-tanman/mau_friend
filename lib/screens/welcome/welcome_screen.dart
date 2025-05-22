@@ -90,20 +90,22 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget _buildAboutTab() {
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SvgPicture.asset('lib/assets/images/Group 11.svg'),  
-          Text('Welcome to mau', style: appTheme().textTheme.titleMedium),        
-          SizedBox(height: 40),
-          primaryButton('Continue', () {
-            _pageController.nextPage(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          }),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset('lib/assets/images/Group 11.svg'),  
+            Text('Welcome to mau', style: appTheme().textTheme.titleMedium),        
+            SizedBox(height: 40),
+            primaryButton('Continue', () {
+              _pageController.nextPage(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -111,65 +113,63 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget _buildFeaturesTab() {
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Privacy and Peace', style: appTheme().textTheme.titleMedium),
-          SizedBox(height: 100),
-          Text('Your location, friends, and places are stored only on your device— never shared, not even with us.', style: TextStyle(color: AppColors.themeColor, fontSize: 16,),),
-            SizedBox(height: 10),
-            Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              'ー Our Promise to You',
-              style: TextStyle(
-                fontSize: 20,
-                color: AppColors.themeColor,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Privacy and Peace', style: appTheme().textTheme.titleMedium),
+            SizedBox(height: 100),
+            Text(
+              'Our Promise to You',
+              style: TextStyle(fontSize: 20, color: AppColors.themeColor),
             ),
-            ),),
-          SizedBox(height: 100),
-          Link(
-            // 開きたいWebページのURLを指定
-            uri: Uri.parse(
-              'https://petanman.notion.site/Privacy-Policy-1efe73611a8f804388a5d41b98b7165f?pvs=4',
-            ),
-            // targetについては後述
-            target: LinkTarget.blank,
-            builder: (BuildContext ctx, FollowLink? openLink) {
-              return TextButton(
-                onPressed: openLink,
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
-                  // minimumSize:
-                  //     MaterialStateProperty.all(Size.zero),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.open_in_new, color: AppColors.linkTextColor),
-                    Text(
-                      'Our Privacy Policy',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppColors.linkTextColor,
-                        decoration: TextDecoration.underline,
+            Text('Your location, friends, and places are stored only on your device— never shared, not even with us.', style: TextStyle(color: AppColors.themeColor, fontSize: 16,),),
+              SizedBox(height: 10),
+              
+            SizedBox(height: 100),
+            Link(
+              // 開きたいWebページのURLを指定
+              uri: Uri.parse(
+                'https://petanman.notion.site/Privacy-Policy-1efe73611a8f804388a5d41b98b7165f?pvs=4',
+              ),
+              // targetについては後述
+              target: LinkTarget.blank,
+              builder: (BuildContext ctx, FollowLink? openLink) {
+                return TextButton(
+                  onPressed: openLink,
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    // minimumSize:
+                    //     MaterialStateProperty.all(Size.zero),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.open_in_new, color: AppColors.linkTextColor),
+                      Text(
+                        'Our Privacy Policy',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: AppColors.linkTextColor,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 30,),
+            primaryButton('Accept and Continue', () {
+              _pageController.nextPage(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
               );
-            },
-          ),
-          SizedBox(height: 30,),
-          primaryButton('Accept and Continue', () {
-            _pageController.nextPage(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          }),
-        ],
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -177,19 +177,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget _buildPermissionTab() {
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(height: 70),
-          Text('Location Access', style: appTheme().textTheme.titleMedium),
-          SvgPicture.asset('lib/assets/images/Map.svg', height: 300),
-          Text(
-            "To successfully share your status with your friends:",
-            style: TextStyle(color: AppColors.darkText1),
-          ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 70),
+            Text('Location Access', style: appTheme().textTheme.titleMedium),
+            SvgPicture.asset('lib/assets/images/Map.svg', height: 300),
+            Text(
+              "To successfully share your status with your friends:",
+              style: TextStyle(color: AppColors.darkText1),
+            ),
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,23 +198,23 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     style: appTheme().textTheme.headlineSmall,
                   ),
                   Text(
-                    "✅ Always allowed",
+                    "✅ Always  allowed",
                     style: appTheme().textTheme.headlineSmall,
                   ),
                 ],
               ),
             ),
-          ),
-          SizedBox(height: 60),
-          primaryButton('Continue', () {
-            MyStatusProvider().initLocationSetting().then((_) {
-              _pageController.nextPage(
-                duration: Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            });
-          }),
-        ],
+            SizedBox(height: 60),
+            primaryButton('Continue', () {
+              MyStatusProvider().initLocationSetting().then((_) {
+                _pageController.nextPage(
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              });
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -224,17 +223,19 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget _buildLoginTab() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset('lib/assets/images/Group 9.svg'),
-          SizedBox(height: 300),
-          primaryButton('Get Started', (){
-            Navigator.pushNamed(context, AuthGate.routeName);
-          })
-          //add login button
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset('lib/assets/images/Group 9.svg'),
+            SizedBox(height: 300),
+            primaryButton('Get Started', (){
+              Navigator.pushNamed(context, AuthGate.routeName);
+            })
+            //add login button
+          ],
+        ),
       ),
     );
   }

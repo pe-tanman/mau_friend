@@ -45,7 +45,12 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
 
     if (localFriendList == null ||
         snapshot.data()!['friendList'].length > localFriendList.length) {
+
       await ref.read(friendListProvider.notifier).loadFriendList();
+      //update statusMap variable
+       final newFriendUID = snapshot.data()!['friendList'].last;
+      updateFriendStatus(newFriendUID);
+      //write prefs
       await prefs.setStringList(
         'friendList',
         snapshot.data()!['friendList'].cast<String>(),
@@ -100,6 +105,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     }
   }
 
+
 Future<void> updateFriendStatus(String friendUID) async {
     final event = await FirebaseDatabase.instance.ref('users/$friendUID').once();
     final map = event.snapshot.value;
@@ -127,7 +133,6 @@ statusMap[friendUID] = map;
         }
       }
     });
-
     friendsSubscription = FirebaseFirestore.instance
         .collection('friendList')
         .doc(myUID)
@@ -135,8 +140,6 @@ statusMap[friendUID] = map;
         .listen((snapshot) {
           ref.read(friendListProvider.notifier).loadFriendList();
           ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
-          final newFriendUID = snapshot.data()!['friendList'].last;
-          updateFriendStatus(newFriendUID);
           if (snapshot.exists) {
             updatePrefs(snapshot);
           }

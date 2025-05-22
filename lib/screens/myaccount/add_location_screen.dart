@@ -603,19 +603,16 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                           builder: (context) {
                             return AlertDialog(
                               title: Text('Add Icon'),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  EmojiSelector(
-                                    onSelected: (value) {
-                                      createMyMarkers();
-                                      setState(() {
-                                        icon = value;
-                                      });
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
+                              content: SingleChildScrollView(
+                                child: EmojiSelector(
+                                  onSelected: (value) {
+                                    createMyMarkers();
+                                    setState(() {
+                                      icon = value;
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
                               ),
                             );
                           },

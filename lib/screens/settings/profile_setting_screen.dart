@@ -166,7 +166,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
             );
             break;
           case 'password':
-          /*
+            /*
             String password = '';
 
             final _formKey = GlobalKey<FormState>();
@@ -248,7 +248,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
       }
     }
     if (credential != null) {
-       await user!.reauthenticateWithCredential(credential);
+      await user!.reauthenticateWithCredential(credential);
     }
     showProgressDialog(context);
     //delete
@@ -259,7 +259,6 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     RealtimeDatabaseHelper().deleteStatus();
     FirestoreHelper().deleteFriendList();
     await user!.delete();
-
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -355,18 +354,26 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                       builder: (context) {
                         return AlertDialog(
                           title: Text('Delete Account'),
-                          content: (isDeleteLoading)?Center(child: CircularProgressIndicator(),):Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'All data including your profile, friends, and locations will be deleted.',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 10),
-                              Text('You may be required to sign-in again.'),
-                            ],
-                          ),
+                          content:
+                              (isDeleteLoading)
+                                  ? Center(child: CircularProgressIndicator())
+                                  : Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'All data including your profile, friends, and locations will be deleted.',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text(
+                                        'You may be required to sign-in again.',
+                                      ),
+                                    ],
+                                  ),
                           actions: [
                             TextButton(
                               onPressed: () {
