@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
+import 'package:mau_friend/screens/myaccount/emergency_screen.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/screens/settings/current_location_screen.dart';
 import 'package:mau_friend/screens/friends/edit_friend_list_screen.dart';
@@ -76,6 +77,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         FriendProfileScreen.routeName : (context) => FriendProfileScreen(),
         NotificationScreen.routeName : (context) => NotificationScreen(),
         EditFriendListScreen.routeName : (context) => EditFriendListScreen(),
+        EmergencyScreen.routeName : (context) => EmergencyScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );
