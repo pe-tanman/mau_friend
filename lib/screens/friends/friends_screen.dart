@@ -111,7 +111,7 @@ Future<void> updateFriendStatus(String friendUID) async {
     final map = event.snapshot.value;
     if (map != null) {
       setState(() {
-statusMap[friendUID] = map;
+        statusMap[friendUID] = map;
       });
       }
     }
@@ -138,8 +138,8 @@ statusMap[friendUID] = map;
         .doc(myUID)
         .snapshots()
         .listen((snapshot) {
-          ref.read(friendListProvider.notifier).loadFriendList();
           ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
+          ref.read(friendListProvider.notifier).loadFriendList();
           if (snapshot.exists) {
             updatePrefs(snapshot);
           }
@@ -188,8 +188,7 @@ statusMap[friendUID] = map;
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          statusMap[friendUID]['icon'] ??
-                              '🔴', //mystatus じゃない要変更 TODO:
+                          statusMap[friendUID]?['icon'] ?? '🔴',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -197,7 +196,7 @@ statusMap[friendUID] = map;
                         ),
                         SizedBox(width: 10),
                         Text(
-                          statusMap[friendUID]['status'] ?? 'offline',
+                          statusMap[friendUID]?['status'] ?? 'offline',
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
                       ],
