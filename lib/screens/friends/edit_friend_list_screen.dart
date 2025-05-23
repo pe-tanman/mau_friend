@@ -5,6 +5,7 @@ import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
+import 'package:mau_friend/utilities/statics.dart';
 
 class EditFriendListScreen extends ConsumerStatefulWidget {
   static const String routeName = '/edit-friend-list';
@@ -40,10 +41,10 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
         final friend = friendProfiles[friendUID];
         return ListTile(
           leading: CircleAvatar(
-            backgroundImage: NetworkImage(friend!.iconLink!),
+            backgroundImage: NetworkImage(friend?.iconLink ?? Statics.defaultIconLink),
           ),
-          title: Text(friend!.name!),
-            trailing: IconButton(
+          title: Text(friend?.name ?? 'username'),
+          trailing: IconButton(
             icon: const Icon(Icons.delete_outline),
             onPressed: () => showDialog(
               context: context,

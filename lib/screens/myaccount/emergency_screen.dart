@@ -114,7 +114,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                 "Your exact location will be sent to your emergency close friends.",
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50),
                 child: AnimatedToggleSwitch.dual(
@@ -176,16 +176,19 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                 "You can send video (~ 1 min) of your current situation to your emergency close friends.",
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50),
                 child: SlideAction(
+                  height: 80,
                   elevation: 0,
                   text: 'Send Video',
                   textStyle: TextStyle(color: Colors.black, fontSize: 18),
                   outerColor: Colors.white,
                   innerColor: Colors.red.shade600,
                   sliderButtonIcon: Icon(
+                    size:30,
+
                     Icons.videocam_outlined,
                     weight: 30,
 

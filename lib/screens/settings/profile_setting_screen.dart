@@ -7,6 +7,7 @@ import 'package:crypto/crypto.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
+import 'package:mau_friend/screens/home_screen.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/screens/welcome/welcome_screen.dart';
 import 'package:mau_friend/themes/app_theme.dart';
@@ -24,6 +25,9 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class ProfileSettingScreen extends ConsumerStatefulWidget {
   static const routeName = '/profile-setting';
+  final bool isNewUser;
+  const ProfileSettingScreen({Key? key, this.isNewUser = false})
+    : super(key: key);
   @override
   _ProfileSettingScreenState createState() => _ProfileSettingScreenState();
 }
@@ -46,10 +50,16 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
   @override
   void initState() {
     super.initState();
+
     final profile = ref.read(profileProvider);
     _usernameController.text = profile.name ?? '';
     _bioController.text = profile.bio ?? '';
     _selectedIcon = profile.iconLink;
+    if (widget.isNewUser) {
+      _usernameController.text = '';
+      _bioController.text = '';
+      _selectedIcon = null;
+    }
   }
 
   Future<void> _saveProfileSettings() async {
@@ -75,7 +85,11 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     setState(() {
       isLoading = false;
     });
-    Navigator.of(context).pop();
+    if (widget.isNewUser) {
+      Navigator.of(context).pushNamed(HomeScreen.routeName);
+    } else {
+      Navigator.of(context).pop();
+    }
   }
 
   Future<void> _selectIcon() async {
@@ -148,11 +162,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     return digest.toString();
   }
 
-  Future<void> deleteAccount() async {
-    final userUID = FirebaseAuth.instance.currentUser!.uid;
-    final friendList = ref.read(friendListProvider);
-
-    User? user = FirebaseAuth.instance.currentUser;
+  Future<void> reauthenticate(User? user) async {
     AuthCredential? credential;
     if (user != null) {
       for (final providerProfile in user.providerData) {
@@ -166,7 +176,6 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
             );
             break;
           case 'password':
-            /*
             String password = '';
 
             final _formKey = GlobalKey<FormState>();
@@ -175,69 +184,83 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
               context: context,
               isScrollControlled: true,
               builder: (context) {
-              return isDeleteLoading ? Center(child: CircularProgressIndicator()) : Container(
-                height: 700,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
-                  left: 25,
-                  right: 25,
-                  top: 50,
-                  ),
-                  child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                    Text('Re-authenticate', style:Theme.of(context).textTheme.headlineMedium),
-                    SizedBox(height: 25),
-                    TextField(
-                      enabled: false,
-                      controller: TextEditingController(text: user.email),
-                      decoration: InputDecoration(labelText: 'Email'),
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      obscureText: true,
-                      decoration: InputDecoration(labelText: 'Password'),
-                      validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      return null;
-                      },
-                      onChanged: (value) {
-                      tempPassword = value;
-                      },
-                    ),
-                    SizedBox(height: 30),
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-
-                      ),
-                      onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        password = tempPassword;
-                        Navigator.of(context).pop();
-                      }
-                      },
+                return isDeleteLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : Container(
+                      height: 700,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                        child: Text('Sign In', style: TextStyle(fontSize: 16),
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                          left: 25,
+                          right: 25,
+                          top: 50,
+                        ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Re-authenticate',
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
+                              ),
+                              SizedBox(height: 25),
+                              TextField(
+                                enabled: false,
+                                controller: TextEditingController(
+                                  text: user.email,
+                                ),
+                                decoration: InputDecoration(labelText: 'Email'),
+                              ),
+                              SizedBox(height: 16),
+                              TextFormField(
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  labelText: 'Password',
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your password';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) {
+                                  tempPassword = value;
+                                },
+                              ),
+                              SizedBox(height: 30),
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(),
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    password = tempPassword;
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 50,
+                                    vertical: 15,
+                                  ),
+                                  child: Text(
+                                    'Sign In',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),)
-                    ],
-                  ),
-                  ),
-                ),
-              );
+                    );
               },
             );
 
             credential = EmailAuthProvider.credential(
               email: user.email!,
               password: password, // Prompt the user for their password
-            );*/
+            );
             break;
           case 'apple.com':
             await FirebaseAuth.instance.currentUser!.reauthenticateWithProvider(
@@ -248,7 +271,26 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
       }
     }
     if (credential != null) {
-      await user!.reauthenticateWithCredential(credential);
+      user!.reauthenticateWithCredential(credential);
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    final userUID = FirebaseAuth.instance.currentUser!.uid;
+    final friendList = ref.read(friendListProvider);
+
+    User? user = FirebaseAuth.instance.currentUser;
+    try {
+      await reauthenticate(user);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Re-authentication failed. Try again.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      Navigator.of(context).pop();
+      return;
     }
     showProgressDialog(context);
     //delete

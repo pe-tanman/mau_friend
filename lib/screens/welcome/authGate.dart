@@ -7,8 +7,10 @@ import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/home_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
 
 class AuthGate extends ConsumerWidget {
   static const routeName = 'auth-gate';
@@ -35,7 +37,9 @@ class AuthGate extends ConsumerWidget {
             ],
           );
         }
-
+        if (snapshot.data!.metadata.creationTime == snapshot.data!.metadata.lastSignInTime) {
+            return ProfileSettingScreen(isNewUser: true);
+        }
         return HomeScreen();
       },
     );

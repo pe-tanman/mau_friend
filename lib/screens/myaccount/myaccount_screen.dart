@@ -152,7 +152,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
         onTap: () {
           tappedCount--;
           if (tappedCount > 0) {
-            if (tappedCount <= 3) {
+
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -172,8 +172,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                   ),
                 ),
               );
-            }
-          } else {
+            }else {
             ScaffoldMessenger.of(context).removeCurrentSnackBar();
             Navigator.pushNamed(context, EmergencyScreen.routeName);
           }

@@ -30,6 +30,11 @@ class MyProfileProvider extends Notifier<Profile> {
       iconLink: profile['iconLink'],
     );
   }
+  void resetProfile(){
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if(uid == null) return;
+    state = Profile(userUID: uid,  name: '', bio: '', iconLink: '');
+  }
 }
 
 final profileProvider = NotifierProvider<MyProfileProvider, Profile>(
