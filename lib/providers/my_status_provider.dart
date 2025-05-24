@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/utilities/statics.dart';
@@ -112,6 +113,14 @@ class MyStatusProvider extends Notifier<UserStatus> {
     }
     if (!notificationPermission && Platform.isAndroid) {
       await Permission.notification.request();
+      final notificationSettings = await FirebaseMessaging.instance
+          .requestPermission(provisional: true);
+          // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
+          //pass unique device token
+      final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      if (apnsToken != null) {
+        
+      }
     }
   }
 

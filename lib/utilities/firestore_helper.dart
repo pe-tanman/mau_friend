@@ -41,6 +41,7 @@ class FirestoreHelper {
     String? username,
     String? bio,
     String? iconLink,
+    String? fcmToken
   ) async {
     try {
       var data = {
@@ -48,6 +49,7 @@ class FirestoreHelper {
         'username': username,
         'bio': bio,
         'iconLink': iconLink,
+        'fcmToken': fcmToken,
       };
       await _firestore.collection('userProfiles').doc(userUID).set(data);
     } catch (e) {
@@ -57,7 +59,7 @@ class FirestoreHelper {
   }
 
   Future<void> deleteUserProfile(String userUID) async {
-    await _firestore.collection('userProfiles').doc(userUID).delete;
+    await _firestore.collection('userProfiles').doc(userUID).delete();
   }
 
   Future<void> updatePassword(String userUID, String password) async {
@@ -176,6 +178,28 @@ class FirestoreHelper {
       rethrow;
     }
   }
+
+  Future<void> addMessage(
+    String title,
+    String body,
+    String imageUrl,
+    List<String> receiverTokens,
+  ) async {
+    final senderUID = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await _firestore.collection('message').add({
+        'title': title,
+        'body': body,
+        'imageUrl': imageUrl,
+        'senderUID': senderUID,
+        'receiverTokens': receiverTokens,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error adding message: $e');
+      rethrow;
+    }
+  }
 }
 
 class StorageHelper {
@@ -203,6 +227,8 @@ class StorageHelper {
       rethrow;
     }
   }
+
+  
 }
 
 class RealtimeDatabaseHelper {

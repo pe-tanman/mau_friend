@@ -182,7 +182,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 70),
-            Text('Location Access', style: appTheme().textTheme.titleMedium),
+            Text('Location and Notification Access', style: appTheme().textTheme.titleMedium),
             SvgPicture.asset('lib/assets/images/Map.svg', height: 300),
             Text(
               "To successfully share your status with your friends:",
@@ -191,14 +191,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 5),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                    Text(
                     "✅ Precise location",
                     style: appTheme().textTheme.headlineSmall,
                   ),
                   Text(
-                    "✅ Always  allowed",
+                    "✅ Location Always  allowed",
+                    style: appTheme().textTheme.headlineSmall,
+                  ),
+                   Text(
+                    "✅ Notificaitons allowed",
                     style: appTheme().textTheme.headlineSmall,
                   ),
                 ],

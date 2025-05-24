@@ -1,6 +1,6 @@
 from firebase_functions import firestore_fn
 
-from firebase_admin import initialize_app, firestore
+from firebase_admin import initialize_app, firestore, messaging
 import google.cloud.firestore
 
 app = initialize_app()
@@ -80,3 +80,33 @@ def onUserProfileDeleted(event: firestore_fn.Event[firestore_fn.Change[firestore
         firestore_client.collection("friendList").document(friend_uid).update({
             "friendList": firestore.ArrayRemove([userUID])
         })
+
+@firestore_fn.on_document_created(
+    document="message/{docId}",
+)
+def onNotificationUploaded(event: firestore_fn.Event[firestore_fn.Change[firestore_fn.DocumentSnapshot | None]]) -> None:
+    print("onNotificationUploaded")
+    if event.data is None:
+        return
+    try:
+        docId = event.params['docId']
+        profile_dict = event.data.after.to_dict() 
+        title = profile_dict['title']
+        body = profile_dict['body']
+        imageUrl = profile_dict['imageUrl']
+        senderUid = profile_dict['senderUID']
+        receiverTokens =  profile_dict['receiverTokens']
+
+        message = messaging.MulticastMessage(
+            notification=messaging.Notification(
+            title=title,
+            body=body,
+            payload={
+                "senderUID": senderUid,
+            }
+            ),
+            tokens=receiverTokens
+        )
+        messaging.send_multicast(message)
+    except KeyError:
+        return

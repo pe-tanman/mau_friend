@@ -73,6 +73,7 @@ dependencies:
   location: ^8.0.0
   slide_to_act: ^2.0.2
   animated_toggle_switch: ^0.8.5
+  firebase_messaging: ^15.2.6
 
 dev_dependencies:
   flutter_test:

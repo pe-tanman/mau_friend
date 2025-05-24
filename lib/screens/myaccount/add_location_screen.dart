@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:emoji_selector/emoji_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
+import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/themes/app_color.dart';
@@ -38,6 +39,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
   Set<Marker> markers = {};
   bool isLoadingMarkers = true;
   double _sliderValue = log(100);
+  bool isNotificationEnabled = false;
 
   RegisteredLocation? argument;
   var arguments;
@@ -179,7 +181,12 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
       coordinates,
       radius,
     );
-
+    if(isNotificationEnabled) {
+      PrefsHelper().addLocationNotificationPrefs(name);
+    }
+    else{
+      PrefsHelper().removeLocationNotificationPrefs(name);
+    }
     Navigator.pop(context, result);
   }
 
@@ -333,6 +340,14 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
       appBar: AppBar(
         title: Text('Add Location'),
         actions: [
+          IconButton(
+            icon: Icon(isNotificationEnabled ? Icons.notifications_active : Icons.notifications_off_outlined),
+            onPressed: () {
+              setState(() {
+                isNotificationEnabled = !isNotificationEnabled;
+              });
+            }
+          ),
           IconButton(
             onPressed: () {
               deleteLocaition();

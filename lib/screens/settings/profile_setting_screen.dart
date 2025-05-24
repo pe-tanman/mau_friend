@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:math';
@@ -79,8 +80,12 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     } else {
       iconLink = _selectedIcon ?? '';
     }
+    //FCM token
+    final _firebaseMessaging = FirebaseMessaging.instance;
+    String? fcmToken = await _firebaseMessaging.getToken();
+
     //save to firestore
-    await FirestoreHelper().addUserProfile(userUID, username, bio, iconLink);
+    await FirestoreHelper().addUserProfile(userUID, username, bio, iconLink, fcmToken);
     ref.read(profileProvider.notifier).loadMyProfile();
     setState(() {
       isLoading = false;
