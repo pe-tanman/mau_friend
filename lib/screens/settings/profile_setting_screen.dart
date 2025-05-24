@@ -52,6 +52,12 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
   void initState() {
     super.initState();
 
+    //TODO: testing
+   final _firebaseMessaging = FirebaseMessaging.instance;
+    _firebaseMessaging.getToken().then((token) {
+      print('FCM Token: $token');
+    });
+
     final profile = ref.read(profileProvider);
     _usernameController.text = profile.name ?? '';
     _bioController.text = profile.bio ?? '';
