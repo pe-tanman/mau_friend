@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
+import 'package:mau_friend/providers/profile_provider.dart';
+import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -129,7 +131,28 @@ class MyStatusProvider extends Notifier<UserStatus> {
     return currentPosition;
   }
 
-  //keep user's basic profile
+  Future<void> sendArrivalNotification(String status) async {
+    final myProfile = ref.read(profileProvider);
+    final senderImageUrl = myProfile.iconLink ?? Statics.defaultIconLink;
+    final senderName = myProfile.name ?? 'username';
+    final receivers = await PrefsHelper().getNotificationPrefs();
+    List<String> receiverTokens = [];
+    for (var receiverUID in receivers) {
+      if (receiverUID.isEmpty) continue; // Skip empty tokens
+      final profile = await FirestoreHelper().getUserProfile(receiverUID);
+      final token = profile['fcmToken'] ?? '';
+      if (token.isEmpty) continue; // Skip empty tokens
+      receiverTokens.add(token);
+    }
+    FirestoreHelper().addMessage(
+      'Arrival',
+      '${myProfile.name} is now in $status',
+      senderImageUrl,
+      receiverTokens,
+    );
+
+    
+  }  //keep user's basic profile
   void updateMyStatus(Position position, List<RegisteredLocation> myLocations) {
     final currentLocation = LatLng(position.latitude, position.longitude);
     //save in firebase and riverpod
@@ -138,6 +161,7 @@ class MyStatusProvider extends Notifier<UserStatus> {
         return;
       } else {
         RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
+       
         dbHelper.updateStatus(value).then((_) {
           state = value;
         });
