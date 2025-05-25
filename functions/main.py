@@ -109,6 +109,8 @@ def onNotificationUploaded(event: firestore_fn.Event[firestore_fn.Change[firesto
             },
             tokens=receiverTokens
         )
-        messaging.send_multicast(message)
+        response = messaging.send_multicast(message)
+        print(f"Successfully sent message: {response.success_count} messages sent.")
     except KeyError:
+        print("KeyError: Missing required fields in the document.")
         return

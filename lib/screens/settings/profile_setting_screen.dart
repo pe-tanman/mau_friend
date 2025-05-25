@@ -53,6 +53,16 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
   void initState() {
     super.initState();
 
+    print('initstate home screen');
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+    });
+
     //TODO: testing
    final _firebaseMessaging = FirebaseMessaging.instance;
     _firebaseMessaging.getToken().then((token) {
@@ -459,7 +469,13 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
               ),
               //TODO: remove
               TextButton(onPressed: (){
-                ref.read(myStatusProvider.notifier).sendArrivalNotification('Test Status');
+                Future.delayed(Duration(seconds: 10), () {
+                  print('Waited for 10 seconds');
+                    ref
+                        .read(myStatusProvider.notifier)
+                        .sendArrivalNotification('Test Status');
+                });
+                
               }, child: Text('Test FCM')),
             ],
           ),
