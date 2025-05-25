@@ -90,21 +90,23 @@ def onNotificationUploaded(event: firestore_fn.Event[firestore_fn.Change[firesto
         return
     try:
         docId = event.params['docId']
-        profile_dict = event.data.after.to_dict() 
+        profile_dict = event.data.to_dict() 
         title = profile_dict['title']
         body = profile_dict['body']
-        imageUrl = profile_dict['imageUrl']
+        imageUrl = profile_dict['iconLink']
         senderUid = profile_dict['senderUID']
-        receiverTokens =  profile_dict['receiverTokens']
+        #receiverTokens =  profile_dict['receiverTokens']
+        receiverTokens = ['dtLCkHfhI0x1ihfgeA-Ouo:APA91bHCO1yfs2H2EpkPXMB1xdbjwMLn51pwh1sBgtVdoJOYEU8myMHTp4hNm3H_YX1zBsCgqpfgCHSIr5QZXRZ6TMGQ_NlpWfm2Nao2VkTynSpYNNcY0fE']
 
         message = messaging.MulticastMessage(
             notification=messaging.Notification(
             title=title,
             body=body,
-            payload={
-                "senderUID": senderUid,
-            }
             ),
+            data={
+                "imageUrl": imageUrl,
+                "senderUID": senderUid,
+            },
             tokens=receiverTokens
         )
         messaging.send_multicast(message)

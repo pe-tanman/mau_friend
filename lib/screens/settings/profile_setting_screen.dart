@@ -7,6 +7,7 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
+import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/home_screen.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
@@ -321,6 +322,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -455,6 +457,10 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                 ),
               ),
+              //TODO: remove
+              TextButton(onPressed: (){
+                ref.read(myStatusProvider.notifier).sendArrivalNotification('Test Status');
+              }, child: Text('Test FCM')),
             ],
           ),
         ),

@@ -69,7 +69,7 @@ class MyStatusProvider extends Notifier<UserStatus> {
     return UserStatus('🟢', 'online');
   }
 
-  void startTrackingLocation()  {
+  void startTrackingLocation() {
     LocationSettings locationSettings;
     if (Platform.isAndroid) {
       locationSettings = AndroidSettings(
@@ -88,10 +88,10 @@ class MyStatusProvider extends Notifier<UserStatus> {
     } else {
       throw UnsupportedError('Unsupported platform');
     }
-    
-     Geolocator.getPositionStream(
-      locationSettings: locationSettings,
-    ).listen((Position? position) {
+
+    Geolocator.getPositionStream(locationSettings: locationSettings).listen((
+      Position? position,
+    ) {
       if (position == null) {
         return;
       }
@@ -113,15 +113,23 @@ class MyStatusProvider extends Notifier<UserStatus> {
     if (!permissionAlways) {
       await Permission.locationAlways.request();
     }
-    if (!notificationPermission && Platform.isAndroid) {
+    if (!notificationPermission) {
       await Permission.notification.request();
-      final notificationSettings = await FirebaseMessaging.instance
-          .requestPermission(provisional: true);
-          // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
-          //pass unique device token
+      await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+      await FirebaseMessaging.instance.subscribeToTopic("arrival");
+      // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
+      //pass unique device token
       final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
       if (apnsToken != null) {
-        
+        print("APNs Token: $apnsToken");
       }
     }
   }
@@ -150,9 +158,8 @@ class MyStatusProvider extends Notifier<UserStatus> {
       senderImageUrl,
       receiverTokens,
     );
+  } //keep user's basic profile
 
-    
-  }  //keep user's basic profile
   void updateMyStatus(Position position, List<RegisteredLocation> myLocations) {
     final currentLocation = LatLng(position.latitude, position.longitude);
     //save in firebase and riverpod
@@ -161,7 +168,8 @@ class MyStatusProvider extends Notifier<UserStatus> {
         return;
       } else {
         RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
-       
+        sendArrivalNotification(value.status);
+
         dbHelper.updateStatus(value).then((_) {
           state = value;
         });

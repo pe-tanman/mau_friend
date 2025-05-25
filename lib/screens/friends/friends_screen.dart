@@ -132,6 +132,7 @@ Future<void> updateFriendStatus(String friendUID) async {
           });
         }
       }
+      
     });
     friendsSubscription = FirebaseFirestore.instance
         .collection('friendList')
