@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
+import 'package:mau_friend/utilities/statics.dart';
 
 class FirestoreHelper {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -41,7 +42,7 @@ class FirestoreHelper {
     String? username,
     String? bio,
     String? iconLink,
-    String? fcmToken
+    String? fcmToken,
   ) async {
     try {
       var data = {
@@ -145,8 +146,15 @@ class FirestoreHelper {
       String myUID = FirebaseAuth.instance.currentUser!.uid;
       final friendDoc =
           await _firestore.collection('friendList').doc(myUID).get();
+
       var data = friendDoc.data();
-      var result = data!['profiles'];
+      var result = {};
+      if (data != null) {
+        result = data['profiles'];
+      } else {
+        result = {};
+      }
+
       return result;
     } catch (e) {
       print('Error loading friend profiles: $e');
@@ -227,8 +235,6 @@ class StorageHelper {
       rethrow;
     }
   }
-
-  
 }
 
 class RealtimeDatabaseHelper {
@@ -247,5 +253,3 @@ class RealtimeDatabaseHelper {
     await database.ref('users/$userUID').remove();
   }
 }
-
-

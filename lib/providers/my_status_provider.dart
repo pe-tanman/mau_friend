@@ -168,7 +168,6 @@ class MyStatusProvider extends Notifier<UserStatus> {
         return;
       } else {
         RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
-        sendArrivalNotification(value.status);
 
         dbHelper.updateStatus(value).then((_) {
           state = value;

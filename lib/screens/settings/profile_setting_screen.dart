@@ -53,22 +53,6 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
   void initState() {
     super.initState();
 
-    print('initstate home screen');
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
-
-      if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
-      }
-    });
-
-    //TODO: testing
-   final _firebaseMessaging = FirebaseMessaging.instance;
-    _firebaseMessaging.getToken().then((token) {
-      print('FCM Token: $token');
-    });
-
     final profile = ref.read(profileProvider);
     _usernameController.text = profile.name ?? '';
     _bioController.text = profile.bio ?? '';
@@ -467,16 +451,6 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                 ),
               ),
-              //TODO: remove
-              TextButton(onPressed: (){
-                Future.delayed(Duration(seconds: 10), () {
-                  print('Waited for 10 seconds');
-                    ref
-                        .read(myStatusProvider.notifier)
-                        .sendArrivalNotification('Test Status');
-                });
-                
-              }, child: Text('Test FCM')),
             ],
           ),
         ),
