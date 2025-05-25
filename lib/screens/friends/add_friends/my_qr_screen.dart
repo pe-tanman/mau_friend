@@ -41,22 +41,7 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
     return '$uid+$password';
   }
 
-@override
-  void initState() {
-    DatabaseReference dbRef = FirebaseDatabase.instance.ref('users');
-    super.initState();
-    
-     dbRef.onValue.listen((event) {
-        FirebaseFirestore.instance
-          .collection('friendList')
-          .doc(myUID)
-          .snapshots()
-          .listen((snapshot) {
-            ref.read(friendListProvider.notifier).loadFriendList();
-            ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
-          });
-    });
-  }
+
   @override
   void dispose() {
     FirestoreHelper().updatePassword(myUID, '');
@@ -69,6 +54,18 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
       print('qr');
       ref.read(profileProvider.notifier).loadMyProfile().then((_) {
           myUID = FirebaseAuth.instance.currentUser!.uid;
+           DatabaseReference dbRef = FirebaseDatabase.instance.ref('users');
+
+        dbRef.onValue.listen((event) {
+          FirebaseFirestore.instance
+              .collection('friendList')
+              .doc(myUID)
+              .snapshots()
+              .listen((snapshot) {
+                ref.read(friendListProvider.notifier).loadFriendList();
+                ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
+              });
+        });
           setState(() {
             isInit = false;
           });

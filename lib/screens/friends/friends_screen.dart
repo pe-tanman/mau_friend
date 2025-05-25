@@ -56,8 +56,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       //update notification
       final newFriend = snapshot.data()!['friendList'].last;
       final newFriendProfile = snapshot.data()!['profiles'][newFriend];
-      final newFriendName = newFriendProfile['username'];
-      final newFriendIconLink = newFriendProfile['iconLink'];
+
+      final newFriendName = newFriendProfile?['username'] ?? 'username';
+      final newFriendIconLink = newFriendProfile?['iconLink'] ?? Statics.defaultIconLink;
       final timestamp =
           '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
 
