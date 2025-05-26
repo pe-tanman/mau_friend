@@ -198,8 +198,15 @@ class FirestoreHelper {
       String myUID = FirebaseAuth.instance.currentUser!.uid;
       final friendDoc =
           await _firestore.collection('friendList').doc(myUID).get();
+
       var data = friendDoc.data();
-      var result = data!['profiles'];
+      var result = {};
+      if (data != null) {
+        result = data['profiles'];
+      } else {
+        result = {};
+      }
+
       return result;
     } catch (e) {
       print('Error loading friend profiles: $e');

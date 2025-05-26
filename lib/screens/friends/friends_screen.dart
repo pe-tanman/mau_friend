@@ -13,9 +13,6 @@ import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
 import 'package:mau_friend/screens/friends/notification_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
-import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
-import 'package:mau_friend/themes/app_color.dart';
-import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
@@ -62,8 +59,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       //update notification
       final newFriend = snapshot.data()!['friendList'].last;
       final newFriendProfile = snapshot.data()!['profiles'][newFriend];
-      final newFriendName = newFriendProfile['username'];
-      final newFriendIconLink = newFriendProfile['iconLink'];
+      final newFriendName = newFriendProfile?['username']?? 'username';
+      final newFriendIconLink = newFriendProfile?['iconLink']?? Statics.defaultIconLink;
       final timestamp =
           '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
 
@@ -86,8 +83,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       final oldFriendProfile = await FirestoreHelper().getUserProfile(
         oldFriend,
       );
-      final oldFriendName = oldFriendProfile['username'];
-      final oldFriendIconLink = oldFriendProfile['iconLink'];
+      final oldFriendName = oldFriendProfile?['username'] ?? 'username';
+      final oldFriendIconLink = oldFriendProfile?['iconLink'] ?? Statics.defaultIconLink;
       final timestamp =
           '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
 
@@ -131,13 +128,16 @@ Future<void> updateLocationAvailable(String friendUID) async {
     dbRef = FirebaseDatabase.instance.ref('users');
     dbRef.onValue.listen((event) {
       final map = event.snapshot.value;
+      print('statusChanged: $map');
       if (map != null) {
-        statusMap = map as Map;
-        if (isLoading) {
-          setState(() {
+        setState(() {
+          isLoading = true;
+          statusMap = map as Map;
+          if (isLoading) {
             isLoading = false;
-          });
-        }
+          }
+        });
+        
       }
     });
     friendsSubscription = FirebaseFirestore.instance

@@ -92,11 +92,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       padding: const EdgeInsets.all(20),
       child: SingleChildScrollView(
         child: Column(
-          
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SvgPicture.asset('lib/assets/images/Group 11.svg'),  
-            Text('Welcome to mau', style: appTheme().textTheme.titleMedium),        
+            SvgPicture.asset('lib/assets/images/Group 11.svg'),
+            Text('Welcome to mau', style: appTheme().textTheme.titleMedium),
             SizedBox(height: 40),
             primaryButton('Continue', () {
               _pageController.nextPage(
@@ -123,16 +122,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             'Our Promise to You',
             style: TextStyle(fontSize: 20, color: AppColors.themeColor),
           ),
-          Text('Your location, friends, and places are stored only on your device— never shared, not even with us.', style: TextStyle(color: AppColors.themeColor, fontSize: 16,),),
-            SizedBox(height: 10),
-            
+          Text(
+            'Your location, friends, and places are stored only on your device— never shared, not even with us.',
+            style: TextStyle(color: AppColors.themeColor, fontSize: 16),
+          ),
+          SizedBox(height: 10),
+
           SizedBox(height: 100),
           Link(
             // 開きたいWebページのURLを指定
             uri: Uri.parse(
               'https://petanman.notion.site/Privacy-Policy-1efe73611a8f804388a5d41b98b7165f?pvs=4',
             ),
-            // targetについては後述
             target: LinkTarget.blank,
             builder: (BuildContext ctx, FollowLink? openLink) {
               return TextButton(
@@ -160,7 +161,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               );
             },
           ),
-          SizedBox(height: 30,),
+          SizedBox(height: 30),
           primaryButton('Accept and Continue', () {
             _pageController.nextPage(
               duration: Duration(milliseconds: 300),
@@ -180,18 +181,24 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 70),
-            Text('Location and Notification Access', style: appTheme().textTheme.titleMedium),
+            Text(
+              'Location and Notification Access',
+              style: appTheme().textTheme.titleMedium,
+            ),
             SvgPicture.asset('lib/assets/images/Map.svg', height: 300),
             Text(
               "To successfully share your status with your friends:",
               style: TextStyle(color: AppColors.darkText1),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 5),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 25.0,
+                vertical: 5,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                   Text(
+                  Text(
                     "✅ Precise location",
                     style: appTheme().textTheme.headlineSmall,
                   ),
@@ -199,7 +206,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     "✅ Location Always  allowed",
                     style: appTheme().textTheme.headlineSmall,
                   ),
-                   Text(
+                  Text(
                     "✅ Notificaitons allowed",
                     style: appTheme().textTheme.headlineSmall,
                   ),
@@ -220,8 +227,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
     );
   }
-  
-  
+
   Widget _buildLoginTab() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -231,9 +237,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         children: [
           SvgPicture.asset('lib/assets/images/Group 9.svg'),
           SizedBox(height: 100),
-          primaryButton('Get Started', (){
+          primaryButton('Get Started', () {
             Navigator.pushNamed(context, AuthGate.routeName);
-          })
+          }),
           //add login button
         ],
       ),

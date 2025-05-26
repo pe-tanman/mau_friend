@@ -144,101 +144,70 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   }
 
   Widget _buildMyCard(Profile profile) {
-    int tappedCount = 5;
     return Card(
       color: (ref.watch(emergencyProvider.notifier).isEmergencyActive())? Colors.red: null,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       elevation: 3,
-      child: InkWell(
-        onTap: () {
-          tappedCount--;
-          if (tappedCount > 0) {
-
-              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: Colors.redAccent,
-
-                  content: Row(
-                    children: [
-                      SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: Icon(Icons.emergency),
-                      ),
-                      Text(
-                        'Tap $tappedCount more times, turn on Feeling Unsafe',
-                      ),
-                    ],
+      child: Column(
+        children: [
+          SizedBox(height: 30),
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: NetworkImage(
+              (profile.iconLink != null && profile.iconLink != '')
+                  ? profile.iconLink!
+                  : Statics.defaultIconLink,
+            ),
+          ), // a cat image
+          SizedBox(height: 10),
+          Text(
+            profile.name ?? 'Username',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 5),
+          Text(
+            profile.bio ?? 'Bio',
+            style: TextStyle(fontSize: 16, color: Colors.grey),
+          ),
+          SizedBox(height: 5),
+          if (profile.name == null)
+            TextButton.icon(
+              label: Text('Complete your profile'),
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                Navigator.pushNamed(context, ProfileSettingScreen.routeName);
+              },
+            ),
+          SizedBox(height: 20),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  ref.watch(myStatusProvider).icon,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
-              );
-            }else {
-            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-            Navigator.pushNamed(context, EmergencyScreen.routeName);
-          }
-        },
-        child: Column(
-          children: [
-            SizedBox(height: 30),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage(
-                (profile.iconLink != null && profile.iconLink != '')
-                    ? profile.iconLink!
-                    : Statics.defaultIconLink,
-              ),
-            ), // a cat image
-            SizedBox(height: 10),
-            Text(
-              profile.name ?? 'Username',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                SizedBox(width: 10),
+                Text(
+                  ref.watch(myStatusProvider).status,
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
+              ],
             ),
-            SizedBox(height: 5),
-            Text(
-              profile.bio ?? 'Bio',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            SizedBox(height: 5),
-            if (profile.name == null)
-              TextButton.icon(
-                label: Text('Complete your profile'),
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  Navigator.pushNamed(context, ProfileSettingScreen.routeName);
-                },
-              ),
-            SizedBox(height: 20),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    ref.watch(myStatusProvider).icon,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    ref.watch(myStatusProvider).status,
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
-          ],
-        ),
+          ),
+          SizedBox(height: 20),
+        ],
       ),
     );
   }
@@ -280,8 +249,6 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
           children: [
             SizedBox(height: 20),
             _buildMyCard(profile),
-            //Tofo:add cute and informative icons
-            //location list
             SizedBox(height: 20),
 
             if (!isLoading)

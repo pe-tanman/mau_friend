@@ -461,16 +461,6 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                 ),
               ),
-              //TODO: remove
-              TextButton(onPressed: (){
-                Future.delayed(Duration(seconds: 10), () {
-                  print('Waited for 10 seconds');
-                    ref
-                        .read(myStatusProvider.notifier)
-                        .sendArrivalNotification('Test Status');
-                });
-                
-              }, child: Text('Test FCM')),
             ],
           ),
         ),

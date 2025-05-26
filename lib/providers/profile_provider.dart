@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 class Profile {
   String userUID;
   String? name;
@@ -30,10 +31,11 @@ class MyProfileProvider extends Notifier<Profile> {
       iconLink: profile['iconLink'],
     );
   }
-  void resetProfile(){
+
+  void resetProfile() {
     final uid = FirebaseAuth.instance.currentUser?.uid;
-    if(uid == null) return;
-    state = Profile(userUID: uid,  name: '', bio: '', iconLink: '');
+    if (uid == null) return;
+    state = Profile(userUID: uid, name: '', bio: '', iconLink: '');
   }
 }
 
@@ -49,17 +51,17 @@ class FriendProfilesProvider extends Notifier<Map<String, Profile>> {
     var profilesMap = await FirestoreHelper().getFriendProfiles();
 
     Map<String, Profile> result = {};
-
+    print(profilesMap);
 
     profilesMap.forEach((key, profile) {
-      result[profile['userUID']] = Profile(
+      print(profile);
+      result[key] = Profile(
         userUID: profile['userUID'],
         name: profile['username'],
         bio: profile['bio'],
         iconLink: profile['iconLink'],
       );
     });
-    
 
     state = result;
   }
