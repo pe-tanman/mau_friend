@@ -107,11 +107,17 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
                         print('Adding $friendUID to mute list');
                         muteList.add(friendUID);
                         PrefsHelper().addMutePrefs(friendUID);
+                        FirestoreHelper().addMutedList(
+                          friendUID
+                        );
                       }
                     } else {
                       if (muteList.contains(friendUID)) {
                         muteList.remove(friendUID);
                         PrefsHelper().removeMutePrefs(friendUID);
+                        FirestoreHelper().removeMutedList(
+                          friendUID
+                        );
                       }
                     }
                   });

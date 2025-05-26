@@ -25,6 +25,29 @@ class FirestoreHelper {
     }
   }
 
+  Future<void>addMutedList(String friendUID)async{
+    var myUID = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await _firestore.collection('userProfiles').doc(myUID).set({
+        'mutedList': FieldValue.arrayUnion([friendUID]),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print('Error adding to muted list: $e');
+      rethrow;
+    }
+  }
+  Future<void> removeMutedList(String friendUID) async {
+    var myUID = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await _firestore.collection('userProfiles').doc(myUID).update({
+        'mutedList': FieldValue.arrayRemove([friendUID]),
+      });
+    } catch (e) {
+      print('Error removing from muted list: $e');
+      rethrow;
+    }
+  }
+
   // Get all documents from a collection
   Future<Map<String, dynamic>> getUserProfile(String userUID) async {
     try {

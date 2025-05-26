@@ -48,13 +48,13 @@ class FriendProfilesProvider extends Notifier<Map<String, Profile>> {
   Map<String, Profile> build() => {};
 
   Future<void> loadFriendProfiles() async {
-    var profilesMap = await FirestoreHelper().getFriendProfiles();
+    Map profilesMap = await FirestoreHelper().getFriendProfiles();
 
     Map<String, Profile> result = {};
-    print(profilesMap);
 
     profilesMap.forEach((key, profile) {
-      print(profile);
+
+
       result[key] = Profile(
         userUID: profile['userUID'],
         name: profile['username'],

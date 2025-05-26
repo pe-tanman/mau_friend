@@ -154,6 +154,11 @@ class MyStatusProvider extends Notifier<UserStatus> {
       if (receiverUID.isEmpty) continue; // Skip empty tokens
       final profile = await FirestoreHelper().getUserProfile(receiverUID);
       final token = profile['fcmToken'] ?? '';
+      final mutedList = profile['mutedList'] ?? [];
+      if (mutedList.contains(myProfile.userUID)) {
+        print('User $receiverUID has muted notifications from $senderName');
+        continue; // Skip sending notification to muted users
+      }
       if (token.isEmpty) continue; // Skip empty tokens
       receiverTokens.add(token);
     }
@@ -161,6 +166,7 @@ class MyStatusProvider extends Notifier<UserStatus> {
       print('No valid receiver tokens found for notification.');
       return; // No valid tokens to send notification
     }
+
     FirestoreHelper().addMessage(
       'Arrival',
       '${senderName} is now in $status',

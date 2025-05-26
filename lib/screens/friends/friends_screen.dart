@@ -148,6 +148,7 @@ Future<void> updateLocationAvailable(String friendUID) async {
         .listen((snapshot) {
           ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
           ref.read(friendListProvider.notifier).loadFriendList();
+          print('Friend List Updated');
           if (snapshot.exists) {
             updatePrefs(snapshot);
           }
