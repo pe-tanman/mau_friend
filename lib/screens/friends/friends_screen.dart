@@ -31,6 +31,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   List profileList = [Profile];
   String userState = 'offline';
   late StreamSubscription friendsSubscription;
+  late StreamSubscription statusSubscription;
   late DatabaseReference dbRef;
   Map statusMap = {};
   bool isLoading = true;
@@ -126,10 +127,9 @@ Future<void> updateLocationAvailable(String friendUID) async {
     NotificationDatabaseHelper().initNotificationDatabase();
     final myUID = FirebaseAuth.instance.currentUser?.uid;
     dbRef = FirebaseDatabase.instance.ref('users');
-    dbRef.onValue.listen((event) {
+     statusSubscription = dbRef.onValue.listen((event) {
       final map = event.snapshot.value;
-      print('statusChanged: $map');
-      if (map != null) {
+      if (map != null && mounted) {
         setState(() {
           isLoading = true;
           statusMap = map as Map;
@@ -140,6 +140,7 @@ Future<void> updateLocationAvailable(String friendUID) async {
         
       }
     });
+    
     friendsSubscription = FirebaseFirestore.instance
         .collection('friendList')
         .doc(myUID)
@@ -151,6 +152,14 @@ Future<void> updateLocationAvailable(String friendUID) async {
             updatePrefs(snapshot);
           }
         });
+  }
+
+  @override
+  void dispose() {
+    statusSubscription.cancel();
+    friendsSubscription.cancel();
+    dbRef.onValue.drain();
+    super.dispose();
   }
 
 

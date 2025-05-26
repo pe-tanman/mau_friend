@@ -196,7 +196,7 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
                                 : Colors.grey,
                       ),
                       Text(
-                        'Notify Emergency',
+                        'Emergency Location',
                         style: TextStyle(
                           color:
                               emergencyList.contains(friendUID)

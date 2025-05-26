@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
@@ -29,6 +30,7 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
   Marker? currentMarker;
   bool isMapLoading = true;
   bool isLocationSharingEnabled = false;
+  late StreamSubscription positionStream;
   LocationSettings locationSettings() {
     LocationSettings locationSettings;
     if (Platform.isAndroid) {
@@ -54,7 +56,8 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
   @override
   void initState() {
     super.initState();
-    isLocationSharingEnabled = ref.read(emergencyProvider.notifier).isEmergencyActive();
+    isLocationSharingEnabled =
+        ref.read(emergencyProvider.notifier).isEmergencyActive();
     Geolocator.getCurrentPosition().then((position) {
       if (position != null) {
         setState(() {
@@ -72,9 +75,11 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
       }
     });
 
-    Geolocator.getPositionStream(locationSettings: locationSettings()).listen((
-      Position? position,
-    ) {
+    
+
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: locationSettings(),
+    ).listen((Position? position) {
       if (position != null) {
         setState(() {
           currentLocation = LatLng(position.latitude, position.longitude);
@@ -89,6 +94,12 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    positionStream.cancel();
+    super.dispose();
   }
 
   bool isDarkMode(BuildContext context) {
@@ -137,7 +148,7 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
                 "Your exact location will be sent to your emergency close friends.",
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50),
                 child: AnimatedToggleSwitch.dual(
@@ -184,15 +195,17 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
                     if (value) {
                       startSharingLocation();
                     } else {
-                      ref.read(emergencyProvider.notifier).deactivateEmergency();
+                      ref
+                          .read(emergencyProvider.notifier)
+                          .deactivateEmergency();
                       FirestoreHelper().removeEmergencyLocation();
                     }
                   },
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 30),
               SizedBox(
-                height: 200,
+                height: 300,
                 child:
                     (isMapLoading)
                         ? Center(child: CircularProgressIndicator())

@@ -27,7 +27,7 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
 
     var result = await dbHelper.getAllData();
     var output = <RegisteredLocation>[];
-    if (result.isNotEmpty) {
+    if (result != null &&result.isNotEmpty) {
       result.forEach((element) {
         var coordinates = LatLng(element['latitude'], element['longitude']);
         var name = element['name'];

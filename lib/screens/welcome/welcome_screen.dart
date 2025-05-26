@@ -123,8 +123,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             style: TextStyle(fontSize: 20, color: AppColors.themeColor),
           ),
           Text(
-            'Your location, friends, and places are stored only on your device— never shared, not even with us.',
+            'Your location, friends, and places are stored only on your device— never shared, not even with us.*',
             style: TextStyle(color: AppColors.themeColor, fontSize: 16),
+          ),
+          SizedBox(height: 20),
+          Text(
+            '*Only in emergency mode, your location is shared with your emergency contacts.',
+            style: TextStyle(color: AppColors.themeColor, fontSize: 10),
           ),
           SizedBox(height: 10),
 

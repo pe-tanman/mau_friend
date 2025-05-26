@@ -25,8 +25,11 @@ class MyLocationDatabaseHelper {
     return _database;
   }
 
-  Future<Database> initMyLocationDatabase() async {
-    final myUID = FirebaseAuth.instance.currentUser!.uid;
+  Future<Database?> initMyLocationDatabase() async {
+    final myUID = FirebaseAuth.instance.currentUser?.uid;
+    if (myUID == null) {
+      return null;
+    }
     String path = join(
       await getDatabasesPath(),
       "my_locations_database_$myUID.db",
@@ -94,9 +97,12 @@ class MyLocationDatabaseHelper {
     return null;
   }
 
-  Future<List<Map<String, dynamic>>> getAllData() async {
+  Future<List<Map<String, dynamic>>?> getAllData() async {
     final Database? db = await database;
-    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    final myUID = FirebaseAuth.instance.currentUser?.uid;
+    if (myUID == null) {
+      return null;
+    }
     print('my_locations_table_$myUID');
     final result = await db!.query('my_locations_table_$myUID');
     print('result: $result');
@@ -193,4 +199,3 @@ class NotificationDatabaseHelper {
     return await db!.query('notification_table_$myUID');
   }
 }
-
