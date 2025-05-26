@@ -93,10 +93,10 @@ def onNotificationUploaded(event: firestore_fn.Event[firestore_fn.Change[firesto
         profile_dict = event.data.to_dict() 
         title = profile_dict['title']
         body = profile_dict['body']
-        imageUrl = profile_dict['iconLink']
+        imageUrl = profile_dict['imageUrl']
         senderUid = profile_dict['senderUID']
         #receiverTokens =  profile_dict['receiverTokens']
-        receiverTokens = ['dtLCkHfhI0x1ihfgeA-Ouo:APA91bHCO1yfs2H2EpkPXMB1xdbjwMLn51pwh1sBgtVdoJOYEU8myMHTp4hNm3H_YX1zBsCgqpfgCHSIr5QZXRZ6TMGQ_NlpWfm2Nao2VkTynSpYNNcY0fE']
+        receiverTokens = ['cSiCYe06S0KGP7s1etrpPn:APA91bEcxvOke2Zx1yPZ3h4LGaDnI5vh-i5bB97ACQLavFbCE9FhEVOKwsBjHOhXgaA9xdsjX6lYTXxbri60V6rle1QNBwD90pCkm_kemD72XPlBg91496I']
 
         message = messaging.MulticastMessage(
             notification=messaging.Notification(
@@ -109,8 +109,9 @@ def onNotificationUploaded(event: firestore_fn.Event[firestore_fn.Change[firesto
             },
             tokens=receiverTokens
         )
-        response = messaging.send_multicast(message)
-        print(f"Successfully sent message: {response.success_count} messages sent.")
-    except KeyError:
-        print("KeyError: Missing required fields in the document.")
+        response = messaging.send_each_for_multicast(message)
+        print(f"Successfully sent message")
+    except KeyError as e:
+        missing_key = str(e).strip("'")
+        print(f"KeyError: Missing required field '{missing_key}' in the document. Ensure that all necessary fields are present.")
         return
