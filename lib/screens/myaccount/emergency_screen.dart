@@ -4,17 +4,24 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:map_location_picker/map_location_picker.dart';
+import 'package:mau_friend/providers/emergency_provider.dart';
+import 'package:mau_friend/providers/profile_provider.dart';
+import 'package:mau_friend/utilities/firestore_helper.dart';
+import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:slide_to_act/slide_to_act.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class EmergencyScreen extends StatefulWidget {
+class EmergencyScreen extends ConsumerStatefulWidget {
   static const String routeName = '/emergency';
   @override
   _EmergencyScreenState createState() => _EmergencyScreenState();
 }
 
-class _EmergencyScreenState extends State<EmergencyScreen> {
+class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
   LatLng currentLocation = Statics.initLocation;
+  bool isLocationSharing = false;
+
   CameraPosition initialCameraPosition = const CameraPosition(
     target: LatLng(0, 0),
     zoom: 14,
@@ -47,6 +54,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   @override
   void initState() {
     super.initState();
+    isLocationSharingEnabled = ref.read(emergencyProvider.notifier).isEmergencyActive();
     Geolocator.getCurrentPosition().then((position) {
       if (position != null) {
         setState(() {
@@ -87,6 +95,21 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     return MediaQuery.of(context).platformBrightness == Brightness.dark;
   }
 
+  Future<void> startSharingLocation() async {
+    setState(() {
+      isLocationSharing = true;
+    });
+    final myProfile = ref.read(profileProvider);
+    final myname = myProfile.name ?? 'Your friend';
+    final title = '$myname Feeling Unsafe';
+    final imageUrl = myProfile.iconLink ?? Statics.defaultIconLink;
+    final body = '$myname started emergency location sharing.';
+    final receiverTokens = await PrefsHelper().getEmergencyPrefs();
+    FirestoreHelper().addMessage(title, body, imageUrl, receiverTokens);
+    FirestoreHelper().addEmergencyLocation(currentLocation);
+    ref.read(emergencyProvider.notifier).activateEmergency();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,38 +142,51 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 50),
                 child: AnimatedToggleSwitch.dual(
                   animationDuration: const Duration(milliseconds: 300),
-                
+
                   first: false,
                   second: true,
                   indicatorSize: const Size(60, 60),
                   height: 80,
-                  borderWidth:10,
-                  style:ToggleStyle(
-                    indicatorColor: isLocationSharingEnabled? Colors.white : Colors.red.shade600,
-                    borderColor: isLocationSharingEnabled
+                  borderWidth: 10,
+                  style: ToggleStyle(
+                    indicatorColor:
+                        isLocationSharingEnabled
+                            ? Colors.white
+                            : Colors.red.shade600,
+                    borderColor:
+                        isLocationSharingEnabled
                             ? Colors.red.shade600
                             : Colors.white,
-                    backgroundColor: isLocationSharingEnabled? Colors.red.shade600 : Colors.white,
+                    backgroundColor:
+                        isLocationSharingEnabled
+                            ? Colors.red.shade600
+                            : Colors.white,
                   ),
-                  iconBuilder: (value) => 
-                     value? Icon(
-                                Icons.stop,
+                  iconBuilder:
+                      (value) =>
+                          value
+                              ? Icon(Icons.stop, color: Colors.black, size: 30)
+                              : Icon(
+                                Icons.location_on_outlined,
                                 color: Colors.black,
                                 size: 30,
-                              )
-                              : Icon(Icons.location_on_outlined, color: Colors.black, size: 30),
-                  textBuilder: (value) => Text(
-                    value ? "Stop Sharing" : "Share Location",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                  ),
+                              ),
+                  textBuilder:
+                      (value) => Text(
+                        value ? "Stop Sharing" : "Share Location",
+                        style: TextStyle(color: Colors.black, fontSize: 18),
+                      ),
                   current: isLocationSharingEnabled,
                   onChanged: (value) {
                     setState(() {
                       isLocationSharingEnabled = value;
                     });
+                    if (value) {
+                      startSharingLocation();
+                    } else {
+                      ref.read(emergencyProvider.notifier).deactivateEmergency();
+                      FirestoreHelper().removeEmergencyLocation();
+                    }
                   },
                 ),
               ),
@@ -167,39 +203,39 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                         ),
               ),
               const SizedBox(height: 60),
-              Text(
-                "Send Circumstances",
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                "You can send video (~ 1 min) of your current situation to your emergency close friends.",
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: SlideAction(
-                  height: 80,
-                  elevation: 0,
-                  text: 'Send Video',
-                  textStyle: TextStyle(color: Colors.black, fontSize: 18),
-                  outerColor: Colors.white,
-                  innerColor: Colors.red.shade600,
-                  sliderButtonIcon: Icon(
-                    size:30,
+              // Text(
+              //   "Send Circumstances",
+              //   style: Theme.of(context).textTheme.headlineMedium,
+              // ),
+              // const SizedBox(height: 10),
+              // Text(
+              //   "You can send video (~ 1 min) of your current situation to your emergency close friends.",
+              //   style: Theme.of(context).textTheme.bodyMedium,
+              // ),
+              // const SizedBox(height: 20),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 50),
+              //   child: SlideAction(
+              //     height: 80,
+              //     elevation: 0,
+              //     text: 'Send Video',
+              //     textStyle: TextStyle(color: Colors.black, fontSize: 18),
+              //     outerColor: Colors.white,
+              //     innerColor: Colors.red.shade600,
+              //     sliderButtonIcon: Icon(
+              //       size: 30,
 
-                    Icons.videocam_outlined,
-                    weight: 30,
+              //       Icons.videocam_outlined,
+              //       weight: 30,
 
-                    color: Colors.black,
-                  ),
-                  onSubmit: () {
-                    // Handle the action when the button is slid
-                    print('Location sent');
-                  },
-                ),
-              ),
+              //       color: Colors.black,
+              //     ),
+              //     onSubmit: () {
+              //       // Handle the action when the button is slid
+              //       print('Location sent');
+              //     },
+              //   ),
+              // ),
             ],
           ),
         ),

@@ -345,6 +345,14 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
             onPressed: () {
               setState(() {
                 isNotificationEnabled = !isNotificationEnabled;
+                if(isNotificationEnabled){
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Registered friends will be notified when you arrive at this location.'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
               });
             }
           ),

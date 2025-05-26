@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:map_location_picker/map_location_picker.dart';
+import 'package:mau_friend/providers/emergency_provider.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/utilities/prefs_helper.dart';
@@ -37,6 +38,10 @@ class MyStatusProvider extends Notifier<UserStatus> {
     List<RegisteredLocation> myLocations,
   ) async {
     double speedKmPH = speed; //speed maybe in km/h
+
+    if (ref.read(emergencyProvider.notifier).isEmergencyActive()) {
+      return UserStatus('🚨', 'feeling unsafe');
+    }
 
     if (currentLocation.latitude == Statics.initLocation.latitude &&
         currentLocation.longitude == Statics.initLocation.longitude) {
@@ -160,7 +165,10 @@ class MyStatusProvider extends Notifier<UserStatus> {
     );
   } //keep user's basic profile
 
-  Future<void> updateMyStatus(Position position, List<RegisteredLocation> myLocations)  async {
+  Future<void> updateMyStatus(
+    Position position,
+    List<RegisteredLocation> myLocations,
+  ) async {
     final currentLocation = LatLng(position.latitude, position.longitude);
     //save in firebase and riverpod
     var status = await userStatus(currentLocation, position.speed, myLocations);
@@ -168,15 +176,16 @@ class MyStatusProvider extends Notifier<UserStatus> {
       return;
     } else {
       RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
-      final notificationEnabledLocations = await PrefsHelper().getLocationNotificationPrefs();
+      final notificationEnabledLocations =
+          await PrefsHelper().getLocationNotificationPrefs();
 
-        if(notificationEnabledLocations.contains(status.status)) {
-          sendArrivalNotification(status.status);
-        } 
-        
-        await dbHelper.updateStatus(status);
-          state = status;
+      if (notificationEnabledLocations.contains(status.status)) {
+        sendArrivalNotification(status.status);
       }
+
+      await dbHelper.updateStatus(status);
+      state = status;
+    }
   }
 }
 

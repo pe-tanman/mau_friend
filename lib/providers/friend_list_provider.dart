@@ -10,7 +10,6 @@ class FriendListProvider extends Notifier<List<String>> {
   //keep user's basic profile
   Future<void> loadFriendList() async {
     var friendList = await FirestoreHelper().getFriendList();
-    print('Friend list: ${friendList.length}');
     state = friendList;
   }
 }

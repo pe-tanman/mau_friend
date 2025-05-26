@@ -4,10 +4,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/screens/friends/edit_friend_list_screen.dart';
+import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
 import 'package:mau_friend/screens/friends/notification_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
@@ -36,6 +38,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   Map statusMap = {};
   bool isLoading = true;
 
+  Map locationAvailableMap = {};
+
   Future<void> updatePrefs(var snapshot) async {
     //Save friend list to local storage from notifier
     print('onUpdated');
@@ -45,10 +49,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
 
     if (localFriendList == null ||
         snapshot.data()!['friendList'].length > localFriendList.length) {
-
       await ref.read(friendListProvider.notifier).loadFriendList();
       //update statusMap variable
-       final newFriendUID = snapshot.data()!['friendList'].last;
+      final newFriendUID = snapshot.data()!['friendList'].last;
       updateFriendStatus(newFriendUID);
       //write prefs
       await prefs.setStringList(
@@ -78,8 +81,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       ref.read(notificationProvider.notifier).loadNotification();
       //when friend is removed
     } else if (snapshot.data()!['friendList'].length < localFriendList.length) {
-
-//update local storage
+      //update local storage
       final oldFriend = localFriendList.last;
       final oldFriendProfile = await FirestoreHelper().getUserProfile(
         oldFriend,
@@ -105,17 +107,22 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     }
   }
 
-
-Future<void> updateFriendStatus(String friendUID) async {
-    final event = await FirebaseDatabase.instance.ref('users/$friendUID').once();
+  Future<void> updateFriendStatus(String friendUID) async {
+    final event =
+        await FirebaseDatabase.instance.ref('users/$friendUID').once();
     final map = event.snapshot.value;
     if (map != null) {
       setState(() {
         statusMap[friendUID] = map;
       });
-      }
     }
-
+  }
+Future<void> updateLocationAvailable(String friendUID) async {
+    final location = await FirestoreHelper().getEmergencyLocation(friendUID);
+    setState(() {
+      locationAvailableMap[friendUID] = location != null;
+    });
+  }
   @override
   void initState() {
     super.initState();
@@ -132,7 +139,6 @@ Future<void> updateFriendStatus(String friendUID) async {
           });
         }
       }
-      
     });
     friendsSubscription = FirebaseFirestore.instance
         .collection('friendList')
@@ -150,9 +156,16 @@ Future<void> updateFriendStatus(String friendUID) async {
 
   Widget buildFriendCard(String friendUID) {
     final profile = ref.watch(friendProfilesProvider)[friendUID];
+    bool isEmergency = statusMap[friendUID]?['status'] == 'feeling unsafe';
+    bool isLocationLoading = true;
+    if (isEmergency) {
+      updateLocationAvailable(friendUID);
+      isLocationLoading = locationAvailableMap[friendUID] == null;
+    }
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
       elevation: 3.0,
+      color: isEmergency ? Colors.red : null,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -203,6 +216,19 @@ Future<void> updateFriendStatus(String friendUID) async {
                       ],
                     ),
           ),
+          SizedBox(height: 20),
+          if (locationAvailableMap[friendUID] != null &&
+              locationAvailableMap[friendUID] == true)
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  EmergencyLocationScreen.routeName,
+                  arguments: {'friendUID': friendUID},
+                );
+              },
+              label: Text("View Location"),
+              icon: Icon(Icons.location_on_outlined),
+            ),
         ],
       ),
     );

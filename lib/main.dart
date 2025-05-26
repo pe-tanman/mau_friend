@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
+import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
 import 'package:mau_friend/screens/myaccount/emergency_screen.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
@@ -35,11 +36,9 @@ Future<void> main() async {
   Future<void> _firebaseMessagingBackgroundHandler(
     RemoteMessage message,
   ) async {
-    // If you're going to use other Firebase services in the background, such as Firestore,
-    // make sure you call `initializeApp` before using other Firebase services.
     await Firebase.initializeApp();
-
-    print("Handling a background message: ${message.messageId}");
+    
+   
   }
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -93,6 +92,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         NotificationScreen.routeName : (context) => NotificationScreen(),
         EditFriendListScreen.routeName : (context) => EditFriendListScreen(),
         EmergencyScreen.routeName : (context) => EmergencyScreen(),
+        EmergencyLocationScreen.routeName : (context) => EmergencyLocationScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

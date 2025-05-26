@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mau_friend/providers/emergency_provider.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/myaccount/emergency_screen.dart';
@@ -145,6 +146,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   Widget _buildMyCard(Profile profile) {
     int tappedCount = 5;
     return Card(
+      color: (ref.watch(emergencyProvider.notifier).isEmergencyActive())? Colors.red: null,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       elevation: 3,

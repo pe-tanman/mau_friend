@@ -5,7 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
+import 'package:mau_friend/utilities/prefs_helper.dart';
 
 class FirestoreHelper {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -36,12 +38,63 @@ class FirestoreHelper {
     }
   }
 
+  Future<void> addEmergencyLocation(LatLng coordinates) async {
+    var myUID = FirebaseAuth.instance.currentUser!.uid;
+    var receivers = await PrefsHelper().getEmergencyPrefs();
+    return _firestore.collection('emergency').doc(myUID).set({
+      'coordinates': GeoPoint(coordinates.latitude, coordinates.longitude),
+      'timestamp': FieldValue.serverTimestamp(),
+      'receivers': receivers,
+    }, SetOptions(merge: true));
+  }
+
+  Future<LatLng?> getEmergencyLocation(String friendUID) async {
+    final emergencyDoc =
+        await _firestore.collection('emergency').doc(friendUID).get();
+    if (emergencyDoc.exists) {
+      var data = emergencyDoc.data();
+      if (data != null) {
+        var timestamp = data['timestamp'];
+        var receivers = data['receivers'];
+    
+        if (timestamp != null && timestamp is Timestamp) {
+          // Check if the timestamp is within the last 1 hour
+          if (timestamp.toDate().isBefore(
+            DateTime.now().subtract(Duration(hours: 1)),
+          )) {
+            return null; // Data is too old, return null
+          }
+        }
+        if (receivers != null && receivers is List) {
+          // Check if the current user is in the receivers list
+          var myUID = FirebaseAuth.instance.currentUser!.uid;
+          if (!receivers.contains(myUID)) {
+            return null; // Current user is not a receiver, return null
+          }
+        }
+        GeoPoint geoPoint = data['coordinates'];
+        return LatLng(geoPoint.latitude, geoPoint.longitude);
+      }
+    }
+    return null;
+  }
+
+  Future<void> removeEmergencyLocation() async {
+    var myUID = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await _firestore.collection('emergency').doc(myUID).delete();
+    } catch (e) {
+      print('Error removing emergency location: $e');
+      rethrow;
+    }
+  }
+
   Future<void> addUserProfile(
     String userUID,
     String? username,
     String? bio,
     String? iconLink,
-    String? fcmToken
+    String? fcmToken,
   ) async {
     try {
       var data = {
@@ -227,8 +280,6 @@ class StorageHelper {
       rethrow;
     }
   }
-
-  
 }
 
 class RealtimeDatabaseHelper {
@@ -247,5 +298,3 @@ class RealtimeDatabaseHelper {
     await database.ref('users/$userUID').remove();
   }
 }
-
-

@@ -25,7 +25,7 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
   List<String> notificationList = [];
   List<String> emergencyList = [];
   List<String> muteList = [];
-
+  bool isInitDialog = true;
   @override
   void initState() {
     loadNotificationPrefs();
@@ -44,9 +44,11 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
   }
 
   Future<void> loadNotificationPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    notificationList = prefs.getStringList('notificationList') ?? [];
-    emergencyList = prefs.getStringList('emergencyList') ?? [];
+    print('Loading notification preferences...');
+    notificationList = await PrefsHelper().getNotificationPrefs();
+    emergencyList = await PrefsHelper().getEmergencyPrefs();
+    muteList = await PrefsHelper().getMutePrefs();
+    
     setState(() {
       isNotificationsLoading = false;
     });
@@ -54,8 +56,9 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
 
   Widget _buildSettingDialog(index) {
     final friendUID = friendList[index];
-    return StatefulBuilder(builder: (context, setState) {
-    return AlertDialog(
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return AlertDialog(
           title: Text('Friend Settings'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -246,7 +249,8 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
             ),
           ],
         );
-    });
+      },
+    );
   }
 
   Widget _buildListTile(int index) {
@@ -283,6 +287,7 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
   Widget build(BuildContext context) {
     friendProfiles = ref.watch(friendProfilesProvider);
     friendList = ref.watch(friendListProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Friend List')),
       body:

@@ -23,7 +23,6 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
   }
 
   Future<void> loadLocations() async {
-    print('loadLocations');
     MyLocationDatabaseHelper dbHelper = MyLocationDatabaseHelper();
 
     var result = await dbHelper.getAllData();
@@ -38,10 +37,8 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
         output.add(RegisteredLocation(name, icon, coordinates, radius));
       });
       state = output;
-      print(state);
     } else {
       state = [];
-      print('No data found');
     }
   }
 }
