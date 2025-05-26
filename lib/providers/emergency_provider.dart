@@ -36,5 +36,3 @@ final emergencyProvider =
     StateNotifierProvider<EmergencyNotifier, Emergency>((ref) {
   return EmergencyNotifier();
 });
-
-

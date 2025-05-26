@@ -30,6 +30,7 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
   Marker? currentMarker;
   bool isMapLoading = true;
   bool isLocationSharingEnabled = false;
+  String receiverNames = '';
   late StreamSubscription positionStream;
   LocationSettings locationSettings() {
     LocationSettings locationSettings;
@@ -75,8 +76,6 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
       }
     });
 
-    
-
     positionStream = Geolocator.getPositionStream(
       locationSettings: locationSettings(),
     ).listen((Position? position) {
@@ -91,6 +90,25 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
             markerId: const MarkerId('currentLocation'),
             position: currentLocation,
           );
+        });
+      }
+    });
+
+    PrefsHelper().getEmergencyPrefs().then((receivers) {
+      if (receivers.isNotEmpty) {
+        setState(() {
+          List receiverNameList = [];
+          for (var receiverUID in receivers) {
+            if (receiverUID.isEmpty) continue; // Skip empty tokens
+            final profile = ref.read(friendProfilesProvider)[receiverUID];
+            if (profile == null) continue; // Skip if profile not found)
+            receiverNameList.add(profile.name ?? 'Unknown');
+          }
+          receiverNames = receiverNameList.join(', ');
+        });
+      } else {
+        setState(() {
+          receiverNames = '(No emergency contacts set.)';
         });
       }
     });
@@ -116,6 +134,7 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
     final imageUrl = myProfile.iconLink ?? Statics.defaultIconLink;
     final body = '$myname started emergency location sharing.';
     final receivers = await PrefsHelper().getEmergencyPrefs();
+
     List<String> receiverTokens = [];
     for (var receiverUID in receivers) {
       if (receiverUID.isEmpty) continue; // Skip empty tokens
@@ -125,7 +144,6 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
       receiverTokens.add(token);
     }
     if (receiverTokens.isEmpty) {
-      
       print('No valid receiver tokens found for notification.');
       return; // No valid tokens to send notification
     }
@@ -159,7 +177,7 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
               ),
               const SizedBox(height: 10),
               Text(
-                "Your exact location will be sent to your emergency close friends.",
+                "Your exact location will be sent to:\n$receiverNames",
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 30),
