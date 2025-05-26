@@ -83,4 +83,27 @@ class PrefsHelper {
         }
     
   }
+
+  Future<void> addMutePrefs(String friendUID) async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    List<String> muteList = await getMutePrefs();
+    muteList.add(friendUID);
+    await prefs.setStringList('muteList_$myUID', muteList);
+  }
+
+  Future<List<String>> getMutePrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    List<String> muteList = prefs.getStringList('muteList_$myUID') ?? [];
+    return muteList;
+  }
+
+  Future<void> removeMutePrefs(String friendUID) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> muteList = await getMutePrefs();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    muteList.remove(friendUID);
+    await prefs.setStringList('muteList_$myUID', muteList);
+  }
 }
