@@ -95,8 +95,7 @@ def onNotificationUploaded(event: firestore_fn.Event[firestore_fn.Change[firesto
         body = profile_dict['body']
         imageUrl = profile_dict['imageUrl']
         senderUid = profile_dict['senderUID']
-        #receiverTokens =  profile_dict['receiverTokens']
-        receiverTokens = ['cSiCYe06S0KGP7s1etrpPn:APA91bEcxvOke2Zx1yPZ3h4LGaDnI5vh-i5bB97ACQLavFbCE9FhEVOKwsBjHOhXgaA9xdsjX6lYTXxbri60V6rle1QNBwD90pCkm_kemD72XPlBg91496I']
+        receiverTokens =  profile_dict['receiverTokens']
 
         message = messaging.MulticastMessage(
             notification=messaging.Notification(

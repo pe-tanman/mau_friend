@@ -160,21 +160,23 @@ class MyStatusProvider extends Notifier<UserStatus> {
     );
   } //keep user's basic profile
 
-  void updateMyStatus(Position position, List<RegisteredLocation> myLocations) {
+  Future<void> updateMyStatus(Position position, List<RegisteredLocation> myLocations)  async {
     final currentLocation = LatLng(position.latitude, position.longitude);
     //save in firebase and riverpod
-    userStatus(currentLocation, position.speed, myLocations).then((value) {
-      if (value.icon == state.icon && value.status == state.status) {
-        return;
-      } else {
-        RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
-        sendArrivalNotification(value.status);
+    var status = await userStatus(currentLocation, position.speed, myLocations);
+    if (status.icon == state.icon && status.status == state.status) {
+      return;
+    } else {
+      RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
+      final notificationEnabledLocations = await PrefsHelper().getLocationNotificationPrefs();
 
-        dbHelper.updateStatus(value).then((_) {
-          state = value;
-        });
+        if(notificationEnabledLocations.contains(status.status)) {
+          sendArrivalNotification(status.status);
+        } 
+        
+        await dbHelper.updateStatus(status);
+          state = status;
       }
-    });
   }
 }
 
