@@ -59,6 +59,7 @@ class _CurrentLocationScreenState extends ConsumerState<CurrentLocationScreen> {
       setState(() {
         currentLocation = LatLng(position.latitude, position.longitude);
         speed = position.speed;
+        updateMyMarkers();
       });
     });
     super.initState();
@@ -135,13 +136,29 @@ class _CurrentLocationScreenState extends ConsumerState<CurrentLocationScreen> {
         infoWindow: InfoWindow(
           title: 'Current Location',
           snippet:
-            'Latitude: ${currentLocation.latitude}, Longitude: ${currentLocation.longitude}, Speed: ${speed} km/h',
+              'Latitude: ${currentLocation.latitude}, Longitude: ${currentLocation.longitude}, Speed: ${speed} km/h',
         ),
       ),
     );
     setState(() {
       isLoadingMarkers = false;
     });
+  }
+
+  void updateMyMarkers() {
+    final currentMarker = markers.toList().last;
+    markers.remove(currentMarker);
+    markers.add(
+      Marker(
+        markerId: currentMarker.markerId,
+        position: currentLocation,
+        infoWindow: InfoWindow(
+          title: 'Current Location',
+          snippet:
+              'Latitude: ${currentLocation.latitude}, Longitude: ${currentLocation.longitude}, Speed: ${speed} km/h',
+        ),
+      ),
+    );
   }
 
   Set<Circle> createMyPolygons() {
@@ -176,7 +193,7 @@ class _CurrentLocationScreenState extends ConsumerState<CurrentLocationScreen> {
       createMyMarkers();
       _getCurrentLocation()
           .then((_) {
-print('Current location: $currentLocation');
+            print('Current location: $currentLocation');
             isInit = false;
             setState(() {
               isLoading = false;
