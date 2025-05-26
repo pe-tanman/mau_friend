@@ -157,6 +157,10 @@ class MyStatusProvider extends Notifier<UserStatus> {
       if (token.isEmpty) continue; // Skip empty tokens
       receiverTokens.add(token);
     }
+    if(receiverTokens.isEmpty) {
+      print('No valid receiver tokens found for notification.');
+      return; // No valid tokens to send notification
+    }
     FirestoreHelper().addMessage(
       'Arrival',
       '${senderName} is now in $status',
@@ -175,6 +179,7 @@ class MyStatusProvider extends Notifier<UserStatus> {
     if (status.icon == state.icon && status.status == state.status) {
       return;
     } else {
+       state = status;
       RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
       final notificationEnabledLocations =
           await PrefsHelper().getLocationNotificationPrefs();
@@ -184,7 +189,6 @@ class MyStatusProvider extends Notifier<UserStatus> {
       }
 
       await dbHelper.updateStatus(status);
-      state = status;
     }
   }
 }

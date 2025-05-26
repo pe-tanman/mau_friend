@@ -95,7 +95,7 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
     final _firebaseMessaging = FirebaseMessaging.instance;
     String? fcmToken = await _firebaseMessaging.getToken();
 
-    //save to firestore
+    //save to firestores
     await FirestoreHelper().addUserProfile(userUID, username, bio, iconLink, fcmToken);
     ref.read(profileProvider.notifier).loadMyProfile();
     setState(() {

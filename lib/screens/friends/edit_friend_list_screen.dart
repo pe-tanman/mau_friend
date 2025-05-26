@@ -58,10 +58,8 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
     final friendUID = friendList[index];
     return StatefulBuilder(
       builder: (context, setState) {
-        return AlertDialog(
-          title: Text('Friend Settings'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+        return SimpleDialog(
+          title: Text('Notification Settings'),
             children: [
               CheckboxListTile(
                 title: Container(
@@ -172,13 +170,13 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
                   });
                 },
               ),
-              CheckboxListTile(
+CheckboxListTile(
+
                 title: Container(
                   padding: const EdgeInsets.symmetric(
                     vertical: 4,
                     horizontal: 12,
                   ),
-                  width: 200,
                   decoration: BoxDecoration(
                     color:
                         emergencyList.contains(friendUID)
@@ -241,17 +239,10 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
                 },
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
+          );
+      }
         );
-      },
-    );
-  }
+      }
 
   Widget _buildListTile(int index) {
     final friendUID = friendList[index];

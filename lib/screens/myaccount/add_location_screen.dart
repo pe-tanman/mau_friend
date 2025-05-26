@@ -333,7 +333,13 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
         );
         name = argument!.name;
       }
-      isInit = false;
+     PrefsHelper().getLocationNotificationPrefs().then((prefs) {
+
+       isNotificationEnabled = prefs.contains(name);
+       setState(() {
+          isInit = false;
+        });
+     });
     }
 
     return Scaffold(
@@ -437,7 +443,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                   ],
                 ),
 
-                SizedBox(height: 20),
+                SizedBox(height: 20), 
 
                 Text(
                   'Address',

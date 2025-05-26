@@ -59,7 +59,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
 
       //update notification
       final newFriend = snapshot.data()!['friendList'].last;
-      final newFriendProfile = snapshot.data()!['profiles'][newFriend];
+      final newFriendProfile = snapshot.data()?['profiles'][newFriend];
       final newFriendName = newFriendProfile?['username']?? 'username';
       final newFriendIconLink = newFriendProfile?['iconLink']?? Statics.defaultIconLink;
       final timestamp =
