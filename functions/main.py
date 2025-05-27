@@ -156,4 +156,42 @@ def onNotificationUploaded(event: firestore_fn.Event[firestore_fn.Change[firesto
         missing_key = str(e).strip("'")
         print(f"KeyError: Missing required field '{missing_key}' in the document. Ensure that all necessary fields are present.")
         return
+    
+@db_fn.on_value_updated(reference="/users/{uid}")
+def onStatusUpdated(event: db_fn.Event[db_fn.Change]):
+    print("onStatusUpdated")
+    if event.data is None:
+        return
+    try:
+        status = event.data.after.get('status', 'offline')
+        icon = event.data.after.get('icon', 'https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif')
+        print("status", status)
+        userUID = event.params['uid']
+
+        statusText = icon + " " + status
+        
+        firebase_client = firestore.client()
+        data = firebase_client.collection("friendList").document(userUID).get()
+        data_dict = data.to_dict()
+        receiverTokens = data_dict.get("firstFriendTokenList", [])
+        if receiverTokens is None or receiverTokens == [] or receiverTokens == [""]:
+            print("No friend list found for user:", userUID)
+
+        else:
+            print("receiverTokens", receiverTokens)
+            print("uid", userUID)
+
+            message = messaging.MulticastMessage(
+                data={
+                    "status": statusText
+                },
+                tokens=receiverTokens
+            )
+            response = messaging.send_each_for_multicast(message)
+
+
+    except KeyError as e:
+        missing_key = str(e).strip("'")
+        print(f"KeyError: Missing required field '{missing_key}' in the document. Ensure that all necessary fields are present.")
+        return
 

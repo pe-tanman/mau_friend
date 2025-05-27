@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
@@ -25,7 +26,7 @@ class FirestoreHelper {
     }
   }
 
-  Future<void>addMutedList(String friendUID)async{
+  Future<void> addMutedList(String friendUID) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     try {
       await _firestore.collection('userProfiles').doc(myUID).set({
@@ -36,6 +37,7 @@ class FirestoreHelper {
       rethrow;
     }
   }
+
   Future<void> removeMutedList(String friendUID) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     try {
@@ -79,7 +81,7 @@ class FirestoreHelper {
       if (data != null) {
         var timestamp = data['timestamp'];
         var receivers = data['receivers'];
-    
+
         if (timestamp != null && timestamp is Timestamp) {
           // Check if the timestamp is within the last 1 hour
           if (timestamp.toDate().isBefore(
@@ -159,6 +161,11 @@ class FirestoreHelper {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     final myProfile = await getUserProfile(myUID);
     final friendProfile = await getUserProfile(friendUID);
+
+    final oldFriendList = await getFriendList();
+    if (oldFriendList == null || oldFriendList.isEmpty) {
+      addFirstFriendToken(friendUID);
+    }
     //update my firestore
     try {
       await _firestore.collection('friendList').doc(myUID).set({
@@ -195,6 +202,7 @@ class FirestoreHelper {
       rethrow;
     }
   }
+
   Future<void> updateFriendList(List<String> friendList) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     try {
@@ -294,6 +302,25 @@ class FirestoreHelper {
       rethrow;
     }
   }
+
+  Future<void> addFirstFriendToken(String friendUID) async {
+    final token = await FirebaseMessaging.instance.getToken();
+      _firestore.collection('friendList').doc(friendUID).set({
+        'firstFriendTokenList': FieldValue.arrayUnion([token]),
+      }, SetOptions(merge: true));
+      print('FCM token for $friendUID added successfully.');
+  }
+  Future<void> removeFirstFriendToken(String friendUID) async {
+    final token = await FirebaseMessaging.instance.getToken();
+    if (token != null) {
+      _firestore.collection('friendList').doc(friendUID).update({
+        'firstFriendTokenList': FieldValue.arrayRemove([token]),
+      });
+      print('FCM token for $friendUID removed successfully.');
+    } else {
+      print('No valid FCM token found for $friendUID');
+    }
+  }
 }
 
 class StorageHelper {
@@ -338,5 +365,4 @@ class RealtimeDatabaseHelper {
     var userUID = FirebaseAuth.instance.currentUser!.uid;
     await database.ref('users/$userUID').remove();
   }
-
 }

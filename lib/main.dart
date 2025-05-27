@@ -27,7 +27,7 @@ import 'package:mau_friend/screens/friends/notification_screen.dart';
 
 @pragma(
   'vm:entry-point',
-) // Mandatory if the App is obfuscated or using Flutter 3.1+
+) // Mandatory if the App is obfuscated or using Flutter 3.1:
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) {
     print(
@@ -51,17 +51,28 @@ Future<void> main() async {
   Future<void> _firebaseMessagingBackgroundHandler(
     RemoteMessage message,
   ) async {
+    print(
+      "Handling a background message: ${message.messageId}",
+    );
     await Firebase.initializeApp();
-    
-   
+    if (message.data.keys.contains('status')) {
+      var status = message.data['status'];
+      const String iOSWidgetName = 'mau_widget';
+      HomeWidget.saveWidgetData<String>('status', status);
+      HomeWidget.updateWidget(iOSName: iOSWidgetName);
+      print('received a background status update');
+      // Handle emergency notification
+    } else {
+      // Handle other types of notifications
+    }
   }
+
   Workmanager().initialize(
     callbackDispatcher, // The top level function, aka callbackDispatcher
     isInDebugMode:
         true, // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
   );
   Workmanager().registerOneOffTask("task-identifier", "simpleTask");
-  
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(ProviderScope(child: MyApp()));
@@ -85,21 +96,16 @@ class _MyAppState extends ConsumerState<MyApp> {
         isLoggedIn = user != null;
       });
     });
-     // Load user profile data
-    // Load user profile data when the user is logged in)
   }
 
-  
   @override
   Widget build(BuildContext context) {
-        ref
-        .watch(locationsProvider.notifier)
-        .loadLocations();
+    ref.watch(locationsProvider.notifier).loadLocations();
     return MaterialApp(
       title: 'Flutter Demo',
       theme: appTheme(),
       darkTheme: darkTheme(),
-      themeMode: mode, 
+      themeMode: mode,
       routes: {
         WelcomeScreen.routeName: (context) => WelcomeScreen(),
         HomeScreen.routeName: (context) => HomeScreen(),
@@ -108,13 +114,14 @@ class _MyAppState extends ConsumerState<MyApp> {
         AddLocationScreen.routeName: (context) => AddLocationScreen(),
         SettingScreen.routeName: (context) => SettingScreen(),
         ProfileSettingScreen.routeName: (context) => ProfileSettingScreen(),
-        CurrentLocationScreen .routeName: (context) => CurrentLocationScreen(),
-        AddFriendScreen.routeName : (context) => AddFriendScreen(),
-        FriendProfileScreen.routeName : (context) => FriendProfileScreen(),
-        NotificationScreen.routeName : (context) => NotificationScreen(),
-        EditFriendListScreen.routeName : (context) => EditFriendListScreen(),
-        EmergencyScreen.routeName : (context) => EmergencyScreen(),
-        EmergencyLocationScreen.routeName : (context) => EmergencyLocationScreen(),
+        CurrentLocationScreen.routeName: (context) => CurrentLocationScreen(),
+        AddFriendScreen.routeName: (context) => AddFriendScreen(),
+        FriendProfileScreen.routeName: (context) => FriendProfileScreen(),
+        NotificationScreen.routeName: (context) => NotificationScreen(),
+        EditFriendListScreen.routeName: (context) => EditFriendListScreen(),
+        EmergencyScreen.routeName: (context) => EmergencyScreen(),
+        EmergencyLocationScreen.routeName:
+            (context) => EmergencyLocationScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

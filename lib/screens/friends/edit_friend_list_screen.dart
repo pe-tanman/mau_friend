@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
@@ -29,6 +31,7 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
   @override
   void initState() {
     loadNotificationPrefs();
+    
     super.initState();
   }
 
@@ -44,6 +47,9 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
   }
 
   Future<void> loadNotificationPrefs() async {
+
+    final myToken = await FirebaseMessaging.instance.getToken();
+    print('mytoken: $myToken');
     print('Loading notification preferences...');
     notificationList = await PrefsHelper().getNotificationPrefs();
     emergencyList = await PrefsHelper().getEmergencyPrefs();
@@ -302,8 +308,14 @@ CheckboxListTile(
            friendList.insert(newIndex, friend);
           FirestoreHelper().updateFriendList(friendList);
           
-          if(oldIndex == 0 || newIndex == 0) {
-            
+          if(newIndex == 0) {
+            FirestoreHelper().addFirstFriendToken(friend);
+            FirestoreHelper().removeFirstFriendToken(friendList[1]);
+
+          }
+          if(oldIndex == 0){
+            FirestoreHelper().removeFirstFriendToken(friend);
+            FirestoreHelper().addFirstFriendToken(friendList[0]);
           }
          
         });},
