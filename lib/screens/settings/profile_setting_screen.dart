@@ -119,14 +119,14 @@ class _ProfileSettingScreenState extends ConsumerState<ProfileSettingScreen> {
 
       //compress image
       var originalSize = originalIconImage.lengthSync();
-      var targetSize = 300000; //300KB
+      var targetSize = 100000; //300KB
       if (originalSize > targetSize) {
         var quality = ((targetSize / originalSize) * 100).toInt();
         List<int> compressedImage =
             (await FlutterImageCompress.compressWithFile(
                   path,
-                  minWidth: 500,
-                  minHeight: 500,
+                  minWidth: 300,
+                  minHeight: 300,
                   quality: quality,
                 ))
                 as List<int>;
