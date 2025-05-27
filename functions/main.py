@@ -1,4 +1,4 @@
-from firebase_functions import firestore_fn
+from firebase_functions import firestore_fn, db_fn
 
 from firebase_admin import initialize_app, firestore, messaging
 import google.cloud.firestore
@@ -126,6 +126,7 @@ def onUserProfileDeleted(event: firestore_fn.Event[firestore_fn.Change[firestore
     document="message/{docId}",
 )
 def onNotificationUploaded(event: firestore_fn.Event[firestore_fn.Change[firestore_fn.DocumentSnapshot | None]]) -> None:
+
     print("onNotificationUploaded")
     if event.data is None:
         return
@@ -155,3 +156,4 @@ def onNotificationUploaded(event: firestore_fn.Event[firestore_fn.Change[firesto
         missing_key = str(e).strip("'")
         print(f"KeyError: Missing required field '{missing_key}' in the document. Ensure that all necessary fields are present.")
         return
+

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/providers/emergency_provider.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
@@ -162,7 +163,7 @@ class MyStatusProvider extends Notifier<UserStatus> {
       if (token.isEmpty) continue; // Skip empty tokens
       receiverTokens.add(token);
     }
-    if(receiverTokens.isEmpty) {
+    if (receiverTokens.isEmpty) {
       print('No valid receiver tokens found for notification.');
       return; // No valid tokens to send notification
     }
@@ -185,7 +186,7 @@ class MyStatusProvider extends Notifier<UserStatus> {
     if (status.icon == state.icon && status.status == state.status) {
       return;
     } else {
-       state = status;
+      state = status;
       RealtimeDatabaseHelper dbHelper = RealtimeDatabaseHelper();
       final notificationEnabledLocations =
           await PrefsHelper().getLocationNotificationPrefs();

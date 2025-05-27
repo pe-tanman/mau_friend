@@ -338,4 +338,5 @@ class RealtimeDatabaseHelper {
     var userUID = FirebaseAuth.instance.currentUser!.uid;
     await database.ref('users/$userUID').remove();
   }
+
 }

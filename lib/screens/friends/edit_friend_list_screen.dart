@@ -301,6 +301,10 @@ CheckboxListTile(
           final String friend = friendList.removeAt(oldIndex);
            friendList.insert(newIndex, friend);
           FirestoreHelper().updateFriendList(friendList);
+          
+          if(oldIndex == 0 || newIndex == 0) {
+            
+          }
          
         });},
                 itemBuilder: (context, index) {

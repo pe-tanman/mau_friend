@@ -119,7 +119,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         statusMap[friendUID] = map;
       });
     } // Update home widget with first friend
-    updateFriendStatus(friendUID);
+    updateHomeWidget();
   }
 
   Future<void> updateLocationAvailable(String friendUID) async {
@@ -171,6 +171,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   }
 
   Future<void> updateHomeWidget() async {
+
+    print('home widget updated');
     const AppGroupId = 'group.mau_widget';
     const String iOSWidgetName = 'mau_widget';
     final firstProfile = ref.read(friendProfilesProvider).values.first;
