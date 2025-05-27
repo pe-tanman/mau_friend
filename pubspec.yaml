@@ -74,6 +74,7 @@ dependencies:
   slide_to_act: ^2.0.2
   animated_toggle_switch: ^0.8.5
   firebase_messaging: ^15.2.6
+  home_widget: ^0.8.0
 
 dev_dependencies:
   flutter_test:

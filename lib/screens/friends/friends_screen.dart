@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
@@ -36,6 +37,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   Map statusMap = {};
   bool isLoading = true;
 
+  final _globalKey = GlobalKey();
+  String? imagePath;
+
   Map locationAvailableMap = {};
 
   Future<void> updatePrefs(var snapshot) async {
@@ -60,8 +64,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       //update notification
       final newFriend = snapshot.data()!['friendList'].last;
       final newFriendProfile = snapshot.data()?['profiles'][newFriend];
-      final newFriendName = newFriendProfile?['username']?? 'username';
-      final newFriendIconLink = newFriendProfile?['iconLink']?? Statics.defaultIconLink;
+      final newFriendName = newFriendProfile?['username'] ?? 'username';
+      final newFriendIconLink =
+          newFriendProfile?['iconLink'] ?? Statics.defaultIconLink;
       final timestamp =
           '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
 
@@ -85,7 +90,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         oldFriend,
       );
       final oldFriendName = oldFriendProfile?['username'] ?? 'username';
-      final oldFriendIconLink = oldFriendProfile?['iconLink'] ?? Statics.defaultIconLink;
+      final oldFriendIconLink =
+          oldFriendProfile?['iconLink'] ?? Statics.defaultIconLink;
       final timestamp =
           '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
 
@@ -113,21 +119,23 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       setState(() {
         statusMap[friendUID] = map;
       });
-    }
+    }// Update home widget with first friend
   }
-Future<void> updateLocationAvailable(String friendUID) async {
+
+  Future<void> updateLocationAvailable(String friendUID) async {
     final location = await FirestoreHelper().getEmergencyLocation(friendUID);
     setState(() {
       locationAvailableMap[friendUID] = location != null;
     });
   }
+
   @override
   void initState() {
     super.initState();
     NotificationDatabaseHelper().initNotificationDatabase();
     final myUID = FirebaseAuth.instance.currentUser?.uid;
     dbRef = FirebaseDatabase.instance.ref('users');
-     statusSubscription = dbRef.onValue.listen((event) {
+    statusSubscription = dbRef.onValue.listen((event) {
       final map = event.snapshot.value;
       if (map != null && mounted) {
         setState(() {
@@ -137,10 +145,9 @@ Future<void> updateLocationAvailable(String friendUID) async {
             isLoading = false;
           }
         });
-        
       }
     });
-    
+
     friendsSubscription = FirebaseFirestore.instance
         .collection('friendList')
         .doc(myUID)
@@ -153,6 +160,23 @@ Future<void> updateLocationAvailable(String friendUID) async {
             updatePrefs(snapshot);
           }
         });
+
+    Future.delayed(Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          updateHomeWidget();
+        });
+      }
+    });
+  }
+
+  Future<void> updateHomeWidget() async {
+    var path = await HomeWidget.renderFlutterWidget(
+      Container(width:200, height: 200, color: Colors.red),
+      key: 'friendCard',
+
+    );
+    imagePath = path as String?;
   }
 
   @override
@@ -163,7 +187,6 @@ Future<void> updateLocationAvailable(String friendUID) async {
     super.dispose();
   }
 
-
   Widget buildFriendCard(String friendUID) {
     final profile = ref.watch(friendProfilesProvider)[friendUID];
     bool isEmergency = statusMap[friendUID]?['status'] == 'feeling unsafe';
@@ -173,6 +196,7 @@ Future<void> updateLocationAvailable(String friendUID) async {
       isLocationLoading = locationAvailableMap[friendUID] == null;
     }
     return Card(
+      key: _globalKey,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
       elevation: 3.0,
       color: isEmergency ? Colors.red : null,
@@ -270,7 +294,9 @@ Future<void> updateLocationAvailable(String friendUID) async {
 
   @override
   Widget build(BuildContext context) {
-    friendList = ref.watch(friendListProvider);
+    friendList = ref.watch(
+      friendListProvider,
+    ); // Update home widget with first friend
     return Scaffold(
       appBar: AppBar(
         title: const Text('Friends'),

@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
 import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
@@ -31,6 +32,7 @@ Future<void> main() async {
     );
   }
   dotenv.load(fileName: 'lib/credential.env');
+  await HomeWidget.setAppGroupId('group.mau_widget');
 
   @pragma('vm:entry-point')
   Future<void> _firebaseMessagingBackgroundHandler(
