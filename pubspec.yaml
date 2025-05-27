@@ -75,6 +75,7 @@ dependencies:
   animated_toggle_switch: ^0.8.5
   firebase_messaging: ^15.2.6
   home_widget: ^0.8.0
+  workmanager: ^0.5.2
 
 dev_dependencies:
   flutter_test:

@@ -8,36 +8,32 @@
 import WidgetKit
 import SwiftUI
 
-struct Provider: AppIntentTimelineProvider {
+struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent(), friendCardPath: "No screenshot available", displaySize: context.displaySize)
+        SimpleEntry(date: Date(), userName: "username", iconLink: "https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif", status: "🔴 Offline")
     }
 
-    func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-        let userDefaults: UserDefaults? = UserDefaults(suiteName: "group.mau_widget")
-        let friendCardPath: String = userDefaults?.string(forKey: "friendCard") ?? "No screenshot available"
-        
-        return SimpleEntry(date: Date(), configuration: configuration, friendCardPath: friendCardPath, displaySize: context.displaySize)
-    }
-
-    
-    
-    func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-        var entries: [SimpleEntry] = []
- let userDefaults: UserDefaults? = UserDefaults(suiteName: "group.mau_widget")
-        let friendCardPath: String = userDefaults?.string(forKey: "friendCard") ?? "No screenshot available"
-        
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-        let currentDate = Date()
-        
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            
-            let entry = SimpleEntry(date: entryDate, configuration: configuration, friendCardPath: friendCardPath, displaySize: context.displaySize)
-            entries.append(entry)
+    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
+        let entry: SimpleEntry
+        if context.isPreview {
+            entry = placeholder(in: context)
+        } else {
+            let userDefaults = UserDefaults(suiteName: "group.mau_widget")
+            let username: String = userDefaults?.string(forKey: "username") ?? "username"
+            let iconLink: String = userDefaults?.string(forKey: "iconLink") ?? "https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif"
+            let status: String = userDefaults?.string(forKey: "status") ?? "🔴 Offline"
+            entry = SimpleEntry(date: Date(), userName: username, iconLink: iconLink, status: status)
         }
+        completion(entry)
+    }
 
-        return Timeline(entries: entries, policy: .atEnd)
+
+    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> ()) {
+        getSnapshot(in: context) { (entry: SimpleEntry) in
+// atEnd policy tells widgetkit to request a new entry after the date has passed
+        let timeline: Timeline<SimpleEntry> = Timeline(entries: [entry], policy: .atEnd)
+                  completion(timeline)
+              }
     }
 
 //    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
@@ -47,66 +43,77 @@ struct Provider: AppIntentTimelineProvider {
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
-    let configuration: ConfigurationAppIntent
-    let friendCardPath: String
-    let displaySize: CGSize
+    let userName: String
+    let iconLink: String
+    let status: String
+}
+extension View {
+    @ViewBuilder
+    func widgetBackground(_ style: some ShapeStyle) -> some View {
+        if #available(iOSApplicationExtension 17.0, *) {
+            self.containerBackground(for: .widget) {
+                ContainerRelativeShape().foregroundStyle(AnyShapeStyle(style))
+            }
+        } else {
+            self.background(AnyShapeStyle(style))
+        }
+    }
 }
 
 struct mau_widgetEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
-        VStack {
-            Text("Time:")
-            Text(entry.date, style: .time)
-
-            Text("Favorite Emoji:")
-            Text(entry.configuration.favoriteEmoji)
-            
-            FriendCard
-            
-        }
-    }
-    var FriendCard: some View {
-        if let uiImage = UIImage(contentsOfFile: entry.friendCardPath) {
-            let image = Image(uiImage: uiImage)
+         VStack() {
+            HStack{
+ if let url = URL(string: entry.iconLink),
+            let imageData = try? Data(contentsOf: url),
+            let uiImage = UIImage(data: imageData) {
+            Image(uiImage: uiImage)
                 .resizable()
-                .frame(width: entry.displaySize.height*0.5, height: entry.displaySize.height*0.5,alignment: .center)
-            return AnyView(image)
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 40, height: 40)
+                    .clipShape(Circle())
         }
-        print("The image file could not be loaded")
-        return AnyView(EmptyView())
+            // User Name
+            Text(entry.userName)
+                .font(.body)
+                .fontWeight(.bold)
+
+            }
+           
+            // Status
+            HStack {
+                Text(entry.status)
+                    .font(.body)
+                    .fontWeight(.bold)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Color(red: 24/255, green: 59/255, blue: 78/255).opacity(0.2))
+                    .cornerRadius(12)
+            }
+        }
+        .widgetBackground(Color(red: 243/255, green: 243/255, blue: 224/255))
     }
+    
 }
 
 struct mau_widget: Widget {
     let kind: String = "mau_widget"
 
-    var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+   var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: Provider()) { entry in
             mau_widgetEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
         }
+        .configurationDisplayName("Mau Widget")
+        .description("Displays user status and profile.")
     }
 }
 
-extension ConfigurationAppIntent {
-    fileprivate static var smiley: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "😀"
-        return intent
-    }
-    
-    fileprivate static var starEyes: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "🤩"
-        return intent
-    }
-}
 
-#Preview(as: .systemSmall) {
-    mau_widget()
-} timeline: {
-    SimpleEntry(date: .now, configuration: .smiley, friendCardPath: "No screenshot available", displaySize: CGSize(width: 100, height: 100))
-    SimpleEntry(date: .now, configuration: .starEyes, friendCardPath: "No screenshot available", displaySize: CGSize(width: 100, height: 100))
+struct mau_widget_Previews: PreviewProvider {
+    static var previews: some View {
+        mau_widgetEntryView(entry: SimpleEntry(date: Date(), userName: "username", iconLink: "https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif", status: "🔴 Offline"))
+            .previewContext(WidgetPreviewContext(family: .systemSmall))
+    }
 }

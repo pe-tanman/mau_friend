@@ -119,7 +119,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       setState(() {
         statusMap[friendUID] = map;
       });
-    }// Update home widget with first friend
+    } // Update home widget with first friend
+    updateFriendStatus(friendUID);
   }
 
   Future<void> updateLocationAvailable(String friendUID) async {
@@ -171,12 +172,15 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   }
 
   Future<void> updateHomeWidget() async {
-    var path = await HomeWidget.renderFlutterWidget(
-      Container(width:200, height: 200, color: Colors.red),
-      key: 'friendCard',
-
-    );
-    imagePath = path as String?;
+    const AppGroupId = 'group.mau_widget';
+    const String iOSWidgetName = 'mau_widget';
+    final firstProfile = ref.read(friendProfilesProvider).values.first;
+    final statusName = statusMap[firstProfile.userUID]?['status'] ?? 'offline';
+    final statusIcon = statusMap[firstProfile.userUID]?['icon'] ?? '🔴';
+    HomeWidget.saveWidgetData<String>('username', firstProfile.name);
+    HomeWidget.saveWidgetData<String>('iconLink', firstProfile.iconLink);
+    HomeWidget.saveWidgetData<String>('status', '$statusIcon $statusName');
+    HomeWidget.updateWidget(iOSName: iOSWidgetName);
   }
 
   @override

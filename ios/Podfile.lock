@@ -284,6 +284,8 @@ PODS:
   - SwiftyGif (5.4.5)
   - url_launcher_ios (0.0.1):
     - Flutter
+  - workmanager (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
@@ -314,6 +316,7 @@ DEPENDENCIES:
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
+  - workmanager (from `.symlinks/plugins/workmanager/ios`)
 
 SPEC REPOS:
   trunk:
@@ -413,6 +416,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sqflite_darwin/darwin"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
+  workmanager:
+    :path: ".symlinks/plugins/workmanager/ios"
 
 CHECKOUT OPTIONS:
   FirebaseFirestore:
@@ -486,6 +491,7 @@ SPEC CHECKSUMS:
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
+  workmanager: 01be2de7f184bd15de93a1812936a2b7f42ef07e
 
 PODFILE CHECKSUM: de3fe9c0edca975996dac461d1a22fda0d8b3db4
 
