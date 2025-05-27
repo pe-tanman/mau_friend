@@ -15,6 +15,7 @@ import 'package:mau_friend/screens/friends/friend_profile_screen.dart';
 import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
 import 'package:mau_friend/screens/settings/setting_screen.dart';
 import 'package:mau_friend/screens/welcome/welcome_screen.dart';
+import 'package:workmanager/workmanager.dart';
 import 'firebase_options.dart';
 import 'package:mau_friend/screens/home_screen.dart';
 import 'package:mau_friend/screens/myaccount/myaccount_screen.dart';
@@ -23,6 +24,18 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/screens/friends/notification_screen.dart';
+
+@pragma(
+  'vm:entry-point',
+) // Mandatory if the App is obfuscated or using Flutter 3.1+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    print(
+      "Native called background task: $task",
+    ); //simpleTask will be emitted here.
+    return Future.value(true);
+  });
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +55,13 @@ Future<void> main() async {
     
    
   }
+  Workmanager().initialize(
+    callbackDispatcher, // The top level function, aka callbackDispatcher
+    isInDebugMode:
+        true, // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+  );
+  Workmanager().registerOneOffTask("task-identifier", "simpleTask");
+  
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(ProviderScope(child: MyApp()));

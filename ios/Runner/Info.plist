@@ -47,6 +47,12 @@
 	<string>This app needs photos access to get user icon from photo library</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+<array>
+	<string>task-identifier</string>
+
+	<string>be.tramckrijte.workmanagerExample.iOSBackgroundAppRefresh</string>
+</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
