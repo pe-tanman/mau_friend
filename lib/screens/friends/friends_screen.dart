@@ -37,7 +37,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   Map statusMap = {};
   bool isLoading = true;
 
-  final _globalKey = GlobalKey();
   String? imagePath;
 
   Map locationAvailableMap = {};
@@ -200,7 +199,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       isLocationLoading = locationAvailableMap[friendUID] == null;
     }
     return Card(
-      key: _globalKey,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
       elevation: 3.0,
       color: isEmergency ? Colors.red : null,

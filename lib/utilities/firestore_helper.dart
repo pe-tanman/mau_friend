@@ -195,6 +195,17 @@ class FirestoreHelper {
       rethrow;
     }
   }
+  Future<void> updateFriendList(List<String> friendList) async {
+    var myUID = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await _firestore.collection('friendList').doc(myUID).set({
+        'friendList': friendList,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print('Error updating friend list: $e');
+      rethrow;
+    }
+  }
 
   Future<void> deleteFriendList() async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;

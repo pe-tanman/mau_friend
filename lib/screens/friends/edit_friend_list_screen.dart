@@ -19,7 +19,7 @@ class EditFriendListScreen extends ConsumerStatefulWidget {
 
 class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
   Map<String, Profile> friendProfiles = {};
-  List friendList = [];
+  List<String> friendList = [];
   bool isNotificationsLoading = true;
   bool isInit = true;
   List<String> notificationList = [];
@@ -292,7 +292,17 @@ CheckboxListTile(
               ? Center(child: Text('No friend added'))
               : (isNotificationsLoading)
               ? Center(child: CircularProgressIndicator())
-              : ListView.builder(
+              : ReorderableListView.builder(
+                 onReorder: (int oldIndex, int newIndex) {
+        setState(() {
+          if (oldIndex < newIndex) {
+            newIndex -= 1;
+          }
+          final String friend = friendList.removeAt(oldIndex);
+           friendList.insert(newIndex, friend);
+          FirestoreHelper().updateFriendList(friendList);
+         
+        });},
                 itemBuilder: (context, index) {
                   final friendUID = friendList[index];
 
@@ -307,6 +317,7 @@ CheckboxListTile(
                     ),
                     onDismissed: (direction) {
                       removeFriend(friendUID);
+                      
                     },
                     confirmDismiss: (direction) async {
                       return await showDialog(
