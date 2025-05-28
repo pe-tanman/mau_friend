@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
+import 'package:mau_friend/screens/friends/add_friends/enter_code_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/my_permanent_address_screen.dart';
 import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
@@ -99,6 +100,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         EmergencyLocationScreen.routeName:
             (context) => EmergencyLocationScreen(),
         MyPermanentAddressScreen.routeName: (context) => MyPermanentAddressScreen(),
+        EnterCodeScreen.routeName: (context) => EnterCodeScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

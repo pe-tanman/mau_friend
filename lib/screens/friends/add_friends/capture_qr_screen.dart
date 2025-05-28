@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mau_friend/screens/friends/add_friends/enter_code_screen.dart';
 import 'package:mau_friend/screens/friends/friend_profile_screen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
@@ -34,6 +35,12 @@ class _CaptureQrScreenState extends ConsumerState<CaptureQrScreen> {
       );
       isInit = false;
       return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).pushNamed(EnterCodeScreen.routeName);
+          },
+          child: const Icon(Icons.abc),
+        ),
         body: MobileScanner(
           controller: cameraController,
           onDetect: (barcode) {
@@ -42,23 +49,35 @@ class _CaptureQrScreenState extends ConsumerState<CaptureQrScreen> {
               final String code = barcode.barcodes.first.rawValue!;
               final uid = code.split('+')[0];
               final password = code.split('+')[1];
-              FirestoreHelper().getPassword(uid).then((value) {
-                if (!mounted) return;
-                if (value == password) {
-                  Navigator.pushNamed(
-                    context,
-                    FriendProfileScreen.routeName,
-                    arguments: uid,
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Invalid QR code. Try again.'),
-                    ),
-                  );
-                  Navigator.of(context).pop();
-                }
-              });
+
+              if (password.length == 10) {
+                FirestoreHelper().getPassword(uid).then((value) {
+                  if (value == password) {
+                    Navigator.pushNamed(
+                      context,
+                      FriendProfileScreen.routeName,
+                      arguments: [uid, false],
+                    );
+                    return;
+                  }
+                });
+              }
+              if(password.length == 5){
+                FirestoreHelper().getPermanentAddress(uid).then((value) {
+                  if (value == code) {
+                    Navigator.pushNamed(
+                      context,
+                      FriendProfileScreen.routeName,
+                      arguments: [uid, true],
+                    );
+                    return;
+                  }
+                });
+              }
+               ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Invalid QR code. Try again.')),
+              );
+              Navigator.of(context).pop();
             }
           },
         ),

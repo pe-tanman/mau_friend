@@ -63,6 +63,24 @@ class FirestoreHelper {
     }
   }
 
+  Future<String> getUIDFromUsername(String username) async{
+    try {
+      final querySnapshot = await _firestore
+          .collection('userProfiles')
+          .where('username', isEqualTo: username)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first.id; // Return the first matching UID
+      } else {
+        return ''; // No matching user found
+      }
+    } catch (e) {
+      print('Error getting UID from username: $e');
+      rethrow;
+    }
+  }
+
   Future<void> addEmergencyLocation(LatLng coordinates) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     var receivers = await PrefsHelper().getEmergencyPrefs();
