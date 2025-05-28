@@ -62,7 +62,7 @@ class _CaptureQrScreenState extends ConsumerState<CaptureQrScreen> {
                   }
                 });
               }
-              if(password.length == 5){
+              else if(password.length == 5){
                 FirestoreHelper().getPermanentAddress(uid).then((value) {
                   if (value == code) {
                     Navigator.pushNamed(
@@ -74,10 +74,12 @@ class _CaptureQrScreenState extends ConsumerState<CaptureQrScreen> {
                   }
                 });
               }
-               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Invalid QR code. Try again.')),
-              );
-              Navigator.of(context).pop();
+              else{
+                 ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Invalid QR code. Try again.')),
+                );
+                Navigator.of(context).pop();
+              }
             }
           },
         ),

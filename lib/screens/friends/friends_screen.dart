@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -43,67 +44,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   Map locationAvailableMap = {};
 
   Future<void> updatePrefs(var snapshot) async {
-    //Save friend list to local storage from notifier
-    print('onUpdated');
-    final prefs = await SharedPreferences.getInstance();
-    List<String>? localFriendList = prefs.getStringList('friendList');
-    print('localFriendList: $localFriendList');
-
-    if (localFriendList == null ||
-        snapshot.data()!['friendList'].length > localFriendList.length) {
       await ref.read(friendListProvider.notifier).loadFriendList();
-      //update statusMap variable
       final newFriendUID = snapshot.data()!['friendList'].last;
       updateFriendStatus(newFriendUID);
-      //write prefs
-      await prefs.setStringList(
-        'friendList',
-        snapshot.data()!['friendList'].cast<String>(),
-      );
-
-      //update notification
-      final newFriend = snapshot.data()!['friendList'].last;
-      final newFriendProfile = snapshot.data()?['profiles'][newFriend];
-      final newFriendName = newFriendProfile?['username'] ?? 'username';
-      final newFriendIconLink =
-          newFriendProfile?['iconLink'] ?? Statics.defaultIconLink;
-      final timestamp =
-          '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
-
-      await NotificationDatabaseHelper().insertData(
-        timestamp,
-        '$newFriendName is now your friend.',
-        newFriendIconLink,
-      );
-      
-      ref.read(notificationProvider.notifier).loadNotification();
-      //when friend is removed
-    } else if (snapshot.data()!['friendList'].length < localFriendList.length) {
-      //update local storage
-      final oldFriend = localFriendList.last;
-      final oldFriendProfile = await FirestoreHelper().getUserProfile(
-        oldFriend,
-      );
-      final oldFriendName = oldFriendProfile?['username'] ?? 'username';
-      final oldFriendIconLink =
-          oldFriendProfile?['iconLink'] ?? Statics.defaultIconLink;
-      final timestamp =
-          '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
-
-      //update local friend list
-      await ref.read(friendListProvider.notifier).loadFriendList();
-      await prefs.setStringList(
-        'friendList',
-        snapshot.data()!['friendList'].cast<String>(),
-      );
-      //update notification
-      await NotificationDatabaseHelper().insertData(
-        timestamp,
-        '$oldFriendName is removed from your friend list.',
-        oldFriendIconLink,
-      );
-      ref.read(notificationProvider.notifier).loadNotification();
-    }
   }
 
   Future<void> updateFriendStatus(String friendUID) async {
@@ -174,7 +117,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     Future.delayed(Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
-          updateHomeWidget();
+          if(Platform.isIOS){
+             updateHomeWidget();
+          }
+         
         });
       }
     });

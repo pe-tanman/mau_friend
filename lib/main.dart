@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
 import 'package:flutter/material.dart';
@@ -33,8 +35,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.data.keys.contains('status')) {
     var status = message.data['status'];
     const String iOSWidgetName = 'mau_widget';
-    HomeWidget.saveWidgetData<String>('status', status);
-    HomeWidget.updateWidget(iOSName: iOSWidgetName);
+   
+    if(Platform.isIOS) {
+       HomeWidget.saveWidgetData<String>('status', status);
+      HomeWidget.updateWidget(iOSName: iOSWidgetName);
+    }
+    
     print('received a background status update');
     // Handle emergency notification
   } else {

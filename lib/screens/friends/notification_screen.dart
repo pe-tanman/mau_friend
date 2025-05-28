@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
+import 'package:mau_friend/utilities/statics.dart';
 
 
 class NotificationScreen extends ConsumerStatefulWidget {
@@ -13,6 +14,13 @@ class NotificationScreen extends ConsumerStatefulWidget {
 
 class _NotificationScreenState extends ConsumerState<NotificationScreen> {
    List notifications = [];
+
+   @override
+  void initState() {
+
+    super.initState();
+    ref.read(notificationProvider.notifier).loadNotification();
+  }
 
 
   
@@ -33,14 +41,13 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           : ListView.builder(
               itemCount: ref.watch(notificationProvider).length,
                 itemBuilder: (context, index) {
-                int backIndex = ref.watch(notificationProvider).length - 1 - index;
-                final notification = ref.watch(notificationProvider)[backIndex];
-                final shortenTimestamp = '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')} ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
+                final notification = ref.watch(notificationProvider)[index];
+                final shortenTimestamp = '${notification.timestamp.year}-${notification.timestamp.month.toString().padLeft(2, '0')}-${notification.timestamp.day.toString().padLeft(2, '0')} ${notification.timestamp.hour.toString().padLeft(2, '0')}:${notification.timestamp.minute.toString().padLeft(2, '0')}';
 
                 return ListTile(
                 contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
                 title: Text(notification.message),
-                subtitle: Text(shortenTimestamp + ' - ' + notification['title']),
+                subtitle: Text(shortenTimestamp),
                 leading: CircleAvatar(
                   radius: 30,
                   backgroundImage: NetworkImage(notification.iconLink),

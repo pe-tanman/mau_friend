@@ -352,7 +352,7 @@ class FirestoreHelper {
       return; // No valid tokens to send notification
     }
     try {
-      await _firestore.collection('message').add({
+      await _firestore.collection('message').doc().set({
         'title': title,
         'body': body,
         'imageUrl': imageUrl,
@@ -363,7 +363,6 @@ class FirestoreHelper {
 
       //add notification
       await addNotification(title, body, imageUrl, type, receivers, senderUID);
-      
     } catch (e) {
       print('Error adding message: $e');
       rethrow;
@@ -378,6 +377,7 @@ class FirestoreHelper {
     List<String> receivers,
     String? senderUID,
   ) async {
+    final timestamp = Timestamp.now();
     for (String receiver in receivers) {
       await _firestore.collection('notifications').doc(receiver).set({
         'notifications': FieldValue.arrayUnion([
@@ -388,7 +388,7 @@ class FirestoreHelper {
             'type': type,
             'senderUID': senderUID,
             'receiverTokens': receivers,
-            'timestamp': FieldValue.serverTimestamp(),
+            'timestamp': timestamp,
           },
         ]),
       }, SetOptions(merge: true));

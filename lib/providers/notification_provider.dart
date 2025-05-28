@@ -19,17 +19,17 @@ class NotificationProvider extends Notifier<List<Notification>> {
   @override
   List<Notification> build() => [];
 
-
   void loadNotification() {
     FirestoreHelper().getNotifications().then((value) {
       List<Notification> result = [];
       for (var element in value) {
-        var format = DateFormat('yyyy-M-d h:m');
+        var datetime = element['timestamp'].toDate();
         result.add(
           Notification(
             element['body'],
             element['imageUrl'] ?? Statics.defaultIconLink,
-            format.parse(element['timestamp']),),
+            datetime,
+          ),
         );
       }
       state = result;

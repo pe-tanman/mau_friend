@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,70 +72,82 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
       body:
           isLoading
               ? Center(child: CircularProgressIndicator())
-              : Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: NetworkImage(
-                          profile['iconLink'] ??
-                              Statics.defaultIconLink, // default icon link
-                        ),
-                      ), // a cat image
-                      SizedBox(height: 10),
-                      Text(
-                        profile['username'] ?? 'Username',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        profile['bio'] ?? 'Bio',
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                      SizedBox(height: 60),
-                      if(isPermanent)...[
-                        Text(
-                          'Message should include your full name and relationship with the person.',
-                        ),
-                        SizedBox(height: 20),
-                        TextField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Message',
+              : Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: NetworkImage(
+                            profile['iconLink'] ??
+                                Statics.defaultIconLink, // default icon link
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              message = value;
-                            });
-                          },
+                        ), // a cat image
+                        SizedBox(height: 10),
+                        Text(
+                          profile['username'] ?? 'Username',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 5),
+                        Text(
+                          profile['bio'] ?? 'Bio',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                        SizedBox(height: 60),
+                        if(isPermanent)...[
+                          Text(
+                            'Message should include your full name and relationship with the person.',
+                          ),
+                          SizedBox(height: 20),
+                          TextField(
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Message',
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                message = value;
+                              });
+                            },
+                          ),
+                          SizedBox(height: 20),
+                        ],
+                        ElevatedButton(
+                          child:
+                              isPermanent
+                                  ? Text('Send Request')
+                                  : Text('Add Friend'),
+                          onPressed:
+                              isPermanent
+                                  ? sendFriendRequest
+                                  : () {
+                                    ref.read(profileProvider.notifier).loadMyProfile();
+                                    FirestoreHelper().addFriendList(
+                                      profile['userUID'],
+                                    );
+                                    final myProfile = ref.read(profileProvider);
+                                    FirestoreHelper().addNotification('New Friend', '${myProfile.name} is now your friend.', myProfile.iconLink ?? Statics.defaultIconLink, 'New Friend', [profile['userUID']], FirebaseAuth.instance.currentUser!.uid);
+                                     FirestoreHelper().addNotification(
+                                      'New Friend',
+                                      '${profile['username']} is now your friend.',
+                                      profile['iconLink'] ?? Statics.defaultIconLink,
+                                      'New Friend',
+                                      [FirebaseAuth.instance.currentUser!.uid],
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                    );
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
+                                  },
+                        ),
                       ],
-                      ElevatedButton(
-                        child:
-                            isPermanent
-                                ? Text('Send Request')
-                                : Text('Add Friend'),
-                        onPressed:
-                            isPermanent
-                                ? sendFriendRequest
-                                : () {
-                                  FirestoreHelper().addFriendList(
-                                    profile['userUID'],
-                                  );
-                                  FirestoreHelper().addNotification('${profile['username']} is now your friend.', body, imageUrl, type, receivers, senderUID)
-                                  Navigator.of(context).pop();
-                                  Navigator.of(context).pop();
-                                },
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),

@@ -167,8 +167,8 @@ onTap: () {
                 content: Row(
                   children: [
                     SizedBox(
-                      width: 50,
-                      height: 50,
+                      width: 30,
+                      height: 30,
                       child: Icon(Icons.emergency),
                     ),
                     Text('Tap $tappedCount more times, turn on Feeling Unsafe'),
