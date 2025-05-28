@@ -1,6 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 import 'package:map_location_picker/map_location_picker.dart';
+import 'package:mau_friend/utilities/firestore_helper.dart';
+import 'package:mau_friend/utilities/statics.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
@@ -17,21 +19,16 @@ class NotificationProvider extends Notifier<List<Notification>> {
   @override
   List<Notification> build() => [];
 
-  void addNotification(String message, String iconLink) {
-    final newNotification = Notification(message, iconLink, DateTime.now());
-    state = [...state, newNotification];
-    ref.read(unreadNotificationProvider.notifier).addUnreadNotification();
-  }
 
   void loadNotification() {
-    NotificationDatabaseHelper().getAllData().then((value) {
+    FirestoreHelper().getNotifications().then((value) {
       List<Notification> result = [];
       for (var element in value) {
         var format = DateFormat('yyyy-M-d h:m');
         result.add(
           Notification(
-            element['message'],
-            element['iconLink'],
+            element['body'],
+            element['imageUrl'] ?? Statics.defaultIconLink,
             format.parse(element['timestamp']),),
         );
       }

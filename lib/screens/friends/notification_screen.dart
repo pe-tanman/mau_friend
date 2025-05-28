@@ -40,7 +40,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                 return ListTile(
                 contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
                 title: Text(notification.message),
-                subtitle: Text(shortenTimestamp),
+                subtitle: Text(shortenTimestamp + ' - ' + notification['title']),
                 leading: CircleAvatar(
                   radius: 30,
                   backgroundImage: NetworkImage(notification.iconLink),

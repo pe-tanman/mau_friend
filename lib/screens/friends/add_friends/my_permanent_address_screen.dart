@@ -50,18 +50,7 @@ class _MyPermanentAddressScreenState
   Future<void> loadMyAddress() async {
     await ref.read(profileProvider.notifier).loadMyProfile();
     myUID = FirebaseAuth.instance.currentUser!.uid;
-    DatabaseReference dbRef = FirebaseDatabase.instance.ref('users');
 
-    dbRef.onValue.listen((event) {
-      FirebaseFirestore.instance
-          .collection('friendList')
-          .doc(myUID)
-          .snapshots()
-          .listen((snapshot) {
-            ref.read(friendListProvider.notifier).loadFriendList();
-            ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
-          });
-    });
     String myAddress = await FirestoreHelper().getPermanentAddress(myUID);
     if (myAddress != '') {
       address = myAddress;

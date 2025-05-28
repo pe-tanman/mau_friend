@@ -149,29 +149,14 @@ class MyStatusProvider extends Notifier<UserStatus> {
     final senderImageUrl = myProfile.iconLink ?? Statics.defaultIconLink;
     final senderName = myProfile.name ?? 'username';
     final receivers = await PrefsHelper().getNotificationPrefs();
-    List<String> receiverTokens = [];
-    for (var receiverUID in receivers) {
-      if (receiverUID.isEmpty) continue; // Skip empty tokens
-      final profile = await FirestoreHelper().getUserProfile(receiverUID);
-      final token = profile['fcmToken'] ?? '';
-      final mutedList = profile['mutedList'] ?? [];
-      if (mutedList.contains(myProfile.userUID)) {
-        print('User $receiverUID has muted notifications from $senderName');
-        continue; // Skip sending notification to muted users
-      }
-      if (token.isEmpty) continue; // Skip empty tokens
-      receiverTokens.add(token);
-    }
-    if (receiverTokens.isEmpty) {
-      print('No valid receiver tokens found for notification.');
-      return; // No valid tokens to send notification
-    }
+   
 
     FirestoreHelper().addMessage(
       'Arrival',
       '${senderName} is now in $status',
       senderImageUrl,
-      receiverTokens,
+      'Arrival',
+      receivers
     );
   } //keep user's basic profile
 

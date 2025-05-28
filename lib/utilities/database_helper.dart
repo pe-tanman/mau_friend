@@ -126,8 +126,6 @@ class MyLocationDatabaseHelper {
     db!.execute('DROP TABLE my_locations_table_$myUID');
   }
 }
-
-//Notificationも継続的に表示されていない
 class NotificationDatabaseHelper {
   static final NotificationDatabaseHelper _instance =
       NotificationDatabaseHelper._internal();

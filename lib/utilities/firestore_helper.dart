@@ -63,12 +63,13 @@ class FirestoreHelper {
     }
   }
 
-  Future<String> getUIDFromUsername(String username) async{
+  Future<String> getUIDFromUsername(String username) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('userProfiles')
-          .where('username', isEqualTo: username)
-          .get();
+      final querySnapshot =
+          await _firestore
+              .collection('userProfiles')
+              .where('username', isEqualTo: username)
+              .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         return querySnapshot.docs.first.id; // Return the first matching UID
@@ -188,11 +189,12 @@ class FirestoreHelper {
       rethrow;
     }
   }
+
   Future<String> getPermanentAddress(String userUID) async {
     try {
       final addressDoc =
           await _firestore.collection('userPasswords').doc(userUID).get();
-          print('permanent address: ${addressDoc.data()}');
+      print('permanent address: ${addressDoc.data()}');
       return addressDoc.data()?['permanentAddress'] ?? '';
     } catch (e) {
       print('Error getting permanent address: $e');
@@ -328,9 +330,27 @@ class FirestoreHelper {
     String title,
     String body,
     String imageUrl,
-    List<String> receiverTokens,
+    String type,
+    List<String> receivers,
   ) async {
     final senderUID = FirebaseAuth.instance.currentUser!.uid;
+
+    List<String> receiverTokens = [];
+    for (var receiverUID in receivers) {
+      if (receiverUID.isEmpty) continue; // Skip empty tokens
+      final profile = await FirestoreHelper().getUserProfile(receiverUID);
+      final token = profile['fcmToken'] ?? '';
+      final mutedList = profile['mutedList'] ?? [];
+      if (mutedList.contains(senderUID) || token.isEmpty) {
+        continue; // Skip if sender is muted or token is empty
+      }
+
+      receiverTokens.add(token);
+    }
+    if (receiverTokens.isEmpty) {
+      print('No valid receiver tokens found for notification.');
+      return; // No valid tokens to send notification
+    }
     try {
       await _firestore.collection('message').add({
         'title': title,
@@ -340,19 +360,72 @@ class FirestoreHelper {
         'receiverTokens': receiverTokens,
         'timestamp': FieldValue.serverTimestamp(),
       });
+
+      //add notification
+      await addNotification(title, body, imageUrl, type, receivers, senderUID);
+      
     } catch (e) {
       print('Error adding message: $e');
       rethrow;
     }
   }
 
+  Future<void> addNotification(
+    String title,
+    String body,
+    String imageUrl,
+    String type,
+    List<String> receivers,
+    String? senderUID,
+  ) async {
+    for (String receiver in receivers) {
+      await _firestore.collection('notifications').doc(receiver).set({
+        'notifications': FieldValue.arrayUnion([
+          {
+            'title': title,
+            'body': body,
+            'imageUrl': imageUrl,
+            'type': type,
+            'senderUID': senderUID,
+            'receiverTokens': receivers,
+            'timestamp': FieldValue.serverTimestamp(),
+          },
+        ]),
+      }, SetOptions(merge: true));
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getNotifications() async {
+    String myUID = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      final notificationDoc =
+          await _firestore.collection('notifications').doc(myUID).get();
+      List<Map<String, dynamic>> notifications =
+          List<Map<String, dynamic>>.from(
+            notificationDoc.data()?['notifications'] ?? [],
+          );
+      // Sort notifications by timestamp in descending order
+      notifications.sort((a, b) {
+        Timestamp? aTimestamp = a['timestamp'];
+        Timestamp? bTimestamp = b['timestamp'];
+        if (aTimestamp == null || bTimestamp == null) return 0;
+        return bTimestamp.compareTo(aTimestamp);
+      });
+      return notifications;
+    } catch (e) {
+      print('Error getting notifications: $e');
+      rethrow;
+    }
+  }
+
   Future<void> addFirstFriendToken(String friendUID) async {
     final token = await FirebaseMessaging.instance.getToken();
-      _firestore.collection('friendList').doc(friendUID).set({
-        'firstFriendTokenList': FieldValue.arrayUnion([token]),
-      }, SetOptions(merge: true));
-      print('FCM token for $friendUID added successfully.');
+    _firestore.collection('friendList').doc(friendUID).set({
+      'firstFriendTokenList': FieldValue.arrayUnion([token]),
+    }, SetOptions(merge: true));
+    print('FCM token for $friendUID added successfully.');
   }
+
   Future<void> removeFirstFriendToken(String friendUID) async {
     final token = await FirebaseMessaging.instance.getToken();
     if (token != null) {

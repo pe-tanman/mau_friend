@@ -33,6 +33,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   String userState = 'offline';
   late StreamSubscription friendsSubscription;
   late StreamSubscription statusSubscription;
+  late StreamSubscription notificationSubscription;
   late DatabaseReference dbRef;
   Map statusMap = {};
   bool isLoading = true;
@@ -74,12 +75,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         '$newFriendName is now your friend.',
         newFriendIconLink,
       );
-      ref
-          .read(notificationProvider.notifier)
-          .addNotification(
-            '$newFriendName is now your friend.',
-            newFriendIconLink,
-          );
+      
       ref.read(notificationProvider.notifier).loadNotification();
       //when friend is removed
     } else if (snapshot.data()!['friendList'].length < localFriendList.length) {
@@ -135,6 +131,20 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     NotificationDatabaseHelper().initNotificationDatabase();
     final myUID = FirebaseAuth.instance.currentUser?.uid;
     dbRef = FirebaseDatabase.instance.ref('users');
+
+    notificationSubscription = FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(myUID)
+        .snapshots()
+        .listen((snapshot) {
+          ref.read(notificationProvider.notifier).loadNotification();
+          print('Notification Updated');
+          if (snapshot.exists) {
+            ref.read(unreadNotificationProvider.notifier)
+                .addUnreadNotification();
+          }
+        });
+
     statusSubscription = dbRef.onValue.listen((event) {
       final map = event.snapshot.value;
       if (map != null && mounted) {
@@ -171,7 +181,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   }
 
   Future<void> updateHomeWidget() async {
-
     print('home widget updated');
     const AppGroupId = 'group.mau_widget';
     const String iOSWidgetName = 'mau_widget';

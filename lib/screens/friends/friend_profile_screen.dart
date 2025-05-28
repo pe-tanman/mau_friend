@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
@@ -16,6 +17,9 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
   late Map<String, dynamic> profile;
   bool isLoading = true;
   bool isPermanent = false;
+  String message = '';
+
+
   Future<void> loadFriendProfile() async {
     final arguments = ModalRoute.of(context)?.settings.arguments! as List;
     final String friendUID = arguments[0];
@@ -25,6 +29,32 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
       profile = friendProfile;
       isLoading = false;
     });
+    
+  }
+
+  Future<void> sendFriendRequest() async {
+    if(message.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a message')),
+      );
+      return;
+    }
+    
+    final title = 'Friend Request from ${profile['username']}';
+    final body = message;
+    final imageUrl = profile['iconLink'] ?? Statics.defaultIconLink;
+    final receiver = profile['userUID'];
+
+    await FirestoreHelper().addMessage(
+      title,
+      body,
+      imageUrl,
+      'Friend Request',
+      [receiver]
+    );
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   @override
@@ -41,43 +71,71 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
       body:
           isLoading
               ? Center(child: CircularProgressIndicator())
-              : Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 20),
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: NetworkImage(
-                        profile['iconLink'] ??
-                            Statics.defaultIconLink, // default icon link
+              : Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage: NetworkImage(
+                          profile['iconLink'] ??
+                              Statics.defaultIconLink, // default icon link
+                        ),
+                      ), // a cat image
+                      SizedBox(height: 10),
+                      Text(
+                        profile['username'] ?? 'Username',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ), // a cat image
-                    SizedBox(height: 10),
-                    Text(
-                      profile['username'] ?? 'Username',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      SizedBox(height: 5),
+                      Text(
+                        profile['bio'] ?? 'Bio',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      profile['bio'] ?? 'Bio',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                    SizedBox(height: 60),
-                    ElevatedButton(
-                      child: Text('Add'),
-                      onPressed: () {
-                        // Add friend logic here
-                        FirestoreHelper().addFriendList(profile['userUID']);
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
+                      SizedBox(height: 60),
+                      if(isPermanent)...[
+                        Text(
+                          'Message should include your full name and relationship with the person.',
+                        ),
+                        SizedBox(height: 20),
+                        TextField(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Message',
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              message = value;
+                            });
+                          },
+                        ),
+                        SizedBox(height: 20),
+                      ],
+                      ElevatedButton(
+                        child:
+                            isPermanent
+                                ? Text('Send Request')
+                                : Text('Add Friend'),
+                        onPressed:
+                            isPermanent
+                                ? sendFriendRequest
+                                : () {
+                                  FirestoreHelper().addFriendList(
+                                    profile['userUID'],
+                                  );
+                                  FirestoreHelper().addNotification('${profile['username']} is now your friend.', body, imageUrl, type, receivers, senderUID)
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
+                                },
+                      ),
+                    ],
+                  ),
                 ),
               ),
     );

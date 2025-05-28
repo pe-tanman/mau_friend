@@ -135,20 +135,7 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
     final body = '$myname started emergency location sharing.';
     final receivers = await PrefsHelper().getEmergencyPrefs();
 
-    List<String> receiverTokens = [];
-    for (var receiverUID in receivers) {
-      if (receiverUID.isEmpty) continue; // Skip empty tokens
-      final profile = await FirestoreHelper().getUserProfile(receiverUID);
-      final token = profile['fcmToken'] ?? '';
-      if (token.isEmpty) continue; // Skip empty tokens
-      receiverTokens.add(token);
-    }
-    if (receiverTokens.isEmpty) {
-      print('No valid receiver tokens found for notification.');
-      return; // No valid tokens to send notification
-    }
-    print('Receiver tokens: $receiverTokens');
-    FirestoreHelper().addMessage(title, body, imageUrl, receiverTokens);
+    FirestoreHelper().addMessage(title, body, imageUrl, 'Emergency', receivers);
     FirestoreHelper().addEmergencyLocation(currentLocation);
     ref.read(emergencyProvider.notifier).activateEmergency();
   }

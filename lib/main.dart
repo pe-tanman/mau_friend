@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -83,6 +84,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       theme: appTheme(),
       darkTheme: darkTheme(),
       themeMode: mode,
+      builder: FlashyFlushbarProvider.init(),
       routes: {
         WelcomeScreen.routeName: (context) => WelcomeScreen(),
         HomeScreen.routeName: (context) => HomeScreen(),

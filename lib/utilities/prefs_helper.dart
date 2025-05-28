@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefsHelper {
+  //arrival notification list
   Future<void> addNotificationPrefs(String friendUID) async {
     final prefs = await SharedPreferences.getInstance();
     final myUID = FirebaseAuth.instance.currentUser!.uid;
@@ -26,6 +27,8 @@ class PrefsHelper {
     return notificationList;
   }
 
+
+////emergency notification list
   Future<void> addEmergencyPrefs(String friendUID) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> emergencyList = await getEmergencyPrefs();
@@ -61,6 +64,7 @@ class PrefsHelper {
     );
   }
 
+//registered location
   Future<List<String>> getLocationNotificationPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final myUID = FirebaseAuth.instance.currentUser!.uid;
@@ -84,6 +88,7 @@ class PrefsHelper {
     
   }
 
+// mute list
   Future<void> addMutePrefs(String friendUID) async {
     final prefs = await SharedPreferences.getInstance();
     final myUID = FirebaseAuth.instance.currentUser!.uid;
