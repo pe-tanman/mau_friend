@@ -41,18 +41,20 @@ color: AppColors.backgroundColor,
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(foregroundColor: AppColors.themeColor),
-  ),
+    style: ElevatedButton.styleFrom(backgroundColor: AppColors.themeColor, foregroundColor: Colors.white,
+  ),),
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
-      side: const BorderSide(color: Colors.grey),
+      side: const BorderSide(color: AppColors.themeColor),
       foregroundColor: Colors.black,
     ),
+
   ),
   scaffoldBackgroundColor: AppColors.scaffoldBackgroundColor,
   colorScheme: ColorScheme.light(
     primary: AppColors.themeColor,
   ),
+
 );
 
 ThemeData darkTheme() => ThemeData(
@@ -72,10 +74,20 @@ ThemeData darkTheme() => ThemeData(
     bodyLarge: TextStyle(fontSize: 16),
     labelMedium: TextStyle(color: AppColors.darkThemeColor, fontSize: 20, fontWeight: FontWeight.bold),
   ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(backgroundColor: AppColors.darkThemeColor, foregroundColor: Colors.black),
+  ),
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      side: const BorderSide(color: AppColors.themeColor),
+      foregroundColor: AppColors.themeColor,
 
+    ),
+  ),
 
   brightness: Brightness.dark, // テーマの明るさをダークに設定。
   colorScheme: ColorScheme.dark(
     primary: const Color.fromARGB(255, 228, 228, 195), 
+
   ),
 );

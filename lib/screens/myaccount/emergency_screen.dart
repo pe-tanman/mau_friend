@@ -135,7 +135,7 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
     final body = '$myname started emergency location sharing.';
     final receivers = await PrefsHelper().getEmergencyPrefs();
 
-    FirestoreHelper().addMessage(title, body, imageUrl, 'Emergency', receivers);
+    FirestoreHelper().addMessage(title: title, body: body, imageUrl: imageUrl, type: 'Emergency', receivers: receivers);
     FirestoreHelper().addEmergencyLocation(currentLocation);
     ref.read(emergencyProvider.notifier).activateEmergency();
   }

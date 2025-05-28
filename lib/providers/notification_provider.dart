@@ -8,12 +8,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 
 class Notification {
-  final String message;
+  final String body;
   final String iconLink;
   final DateTime timestamp;
-  Notification(this.message, this.iconLink, this.timestamp);
+  final String type;
+  final String senderUID;
+  final String? message;
+  Notification(this.body, this.iconLink, this.timestamp, this.type, this.senderUID, {this.message});
 }
-
 @riverpod
 class NotificationProvider extends Notifier<List<Notification>> {
   @override
@@ -24,11 +26,15 @@ class NotificationProvider extends Notifier<List<Notification>> {
       List<Notification> result = [];
       for (var element in value) {
         var datetime = element['timestamp'].toDate();
+        var type = element['type'] ?? 'General';
         result.add(
           Notification(
             element['body'],
             element['imageUrl'] ?? Statics.defaultIconLink,
             datetime,
+            type,
+            element['senderUID'],
+            message: element['message'],
           ),
         );
       }

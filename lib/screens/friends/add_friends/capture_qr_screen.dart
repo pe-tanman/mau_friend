@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mau_friend/screens/friends/add_friends/enter_code_screen.dart';
-import 'package:mau_friend/screens/friends/friend_profile_screen.dart';
+import 'package:mau_friend/screens/friends/add_friends/friend_profile_screen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -61,21 +61,19 @@ class _CaptureQrScreenState extends ConsumerState<CaptureQrScreen> {
                     return;
                   }
                 });
-              }
-              else if(password.length == 5){
-                FirestoreHelper().getPermanentAddress(uid).then((value) {
-                  if (value == code) {
-                    Navigator.pushNamed(
-                      context,
-                      FriendProfileScreen.routeName,
-                      arguments: [uid, true],
-                    );
-                    return;
-                  }
+              } else if (password.length == 5) {
+                  FirestoreHelper().getPermanentAddress(uid).then((value) {
+                    if (value == code) {
+                      Navigator.pushNamed(
+                        context,
+                        FriendProfileScreen.routeName,
+                        arguments: [uid, true],
+                      );
+                      return;
+                    }
                 });
-              }
-              else{
-                 ScaffoldMessenger.of(context).showSnackBar(
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Invalid QR code. Try again.')),
                 );
                 Navigator.of(context).pop();

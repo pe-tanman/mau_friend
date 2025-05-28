@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mau_friend/screens/friends/friend_profile_screen.dart';
+import 'package:mau_friend/screens/friends/add_friends/friend_profile_screen.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 
 class EnterCodeScreen extends StatefulWidget {
@@ -13,22 +13,20 @@ class _EnterCodeScreenState extends State<EnterCodeScreen> {
 
   Future<void> _submitCode() async {
     final code = _codeController.text.trim();
-    String username = code.split('+')[0];
+    String userUID = code.split('+')[0];
     String password = code.split('+')[1];
 
-    if (username.isNotEmpty && password.isNotEmpty) {
-      final uid = await FirestoreHelper().getUIDFromUsername(username);
-      if(uid.isNotEmpty) {
-        final storedAddress = await FirestoreHelper().getPermanentAddress(uid);
+    if (userUID.isNotEmpty && password.isNotEmpty) {
+  
+        final storedAddress = await FirestoreHelper().getPermanentAddress(userUID);
         if (storedAddress == code) {
           // Navigate to the friend's profile screen
           Navigator.of(context).pushNamed(
             FriendProfileScreen.routeName,
-            arguments: [uid, true],
+            arguments: [userUID, true],
           );
           return;
         }
-      }
     }
       // Show error or feedback
       ScaffoldMessenger.of(context).showSnackBar(

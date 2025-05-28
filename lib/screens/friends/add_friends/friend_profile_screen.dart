@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
+import 'package:mau_friend/screens/home_screen.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
@@ -20,7 +21,6 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
   bool isPermanent = false;
   String message = '';
 
-
   Future<void> loadFriendProfile() async {
     final arguments = ModalRoute.of(context)?.settings.arguments! as List;
     final String friendUID = arguments[0];
@@ -30,32 +30,56 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
       profile = friendProfile;
       isLoading = false;
     });
-    
   }
 
   Future<void> sendFriendRequest() async {
-    if(message.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter a message')),
-      );
+    if (message.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Please enter a message')));
       return;
     }
-    
-    final title = 'Friend Request from ${profile['username']}';
-    final body = message;
+
+    final title = 'Friend Request';
+    final body = '${profile['username']} has sent you a friend request.';
     final imageUrl = profile['iconLink'] ?? Statics.defaultIconLink;
     final receiver = profile['userUID'];
 
     await FirestoreHelper().addMessage(
-      title,
-      body,
-      imageUrl,
-      'Friend Request',
-      [receiver]
+      title: title,
+      body: body,
+      imageUrl: imageUrl,
+      type: 'Friend Request',
+      receivers: [receiver],
+      message: message,
     );
-    Navigator.of(context).pop();
-    Navigator.of(context).pop();
-    Navigator.of(context).pop();
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Friend request sent')));
+    Navigator.of(context).pushNamed(HomeScreen.routeName);
+  }
+
+  Future<void> addFriend() async {
+    ref.read(profileProvider.notifier).loadMyProfile();
+    FirestoreHelper().addFriendList(profile['userUID']);
+    final myProfile = ref.read(profileProvider);
+    FirestoreHelper().addNotification(
+      'New Friend',
+      '${myProfile.name} is now your friend.',
+      myProfile.iconLink ?? Statics.defaultIconLink,
+      'New Friend',
+      [profile['userUID']],
+      FirebaseAuth.instance.currentUser!.uid,
+    );
+    FirestoreHelper().addNotification(
+      'New Friend',
+      '${profile['username']} is now your friend.',
+      profile['iconLink'] ?? Statics.defaultIconLink,
+      'New Friend',
+      [FirebaseAuth.instance.currentUser!.uid],
+      FirebaseAuth.instance.currentUser!.uid,
+    );
+    Navigator.of(context).pushNamed(HomeScreen.routeName);
   }
 
   @override
@@ -101,15 +125,15 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
                           style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                         SizedBox(height: 60),
-                        if(isPermanent)...[
+                        if (isPermanent) ...[
                           Text(
-                            'Message should include your full name and relationship with the person.',
+                            'Friend request message should include your full name and relationship with the person.',
                           ),
                           SizedBox(height: 20),
                           TextField(
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
-                              labelText: 'Message',
+                              labelText: 'Friend Request Message',
                             ),
                             onChanged: (value) {
                               setState(() {
@@ -122,29 +146,10 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
                         ElevatedButton(
                           child:
                               isPermanent
-                                  ? Text('Send Request')
+                                  ? Text('Send Friend Request')
                                   : Text('Add Friend'),
                           onPressed:
-                              isPermanent
-                                  ? sendFriendRequest
-                                  : () {
-                                    ref.read(profileProvider.notifier).loadMyProfile();
-                                    FirestoreHelper().addFriendList(
-                                      profile['userUID'],
-                                    );
-                                    final myProfile = ref.read(profileProvider);
-                                    FirestoreHelper().addNotification('New Friend', '${myProfile.name} is now your friend.', myProfile.iconLink ?? Statics.defaultIconLink, 'New Friend', [profile['userUID']], FirebaseAuth.instance.currentUser!.uid);
-                                     FirestoreHelper().addNotification(
-                                      'New Friend',
-                                      '${profile['username']} is now your friend.',
-                                      profile['iconLink'] ?? Statics.defaultIconLink,
-                                      'New Friend',
-                                      [FirebaseAuth.instance.currentUser!.uid],
-                                      FirebaseAuth.instance.currentUser!.uid,
-                                    );
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).pop();
-                                  },
+                              isPermanent ? sendFriendRequest : addFriend,
                         ),
                       ],
                     ),

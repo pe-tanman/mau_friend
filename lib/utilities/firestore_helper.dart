@@ -327,11 +327,15 @@ class FirestoreHelper {
   }
 
   Future<void> addMessage(
-    String title,
-    String body,
-    String imageUrl,
-    String type,
-    List<String> receivers,
+    {
+    required String title,
+    required String body,
+    required String imageUrl,
+    required String type,
+    required List<String> receivers,
+    String? message,
+  }
+    
   ) async {
     final senderUID = FirebaseAuth.instance.currentUser!.uid;
 
@@ -362,7 +366,7 @@ class FirestoreHelper {
       });
 
       //add notification
-      await addNotification(title, body, imageUrl, type, receivers, senderUID);
+      await addNotification(title, body, imageUrl, type, receivers, senderUID, message: message);
     } catch (e) {
       print('Error adding message: $e');
       rethrow;
@@ -375,7 +379,8 @@ class FirestoreHelper {
     String imageUrl,
     String type,
     List<String> receivers,
-    String? senderUID,
+    String senderUID,
+    {String? message}
   ) async {
     final timestamp = Timestamp.now();
     for (String receiver in receivers) {
@@ -389,6 +394,7 @@ class FirestoreHelper {
             'senderUID': senderUID,
             'receiverTokens': receivers,
             'timestamp': timestamp,
+            'message': message ?? '',
           },
         ]),
       }, SetOptions(merge: true));

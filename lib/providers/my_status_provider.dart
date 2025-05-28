@@ -152,11 +152,11 @@ class MyStatusProvider extends Notifier<UserStatus> {
    
 
     FirestoreHelper().addMessage(
-      'Arrival',
-      '${senderName} is now in $status',
-      senderImageUrl,
-      'Arrival',
-      receivers
+      title: 'Arrival',
+      body: '${senderName} is now in $status',
+      imageUrl: senderImageUrl,
+      type: 'Arrival',
+      receivers: receivers
     );
   } //keep user's basic profile
 
