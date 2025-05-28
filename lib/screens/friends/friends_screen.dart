@@ -176,7 +176,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     const AppGroupId = 'group.mau_widget';
     const String iOSWidgetName = 'mau_widget';
     final firstProfile = ref.read(friendProfilesProvider).values.first;
-    final statusName = statusMap[firstProfile.userUID]?['status'] ?? 'offline';
+    final statusName = statusMap[firstProfile.userUID]?['status'] ?? 'Offline';
     final statusIcon = statusMap[firstProfile.userUID]?['icon'] ?? '🔴';
     HomeWidget.saveWidgetData<String>('username', firstProfile.name);
     HomeWidget.saveWidgetData<String>('iconLink', firstProfile.iconLink);

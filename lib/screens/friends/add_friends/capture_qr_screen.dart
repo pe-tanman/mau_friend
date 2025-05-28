@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_launcher_icons/android.dart';
-import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/friends/friend_profile_screen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';

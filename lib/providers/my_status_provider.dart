@@ -103,7 +103,6 @@ class MyStatusProvider extends Notifier<UserStatus> {
       }
       final myLocations = ref.read(locationsProvider);
       updateMyStatus(position, myLocations);
-      print('Current speed: ${position.speed}');
     });
   }
 

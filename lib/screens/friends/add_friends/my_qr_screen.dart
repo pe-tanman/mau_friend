@@ -7,6 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
+import 'package:mau_friend/screens/friends/add_friends/my_permanent_address_screen.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,7 +25,6 @@ class MyQrScreen extends ConsumerStatefulWidget {
 class _MyQrScreenState extends ConsumerState<MyQrScreen> {
   bool isInit = true;
   String myUID = '';
-  
 
   String getMyQRData(String uid) {
     // Generate a random password
@@ -41,7 +41,6 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
     return '$uid+$password';
   }
 
-
   @override
   void dispose() {
     FirestoreHelper().updatePassword(myUID, '');
@@ -53,8 +52,8 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
     if (isInit) {
       print('qr');
       ref.read(profileProvider.notifier).loadMyProfile().then((_) {
-          myUID = FirebaseAuth.instance.currentUser!.uid;
-           DatabaseReference dbRef = FirebaseDatabase.instance.ref('users');
+        myUID = FirebaseAuth.instance.currentUser!.uid;
+        DatabaseReference dbRef = FirebaseDatabase.instance.ref('users');
 
         dbRef.onValue.listen((event) {
           FirebaseFirestore.instance
@@ -66,9 +65,9 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
                 ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
               });
         });
-          setState(() {
-            isInit = false;
-          });
+        setState(() {
+          isInit = false;
+        });
       });
     }
     return isInit
@@ -99,6 +98,13 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
             ),
             const SizedBox(height: 40),
             const Text('Keep this page until you successfully add friends'),
+            const SizedBox(height: 50),
+            OutlinedButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(MyPermanentAddressScreen.routeName);
+              },
+              child: const Text('Create a permanent address'),
+            ),
           ],
         );
   }

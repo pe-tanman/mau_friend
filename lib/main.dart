@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
+import 'package:mau_friend/screens/friends/add_friends/my_permanent_address_screen.dart';
 import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
 import 'package:mau_friend/screens/myaccount/emergency_screen.dart';
@@ -15,26 +16,28 @@ import 'package:mau_friend/screens/friends/friend_profile_screen.dart';
 import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
 import 'package:mau_friend/screens/settings/setting_screen.dart';
 import 'package:mau_friend/screens/welcome/welcome_screen.dart';
-import 'package:workmanager/workmanager.dart';
 import 'firebase_options.dart';
 import 'package:mau_friend/screens/home_screen.dart';
 import 'package:mau_friend/screens/myaccount/myaccount_screen.dart';
 import 'package:mau_friend/themes/app_theme.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/screens/friends/notification_screen.dart';
 
-@pragma(
-  'vm:entry-point',
-) // Mandatory if the App is obfuscated or using Flutter 3.1:
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) {
-    print(
-      "Native called background task: $task",
-    ); //simpleTask will be emitted here.
-    return Future.value(true);
-  });
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("Handling a background message: ${message.messageId}");
+  await Firebase.initializeApp();
+  if (message.data.keys.contains('status')) {
+    var status = message.data['status'];
+    const String iOSWidgetName = 'mau_widget';
+    HomeWidget.saveWidgetData<String>('status', status);
+    HomeWidget.updateWidget(iOSName: iOSWidgetName);
+    print('received a background status update');
+    // Handle emergency notification
+  } else {
+    // Handle other types of notifications
+  }
 }
 
 Future<void> main() async {
@@ -46,33 +49,6 @@ Future<void> main() async {
   }
   dotenv.load(fileName: 'lib/credential.env');
   await HomeWidget.setAppGroupId('group.mau_widget');
-
-  @pragma('vm:entry-point')
-  Future<void> _firebaseMessagingBackgroundHandler(
-    RemoteMessage message,
-  ) async {
-    print(
-      "Handling a background message: ${message.messageId}",
-    );
-    await Firebase.initializeApp();
-    if (message.data.keys.contains('status')) {
-      var status = message.data['status'];
-      const String iOSWidgetName = 'mau_widget';
-      HomeWidget.saveWidgetData<String>('status', status);
-      HomeWidget.updateWidget(iOSName: iOSWidgetName);
-      print('received a background status update');
-      // Handle emergency notification
-    } else {
-      // Handle other types of notifications
-    }
-  }
-
-  Workmanager().initialize(
-    callbackDispatcher, // The top level function, aka callbackDispatcher
-    isInDebugMode:
-        true, // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-  );
-  Workmanager().registerOneOffTask("task-identifier", "simpleTask");
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(ProviderScope(child: MyApp()));
@@ -122,6 +98,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         EmergencyScreen.routeName: (context) => EmergencyScreen(),
         EmergencyLocationScreen.routeName:
             (context) => EmergencyLocationScreen(),
+        MyPermanentAddressScreen.routeName: (context) => MyPermanentAddressScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

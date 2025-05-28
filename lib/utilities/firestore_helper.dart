@@ -143,7 +143,7 @@ class FirestoreHelper {
   Future<void> updatePassword(String userUID, String password) async {
     await _firestore.collection('userPasswords').doc(userUID).set({
       'password': password,
-    });
+    }, SetOptions(merge: true));
   }
 
   Future<String> getPassword(String userUID) async {
@@ -153,6 +153,31 @@ class FirestoreHelper {
       return passwordDoc.data()?['password'] ?? '';
     } catch (e) {
       print('Error getting password: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updatePermanentAddress(
+    String userUID,
+    String permanentAddress,
+  ) async {
+    try {
+      await _firestore.collection('userPasswords').doc(userUID).set({
+        'permanentAddress': permanentAddress,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print('Error updating permanent address: $e');
+      rethrow;
+    }
+  }
+  Future<String> getPermanentAddress(String userUID) async {
+    try {
+      final addressDoc =
+          await _firestore.collection('userPasswords').doc(userUID).get();
+          print('permanent address: ${addressDoc.data()}');
+      return addressDoc.data()?['permanentAddress'] ?? '';
+    } catch (e) {
+      print('Error getting permanent address: $e');
       rethrow;
     }
   }
