@@ -1,5 +1,4 @@
 import 'dart:ui' as ui;
-
 import 'package:emoji_selector/emoji_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';

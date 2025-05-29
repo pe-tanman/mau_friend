@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lottie/lottie.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/themes/app_color.dart';
@@ -92,9 +93,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SvgPicture.asset('lib/assets/images/Group 11.svg'),
+            SizedBox(height: 60),
+            Lottie.network(
+              'https://lottie.host/05e8d74f-274a-4d59-ad34-e737a580c414/P0XJGUBihf.json',
+              height: 500,
+            ),
+            SizedBox(height: 30),
             Text('Welcome to mau', style: appTheme().textTheme.titleMedium),
-            SizedBox(height: 40),
+            SizedBox(height: 30),
             primaryButton('Continue', () {
               _pageController.nextPage(
                 duration: Duration(milliseconds: 300),
@@ -114,55 +120,104 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Privacy and Peace', style: appTheme().textTheme.titleMedium),
-          SizedBox(height: 100),
-          Text(
-            'Our Promise to You',
-            style: TextStyle(fontSize: 20, color: AppColors.themeColor),
-          ),
-          Text(
-            'Your location, friends, and places are stored only on your device— never shared, not even with us.*',
-            style: TextStyle(color: AppColors.themeColor, fontSize: 16),
-          ),
-          SizedBox(height: 20),
-          Text(
-            '*Only in emergency mode, your location is shared with your emergency contacts.',
-            style: TextStyle(color: AppColors.themeColor, fontSize: 10),
-          ),
-          SizedBox(height: 10),
-
-          SizedBox(height: 100),
-          Link(
-            // 開きたいWebページのURLを指定
-            uri: Uri.parse(
-              'https://petanman.notion.site/Privacy-Policy-1efe73611a8f804388a5d41b98b7165f?pvs=4',
+          Center(
+            child: Text(
+              'Privacy and Peace',
+              style: appTheme().textTheme.titleMedium,
+              textAlign: TextAlign.center,
             ),
-            target: LinkTarget.blank,
-            builder: (BuildContext ctx, FollowLink? openLink) {
-              return TextButton(
-                onPressed: openLink,
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
-                  // minimumSize:
-                  //     MaterialStateProperty.all(Size.zero),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.open_in_new, color: AppColors.linkTextColor),
-                    Text(
-                      'Our Privacy Policy',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppColors.linkTextColor,
-                        decoration: TextDecoration.underline,
-                      ),
+          ),
+          SizedBox(height: 40),
+          Card(
+            elevation: 0,
+          color: Colors.white,
+          child:
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+
+                children: [
+                  Text('🤝', style: TextStyle(
+                    fontSize: 30,
+                  ),),
+                  SizedBox(width: 10),
+                  Text(
+                    'Our Promise to You',
+                    style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.themeColor,
                     ),
-                  ],
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                'Your location and familiar places are stored locally, never shared.',
+                style: TextStyle(fontSize: 16, color: AppColors.themeColor),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                '*Exept for Feeling Unsafe Mode',
+                style: TextStyle(
+            fontSize: 12,
+            fontStyle: FontStyle.italic,
+            color: AppColors.themeColor,
                 ),
-              );
-            },
+                textAlign: TextAlign.center,
+              ),
+            ),
+              ],
+            ),
+          )
+          ),
+          
+          SizedBox(height: 30),
+          Center(
+            child: Link(
+              uri: Uri.parse(
+          'https://petanman.notion.site/Privacy-Policy-1efe73611a8f804388a5d41b98b7165f?pvs=4',
+              ),
+              target: LinkTarget.blank,
+              builder: (BuildContext ctx, FollowLink? openLink) {
+          return TextButton(
+            onPressed: openLink,
+            style: ButtonStyle(
+              padding: MaterialStateProperty.all(
+                EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.open_in_new, color: AppColors.linkTextColor),
+                SizedBox(width: 5),
+                Text(
+            'Our Privacy Policy',
+            style: TextStyle(
+              fontSize: 16,
+              color: AppColors.linkTextColor,
+              decoration: TextDecoration.underline,
+            ),
+                ),
+              ],
+            ),
+          );
+              },
+            ),
           ),
           SizedBox(height: 30),
           primaryButton('Accept and Continue', () {
@@ -185,14 +240,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           children: [
             SizedBox(height: 70),
             Text(
-              'Location and Notification Access',
+              'Permissions',
               style: appTheme().textTheme.titleMedium,
             ),
-            SvgPicture.asset('lib/assets/images/Map.svg', height: 300),
+            Lottie.network(
+              'https://lottie.host/65b35dcd-45e6-465d-9994-dce278b0d2c9/q1OdWClGnS.json',
+            ),
             Text(
               "To successfully share your status with your friends:",
               style: TextStyle(color: AppColors.darkText1),
             ),
+            
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 25.0,
@@ -202,15 +260,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    "✅ Precise location",
+                    "✅ Allow Precise Location",
                     style: appTheme().textTheme.headlineSmall,
                   ),
                   Text(
-                    "✅ Location Always  allowed",
+                    "✅ Always Allow Location",
                     style: appTheme().textTheme.headlineSmall,
                   ),
                   Text(
-                    "✅ Notificaitons allowed",
+                    "✅ Allow Notifications",
                     style: appTheme().textTheme.headlineSmall,
                   ),
                 ],
