@@ -240,7 +240,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             ref
                 .read(unreadNotificationProvider.notifier)
                 .resetUnreadNotificationCount();
-            PrefsHelper().updateReadNotificationPrefs(unread);
+            PrefsHelper().updateReadNotificationPrefs(ref.read(notificationProvider).length);
           },
         ),
       );

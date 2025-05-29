@@ -67,9 +67,8 @@ class UnreadNotificationProvider extends Notifier<int> {
 
   Future<void> loadUnreadNotificationCount() async {
       int readCount = await PrefsHelper().getReadNotification();
-      int totalCount = ref.watch(notificationProvider).length;
+      int totalCount = ref.read(notificationProvider).length;
       state = totalCount - readCount;
-      print('Unread notifications: $state');
   }
 
   void resetUnreadNotificationCount() {
