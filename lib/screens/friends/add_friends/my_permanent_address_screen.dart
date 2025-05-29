@@ -1,14 +1,8 @@
-import 'dart:io';
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mau_friend/providers/friend_list_provider.dart';
-import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

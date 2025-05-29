@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/themes/app_color.dart';

@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefsHelper {

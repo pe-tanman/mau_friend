@@ -1,12 +1,7 @@
-import 'package:firebase_database/firebase_database.dart';
-import 'package:intl/intl.dart';
-import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mau_friend/utilities/database_helper.dart';
 
 class Notification {
   final String body;
@@ -70,7 +65,6 @@ class UnreadNotificationProvider extends Notifier<int> {
       int totalCount = ref.read(notificationProvider).length; //here changing to ref.read() made the provider work
       state = totalCount - readCount;
   }
-
   void resetUnreadNotificationCount() {
     state = 0;
   }

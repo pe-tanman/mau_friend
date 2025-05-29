@@ -17,8 +17,9 @@ import 'dart:async';
 import 'package:mau_friend/providers/locations_provider.dart';
 
 class MyAccountScreen extends ConsumerStatefulWidget {
-  @override
+  
   static const routeName = 'my-account-screen';
+  @override
   _MyAccountScreenState createState() => _MyAccountScreenState();
 }
 
@@ -30,10 +31,6 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   LatLng coordinates = Statics.initLocation;
   bool isLoading = true;
   bool isInit = true;
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
 
   @override
   void initState() {

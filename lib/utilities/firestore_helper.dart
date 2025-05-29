@@ -206,7 +206,7 @@ class FirestoreHelper {
     final friendProfile = await getUserProfile(friendUID);
 
     final oldFriendList = await getFriendList();
-    if (oldFriendList == null || oldFriendList.isEmpty) {
+    if (oldFriendList.isEmpty) {
       addFirstFriendToken(friendUID);
     }
     //update my firestore

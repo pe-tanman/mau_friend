@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/providers/emergency_provider.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
@@ -12,10 +10,7 @@ import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
-import 'package:mau_friend/providers/my_status_provider.dart';
 
 class UserStatus {
   String status;

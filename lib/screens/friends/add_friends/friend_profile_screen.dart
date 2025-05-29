@@ -1,17 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/home_screen.dart';
-import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 
 class FriendProfileScreen extends ConsumerStatefulWidget {
-  @override
   static const routeName = 'friend-profile-screen';
+
+  const FriendProfileScreen({super.key});
   _FriendProfileScreenState createState() => _FriendProfileScreenState();
 }
 

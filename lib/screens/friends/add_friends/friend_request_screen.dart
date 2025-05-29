@@ -1,17 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
-import 'package:mau_friend/themes/app_color.dart';
-import 'package:mau_friend/themes/app_theme.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 
 class FriendRequestScreen extends ConsumerStatefulWidget {
-  @override
   static const routeName = 'friend-request-screen';
+
+  const FriendRequestScreen({super.key});
+  @override
   _FriendRequestScreenState createState() => _FriendRequestScreenState();
 }
 

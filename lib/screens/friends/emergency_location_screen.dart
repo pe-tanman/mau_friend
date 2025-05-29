@@ -3,17 +3,11 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:mau_friend/providers/locations_provider.dart';
-import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
-import 'dart:developer';
 
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 class EmergencyLocationScreen extends ConsumerStatefulWidget {
   static const routeName = 'emergency-location-screen';

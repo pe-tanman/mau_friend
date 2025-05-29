@@ -1,12 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:fast_csv/fast_csv.dart' as fast_csv;
-import 'dart:math' as math;
 import 'package:path/path.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 class MyLocationDatabaseHelper {
   static final MyLocationDatabaseHelper _instance =
@@ -66,7 +61,7 @@ class MyLocationDatabaseHelper {
 
     final _icon = icon ?? prevData!['icon'];
     final _coordinates =
-        coordinates ?? LatLng(prevData!['latitude'], prevData!['longitude']);
+        coordinates ?? LatLng(prevData!['latitude'], prevData['longitude']);
     final _radius = radius ?? prevData!['radius'];
     Map<String, dynamic> data = {
       'name': name,
@@ -121,7 +116,7 @@ class MyLocationDatabaseHelper {
     final Database? db = await database;
     final myUID = FirebaseAuth.instance.currentUser!.uid;
     db!.delete('my_locations_table_$myUID');
-    db!.execute('DROP TABLE my_locations_table_$myUID');
+    db.execute('DROP TABLE my_locations_table_$myUID');
   }
 }
 class NotificationDatabaseHelper {

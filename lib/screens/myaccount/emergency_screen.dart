@@ -3,14 +3,12 @@ import 'dart:io';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/providers/emergency_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
-import 'package:slide_to_act/slide_to_act.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EmergencyScreen extends ConsumerStatefulWidget {
@@ -60,7 +58,6 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
     isLocationSharingEnabled =
         ref.read(emergencyProvider.notifier).isEmergencyActive();
     Geolocator.getCurrentPosition().then((position) {
-      if (position != null) {
         setState(() {
           currentLocation = LatLng(position.latitude, position.longitude);
           initialCameraPosition = CameraPosition(
@@ -73,7 +70,6 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
           );
           isMapLoading = false;
         });
-      }
     });
 
     positionStream = Geolocator.getPositionStream(

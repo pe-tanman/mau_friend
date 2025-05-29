@@ -1,20 +1,16 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
-import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/screens/friends/add_friends/my_permanent_address_screen.dart';
 import 'package:mau_friend/themes/app_color.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
-import 'package:mau_friend/themes/app_theme.dart';
-
 class MyQrScreen extends ConsumerStatefulWidget {
   const MyQrScreen({Key? key}) : super(key: key);
 

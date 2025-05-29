@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/screens/friends/add_friends/friend_request_screen.dart';
-import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 
 class NotificationScreen extends ConsumerStatefulWidget {
