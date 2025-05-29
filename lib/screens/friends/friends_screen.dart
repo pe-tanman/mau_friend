@@ -223,13 +223,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
 
   Widget buildNotificationButton() {
     int unread = ref.watch(unreadNotificationProvider);
-    PrefsHelper().getReadNotification().then((value) {
-      final notifications = ref.read(notificationProvider);
-      print('read Notifications length: ${value}');
-      print('provider length: ${ref.read(notificationProvider).length}');
-    });
-
-    print('Unread notifications: $unread');
     if (unread > 0) {
       return Badge.count(
         count: unread,

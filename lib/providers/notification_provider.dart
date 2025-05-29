@@ -67,7 +67,7 @@ class UnreadNotificationProvider extends Notifier<int> {
 
   Future<void> loadUnreadNotificationCount() async {
       int readCount = await PrefsHelper().getReadNotification();
-      int totalCount = ref.read(notificationProvider).length;
+      int totalCount = ref.read(notificationProvider).length; //here changing to ref.read() made the provider work
       state = totalCount - readCount;
   }
 
