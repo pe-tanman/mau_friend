@@ -1,20 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
-import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
-import 'package:mau_friend/themes/app_color.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class EditFriendListScreen extends ConsumerStatefulWidget {
   static const String routeName = '/edit-friend-list';
-  const EditFriendListScreen({Key? key}) : super(key: key);
+  const EditFriendListScreen({super.key});
 
   @override
   _EditFriendListScreenState createState() => _EditFriendListScreenState();
@@ -38,7 +34,7 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
 
   void removeFriend(String friendUID) {
     ref.read(profileProvider.notifier).loadMyProfile();
-    
+
     FirestoreHelper().removeFriend(friendUID);
     FirestoreHelper().removeFriendProfile(friendUID);
 
