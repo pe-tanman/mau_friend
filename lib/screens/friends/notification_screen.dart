@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/screens/friends/add_friends/friend_request_screen.dart';
+import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 
 class NotificationScreen extends ConsumerStatefulWidget {
@@ -18,7 +19,11 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(notificationProvider.notifier).loadNotification();
+    ref.read(notificationProvider.notifier).loadNotification().then((_) {
+      setState(() {
+        notifications = ref.read(notificationProvider);
+      });
+    });
   }
 
   @override
@@ -36,7 +41,6 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                       '${notification.timestamp.year}-${notification.timestamp.month.toString().padLeft(2, '0')}-${notification.timestamp.day.toString().padLeft(2, '0')} ${notification.timestamp.hour.toString().padLeft(2, '0')}:${notification.timestamp.minute.toString().padLeft(2, '0')}';
 
                   if (notification.type == 'Friend Request') {
-                    print('senderUID');
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(
                         vertical: 16.0,
@@ -71,7 +75,10 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                     subtitle: Text(shortenTimestamp),
                     leading: CircleAvatar(
                       radius: 30,
-                      backgroundImage: (notification.iconLink.isNotEmpty)? NetworkImage(notification.iconLink): NetworkImage(Statics.defaultIconLink),
+                      backgroundImage:
+                          (notification.iconLink.isNotEmpty)
+                              ? NetworkImage(notification.iconLink)
+                              : NetworkImage(Statics.defaultIconLink),
                     ),
                   );
                 },

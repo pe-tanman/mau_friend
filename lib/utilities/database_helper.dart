@@ -103,9 +103,7 @@ class MyLocationDatabaseHelper {
     if (myUID == null) {
       return null;
     }
-    print('my_locations_table_$myUID');
     final result = await db!.query('my_locations_table_$myUID');
-    print('result: $result');
     return result;
   }
 

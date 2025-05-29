@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefsHelper {
@@ -27,8 +28,7 @@ class PrefsHelper {
     return notificationList;
   }
 
-
-////emergency notification list
+  ////emergency notification list
   Future<void> addEmergencyPrefs(String friendUID) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> emergencyList = await getEmergencyPrefs();
@@ -40,7 +40,8 @@ class PrefsHelper {
   Future<List<String>> getEmergencyPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final myUID = FirebaseAuth.instance.currentUser!.uid;
-    List<String> emergencyList = prefs.getStringList('emergencyList_$myUID') ?? [];
+    List<String> emergencyList =
+        prefs.getStringList('emergencyList_$myUID') ?? [];
     return emergencyList;
   }
 
@@ -55,8 +56,8 @@ class PrefsHelper {
   Future<void> addLocationNotificationPrefs(String status) async {
     final prefs = await SharedPreferences.getInstance();
     final myUID = FirebaseAuth.instance.currentUser!.uid;
-    List<String> locationNotificationList = await getLocationNotificationPrefs(
-    );
+    List<String> locationNotificationList =
+        await getLocationNotificationPrefs();
     locationNotificationList.add(status);
     await prefs.setStringList(
       'locationNotificationList_$myUID',
@@ -64,7 +65,7 @@ class PrefsHelper {
     );
   }
 
-//registered location
+  //registered location
   Future<List<String>> getLocationNotificationPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final myUID = FirebaseAuth.instance.currentUser!.uid;
@@ -72,23 +73,22 @@ class PrefsHelper {
         prefs.getStringList('locationNotificationList_$myUID') ?? [];
     return locationNotificationList;
   }
+
   Future<void> removeLocationNotificationPrefs(String status) async {
-    
     final prefs = await SharedPreferences.getInstance();
     List<String> locationNotificationList =
         await getLocationNotificationPrefs();
-        if(locationNotificationList.contains(status)){
-          final myUID = FirebaseAuth.instance.currentUser!.uid;
+    if (locationNotificationList.contains(status)) {
+      final myUID = FirebaseAuth.instance.currentUser!.uid;
       locationNotificationList.remove(status);
       await prefs.setStringList(
         'locationNotificationList_$myUID',
         locationNotificationList,
       );
-        }
-    
+    }
   }
 
-// mute list
+  // mute list
   Future<void> addMutePrefs(String friendUID) async {
     final prefs = await SharedPreferences.getInstance();
     final myUID = FirebaseAuth.instance.currentUser!.uid;
@@ -110,5 +110,19 @@ class PrefsHelper {
     final myUID = FirebaseAuth.instance.currentUser!.uid;
     muteList.remove(friendUID);
     await prefs.setStringList('muteList_$myUID', muteList);
+  }
+
+  // unread notification
+  Future<void> updateReadNotificationPrefs(int length) async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    await prefs.setInt('unreadNotification_$myUID', length);
+  }
+
+  Future<int> getReadNotification() async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    int length = prefs.getInt('unreadNotification_$myUID') ?? 0;
+    return length;
   }
 }

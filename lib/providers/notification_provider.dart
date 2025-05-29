@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
+import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,17 +15,25 @@ class Notification {
   final String type;
   final String senderUID;
   final String? message;
-  Notification(this.body, this.iconLink, this.timestamp, this.type, this.senderUID, {this.message});
+  Notification(
+    this.body,
+    this.iconLink,
+    this.timestamp,
+    this.type,
+    this.senderUID, {
+    this.message,
+  });
 }
+
 @riverpod
 class NotificationProvider extends Notifier<List<Notification>> {
   @override
   List<Notification> build() => [];
 
-  void loadNotification() {
-    FirestoreHelper().getNotifications().then((value) {
+  Future<void> loadNotification() async {
+    final notifications = await FirestoreHelper().getNotifications();
       List<Notification> result = [];
-      for (var element in value) {
+      for (var element in notifications) {
         var datetime = element['timestamp'].toDate();
         var type = element['type'] ?? 'General';
         result.add(
@@ -39,8 +48,9 @@ class NotificationProvider extends Notifier<List<Notification>> {
         );
       }
       state = result;
-    });
   }
+
+  
 }
 
 final notificationProvider =
@@ -50,14 +60,19 @@ final notificationProvider =
 
 @riverpod
 class UnreadNotificationProvider extends Notifier<int> {
-  @override
-  int build() => 0;
-
-  void addUnreadNotification() {
-    state = state + 1;
+    @override
+  int build() {
+    return 0;
   }
 
-  void resetUnreadNotification() {
+  Future<void> loadUnreadNotificationCount() async {
+      int readCount = await PrefsHelper().getReadNotification();
+      int totalCount = ref.watch(notificationProvider).length;
+      state = totalCount - readCount;
+      print('Unread notifications: $state');
+  }
+
+  void resetUnreadNotificationCount() {
     state = 0;
   }
 }

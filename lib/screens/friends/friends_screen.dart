@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/screens/friends/edit_friend_list_screen.dart';
@@ -17,9 +14,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
+import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:mau_friend/providers/friend_list_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FriendsScreen extends ConsumerStatefulWidget {
   const FriendsScreen({Key? key}) : super(key: key);
@@ -38,15 +35,16 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   late DatabaseReference dbRef;
   Map statusMap = {};
   bool isLoading = true;
+  bool isUnreadLoading = true;
 
   String? imagePath;
 
   Map locationAvailableMap = {};
 
   Future<void> updatePrefs(var snapshot) async {
-      await ref.read(friendListProvider.notifier).loadFriendList();
-      final newFriendUID = snapshot.data()!['friendList'].last;
-      updateFriendStatus(newFriendUID);
+    await ref.read(friendListProvider.notifier).loadFriendList();
+    final newFriendUID = snapshot.data()!['friendList'].last;
+    updateFriendStatus(newFriendUID);
   }
 
   Future<void> updateFriendStatus(String friendUID) async {
@@ -58,7 +56,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         statusMap[friendUID] = map;
       });
     } // Update home widget with first friend
-    updateHomeWidget();
+    if (Platform.isIOS) {
+      updateHomeWidget();
+    }
   }
 
   Future<void> updateLocationAvailable(String friendUID) async {
@@ -81,11 +81,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         .snapshots()
         .listen((snapshot) {
           ref.read(notificationProvider.notifier).loadNotification();
-          print('Notification Updated');
-          if (snapshot.exists) {
-            ref.read(unreadNotificationProvider.notifier)
-                .addUnreadNotification();
-          }
+          print('Notification count updated');
+          ref
+              .read(unreadNotificationProvider.notifier)
+              .loadUnreadNotificationCount();
         });
 
     statusSubscription = dbRef.onValue.listen((event) {
@@ -108,26 +107,21 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
         .listen((snapshot) {
           ref.read(friendProfilesProvider.notifier).loadFriendProfiles();
           ref.read(friendListProvider.notifier).loadFriendList();
-          print('Friend List Updated');
           if (snapshot.exists) {
             updatePrefs(snapshot);
           }
         });
 
     Future.delayed(Duration(seconds: 2), () {
-      if (mounted) {
+      if (mounted && Platform.isIOS) {
         setState(() {
-          if(Platform.isIOS){
-             updateHomeWidget();
-          }
-         
+          updateHomeWidget();
         });
       }
     });
   }
 
   Future<void> updateHomeWidget() async {
-    print('home widget updated');
     const AppGroupId = 'group.mau_widget';
     const String iOSWidgetName = 'mau_widget';
     final firstProfile = ref.read(friendProfilesProvider).values.first;
@@ -228,16 +222,25 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   }
 
   Widget buildNotificationButton() {
-    if (ref.watch(unreadNotificationProvider) > 0) {
+    int unread = ref.watch(unreadNotificationProvider);
+    PrefsHelper().getReadNotification().then((value) {
+      final notifications = ref.read(notificationProvider);
+      print('read Notifications length: ${value}');
+      print('provider length: ${ref.read(notificationProvider).length}');
+    });
+
+    print('Unread notifications: $unread');
+    if (unread > 0) {
       return Badge.count(
-        count: ref.watch(unreadNotificationProvider),
+        count: unread,
         child: IconButton(
           icon: const Icon(Icons.notifications_outlined),
           onPressed: () {
             Navigator.pushNamed(context, NotificationScreen.routeName);
             ref
-                .watch(unreadNotificationProvider.notifier)
-                .resetUnreadNotification();
+                .read(unreadNotificationProvider.notifier)
+                .resetUnreadNotificationCount();
+            PrefsHelper().updateReadNotificationPrefs(unread);
           },
         ),
       );
