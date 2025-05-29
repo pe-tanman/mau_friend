@@ -17,6 +17,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
   late Map<String, dynamic> profile;
   bool isLoading = true;
   bool isPermanent = false;
+  bool isDetail = false;
   String message = '';
 
   Future<void> loadFriendProfile() async {
@@ -96,22 +97,23 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
               ? Center(child: CircularProgressIndicator())
               : Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(30.0),
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CircleAvatar(
-                          radius: 50,
+                          radius: 70,
                           backgroundImage: NetworkImage(
                             profile['iconLink'] ??
                                 Statics.defaultIconLink, // default icon link
                           ),
                         ), // a cat image
-                        SizedBox(height: 10),
+                        SizedBox(height: 20),
                         Text(
                           profile['username'] ?? 'Username',
+                          overflow: TextOverflow.clip,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -119,6 +121,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
                         ),
                         SizedBox(height: 5),
                         Text(
+                          overflow: TextOverflow.clip,
                           profile['bio'] ?? 'Bio',
                           style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
@@ -142,13 +145,15 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
                           SizedBox(height: 20),
                         ],
                         ElevatedButton(
-                          child:
-                              isPermanent
-                                  ? Text('Send Friend Request')
-                                  : Text('Add Friend'),
                           onPressed:
                               isPermanent ? sendFriendRequest : addFriend,
+                          child:
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Text(isPermanent? 'Send Friend Request' : 'Add Friend', style: TextStyle(fontSize: 16)),
+                              ),
                         ),
+                        SizedBox(height: 20),
                       ],
                     ),
                   ),

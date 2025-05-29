@@ -37,15 +37,6 @@ class _CurrentLocationScreenState extends ConsumerState<CurrentLocationScreen> {
     return MediaQuery.of(context).platformBrightness == Brightness.dark;
   }
 
-  Future<void> _getCurrentLocation() async {
-    final currentPosition = await Geolocator.getCurrentPosition();
-    currentLocation = LatLng(
-      currentPosition.latitude,
-      currentPosition.longitude,
-    );
-    speed = currentPosition.speed;
-  }
-
   @override
   void initState() {
     positionStream = Geolocator.getPositionStream(
@@ -57,7 +48,6 @@ class _CurrentLocationScreenState extends ConsumerState<CurrentLocationScreen> {
       setState(() {
         currentLocation = LatLng(position.latitude, position.longitude);
         speed = position.speed;
-        updateMyMarkers();
       });
     });
     super.initState();
@@ -127,36 +117,9 @@ class _CurrentLocationScreenState extends ConsumerState<CurrentLocationScreen> {
       );
       markers.add(marker);
     }
-    markers.add(
-      Marker(
-        markerId: const MarkerId('currentLocation'),
-        position: currentLocation,
-        infoWindow: InfoWindow(
-          title: 'Current Location',
-          snippet:
-              'Latitude: ${currentLocation.latitude}, Longitude: ${currentLocation.longitude}, Speed: ${speed} km/h',
-        ),
-      ),
-    );
     setState(() {
       isLoadingMarkers = false;
     });
-  }
-
-  void updateMyMarkers() {
-    final currentMarker = markers.toList().last;
-    markers.remove(currentMarker);
-    markers.add(
-      Marker(
-        markerId: currentMarker.markerId,
-        position: currentLocation,
-        infoWindow: InfoWindow(
-          title: 'Current Location',
-          snippet:
-              'Latitude: ${currentLocation.latitude}, Longitude: ${currentLocation.longitude}, Speed: ${speed} km/h',
-        ),
-      ),
-    );
   }
 
   Set<Circle> createMyPolygons() {
@@ -189,17 +152,6 @@ class _CurrentLocationScreenState extends ConsumerState<CurrentLocationScreen> {
   Widget build(BuildContext context) {
     if (isInit) {
       createMyMarkers();
-      _getCurrentLocation()
-          .then((_) {
-            print('Current location: $currentLocation');
-            isInit = false;
-            setState(() {
-              isLoading = false;
-            });
-          })
-          .catchError((error) {
-            log('Error getting location: $error');
-          });
     }
 
     return Scaffold(
@@ -208,6 +160,8 @@ class _CurrentLocationScreenState extends ConsumerState<CurrentLocationScreen> {
           (isLoading && isLoadingMarkers)
               ? Center(child: CircularProgressIndicator())
               : GoogleMap(
+                myLocationButtonEnabled: true,
+                myLocationEnabled: true,
                 style: isDarkMode(context) ? Statics.darkStyle : null,
                 initialCameraPosition: CameraPosition(
                   target: Statics.initLocation, // Placeholder position

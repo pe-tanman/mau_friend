@@ -244,7 +244,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               style: appTheme().textTheme.titleMedium,
             ),
             Lottie.network(
-              'https://lottie.host/65b35dcd-45e6-465d-9994-dce278b0d2c9/q1OdWClGnS.json',
+              'https://lottie.host/65b35dcd-45e6-465d-9994-dce278b0d2c9/q1OdWClGnS.json', 
             ),
             Text(
               "To successfully share your status with your friends:",

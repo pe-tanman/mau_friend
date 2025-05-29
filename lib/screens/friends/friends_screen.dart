@@ -9,6 +9,7 @@ import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
 import 'package:mau_friend/screens/friends/edit_friend_list_screen.dart';
 import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
+import 'package:mau_friend/screens/friends/friend_detail_screen.dart';
 import 'package:mau_friend/screens/friends/notification_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
@@ -153,70 +154,93 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
       elevation: 3.0,
       color: isEmergency ? Colors.red : null,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: NetworkImage(
-              profile?.iconLink ?? Statics.defaultIconLink, // default icon link
-            ),
-          ), // a cat image
-          SizedBox(height: 20),
-          Text(
-            profile?.name ?? 'Username',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10),
-          Text(
-            profile?.bio ?? 'Bio',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-          SizedBox(height: 60),
-
-          //status
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child:
-                isLoading
-                    ? Center(child: CircularProgressIndicator())
-                    : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          statusMap[friendUID]?['icon'] ?? '🔴',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          statusMap[friendUID]?['status'] ?? 'offline',
-                          style: Theme.of(context).textTheme.labelMedium,
-                        ),
-                      ],
-                    ),
-          ),
-          SizedBox(height: 20),
-          if (locationAvailableMap[friendUID] != null &&
-              locationAvailableMap[friendUID] == true)
-            OutlinedButton.icon(
-              onPressed: () {
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            InkWell(
+              onTap: () {
                 Navigator.of(context).pushNamed(
-                  EmergencyLocationScreen.routeName,
-                  arguments: {'friendUID': friendUID},
+                  FriendDetailScreen.routeName,
+                  arguments: friendUID, // pass the friendUID to detail screen
                 );
               },
-              label: Text("View Location"),
-              icon: Icon(Icons.location_on_outlined),
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: NetworkImage(
+                  profile?.iconLink ??
+                      Statics.defaultIconLink, // default icon link
+                ),
+              ),
+            ), // a cat image
+            SizedBox(height: 20),
+            Text(
+              overflow: TextOverflow.ellipsis,
+              profile?.name ?? 'Username',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-        ],
+            SizedBox(height: 10),
+            Text(
+              overflow: TextOverflow.ellipsis,
+              maxLines: 3,
+              profile?.bio ?? 'Bio',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            SizedBox(height: 60),
+
+            //status
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child:
+                  isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            statusMap[friendUID]?['icon'] ?? '🔴',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: 160,
+                              minWidth: 50,
+                            ),
+                            child: Text(
+                              statusMap[friendUID]?['status'] ?? 'offline',
+                              style: Theme.of(context).textTheme.labelMedium,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+            ),
+            SizedBox(height: 20),
+            if (locationAvailableMap[friendUID] != null &&
+                locationAvailableMap[friendUID] == true)
+              OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    EmergencyLocationScreen.routeName,
+                    arguments: {'friendUID': friendUID},
+                  );
+                },
+                label: Text("View Location"),
+                icon: Icon(Icons.location_on_outlined),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -233,7 +257,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
             ref
                 .read(unreadNotificationProvider.notifier)
                 .resetUnreadNotificationCount();
-            PrefsHelper().updateReadNotificationPrefs(ref.read(notificationProvider).length);
+            PrefsHelper().updateReadNotificationPrefs(
+              ref.read(notificationProvider).length,
+            );
           },
         ),
       );

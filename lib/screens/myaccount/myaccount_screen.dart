@@ -178,65 +178,75 @@ onTap: () {
             Navigator.pushNamed(context, EmergencyScreen.routeName);
           }
         },
-        child: Column(
-          children: [
-            SizedBox(height: 30),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage(
-                (profile.iconLink != null && profile.iconLink != '')
-                    ? profile.iconLink!
-                    : Statics.defaultIconLink,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: 30),
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: NetworkImage(
+                  (profile.iconLink != null && profile.iconLink != '')
+                      ? profile.iconLink!
+                      : Statics.defaultIconLink,
+                ),
+              ), // a cat image
+              SizedBox(height: 10),
+              Text(
+                profile.name ?? 'Username',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-            ), // a cat image
-            SizedBox(height: 10),
-            Text(
-              profile.name ?? 'Username',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 5),
-            Text(
-              profile.bio ?? 'Bio',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            SizedBox(height: 5),
-            if (profile.name == null)
-              TextButton.icon(
-                label: Text('Complete your profile'),
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  Navigator.pushNamed(context, ProfileSettingScreen.routeName);
-                },
+              SizedBox(height: 5),
+              Text(
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+                profile.bio ?? 'Bio',
+                style: TextStyle(fontSize: 16, color: Colors.grey,),
               ),
-            SizedBox(height: 20),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    ref.watch(myStatusProvider).icon,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
+              SizedBox(height: 5),
+              if (profile.name == null)
+                TextButton.icon(
+                  label: Text('Complete your profile'),
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    Navigator.pushNamed(context, ProfileSettingScreen.routeName);
+                  },
+                ),
+              SizedBox(height: 20),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                margin: EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      ref.watch(myStatusProvider).icon,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    ref.watch(myStatusProvider).status,
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                ],
+                    SizedBox(width: 10),
+                    ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 160, minWidth: 50),
+                            child: Text(
+                             ref.watch(myStatusProvider).status,
+                              style: Theme.of(context).textTheme.labelMedium,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-          ],
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

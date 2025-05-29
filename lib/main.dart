@@ -12,6 +12,7 @@ import 'package:mau_friend/screens/friends/add_friends/enter_code_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/friend_request_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/my_permanent_address_screen.dart';
 import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
+import 'package:mau_friend/screens/friends/friend_detail_screen.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
 import 'package:mau_friend/screens/myaccount/emergency_screen.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
@@ -111,7 +112,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         MyPermanentAddressScreen.routeName: (context) => MyPermanentAddressScreen(),
         EnterCodeScreen.routeName: (context) => EnterCodeScreen(),
         FriendRequestScreen.routeName: (context) => FriendRequestScreen(),
-        
+        FriendDetailScreen.routeName: (context) => FriendDetailScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );
