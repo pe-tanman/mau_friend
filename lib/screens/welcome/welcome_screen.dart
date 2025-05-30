@@ -122,7 +122,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         children: [
           Center(
             child: Text(
-              'Privacy and Peace',
+              AppLocalizations.of(context)!.helloWorld,
               style: appTheme().textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
