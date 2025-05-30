@@ -103,7 +103,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/credential.env
-    - lib/assets/images/
+    - lib/assets/images
+    - lib/assets/lotties
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

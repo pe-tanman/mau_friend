@@ -94,8 +94,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 60),
-            Lottie.network(
-              'https://lottie.host/05e8d74f-274a-4d59-ad34-e737a580c414/P0XJGUBihf.json',
+            Lottie.asset(
+              'lib/assets/lotties/welcome_animation.json',
               height: 500,
             ),
             SizedBox(height: 30),
@@ -243,8 +243,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               'Permissions',
               style: appTheme().textTheme.titleMedium,
             ),
-            Lottie.network(
-              'https://lottie.host/65b35dcd-45e6-465d-9994-dce278b0d2c9/q1OdWClGnS.json', 
+            Lottie.asset(
+              'lib/assets/lotties/location_animation.json',
+              height: 300,
             ),
             Text(
               "To successfully share your status with your friends:",

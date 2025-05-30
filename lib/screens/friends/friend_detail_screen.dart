@@ -1,8 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mau_friend/providers/profile_provider.dart';
-import 'package:mau_friend/screens/home_screen.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 
