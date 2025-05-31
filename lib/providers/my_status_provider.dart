@@ -74,7 +74,8 @@ class MyStatusProvider extends Notifier<UserStatus> {
     LocationSettings locationSettings;
     if (Platform.isAndroid) {
       locationSettings = AndroidSettings(
-        accuracy: LocationAccuracy.high,
+        distanceFilter: 5,
+        accuracy: LocationAccuracy.medium,
         foregroundNotificationConfig: const ForegroundNotificationConfig(
           notificationTitle: "Location Service is running",
           notificationText: 'mau is updating your status',
@@ -82,7 +83,8 @@ class MyStatusProvider extends Notifier<UserStatus> {
       );
     } else if (Platform.isIOS) {
       locationSettings = AppleSettings(
-        accuracy: LocationAccuracy.high,
+        distanceFilter: 5,
+        accuracy: LocationAccuracy.low,
         showBackgroundLocationIndicator: true,
         allowBackgroundLocationUpdates: true,
       );
