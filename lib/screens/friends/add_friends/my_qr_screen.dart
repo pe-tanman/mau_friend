@@ -68,40 +68,42 @@ class _MyQrScreenState extends ConsumerState<MyQrScreen> {
     }
     return isInit
         ? Center(child: CircularProgressIndicator())
-        : Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const SizedBox(height: 70),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(30)),
-                color: AppColors.backgroundColor,
-              ),
-              width: 350,
-              height: 350,
-              child: Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: PrettyQrView.data(
-                  data: getMyQRData(myUID),
-                  decoration: const PrettyQrDecoration(
-                    shape: PrettyQrSmoothSymbol(
-                      roundFactor: 0,
-                      color: AppColors.themeColor,
+        : SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(height: 70),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                  color: AppColors.backgroundColor,
+                ),
+                width: 350,
+                height: 350,
+                child: Padding(
+                  padding: const EdgeInsets.all(25.0),
+                  child: PrettyQrView.data(
+                    data: getMyQRData(myUID),
+                    decoration: const PrettyQrDecoration(
+                      shape: PrettyQrSmoothSymbol(
+                        roundFactor: 0,
+                        color: AppColors.themeColor,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 40),
-            const Text('Keep this page until you successfully add friends'),
-            const SizedBox(height: 50),
-            OutlinedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(MyPermanentAddressScreen.routeName);
-              },
-              child: const Text('Create a permanent address'),
-            ),
-          ],
+              const SizedBox(height: 40),
+              const Text('Keep this page until you successfully add friends'),
+              const SizedBox(height: 50),
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(MyPermanentAddressScreen.routeName);
+                },
+                child: const Text('Create a permanent address'),
+              ),
+            ],
+          ),
         );
   }
 }

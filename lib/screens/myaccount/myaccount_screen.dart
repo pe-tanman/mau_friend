@@ -161,15 +161,19 @@ onTap: () {
               SnackBar(
                 backgroundColor: Colors.redAccent,
 
-                content: Row(
-                  children: [
-                    SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: Icon(Icons.emergency),
-                    ),
-                    Text('Tap $tappedCount more times, turn on Feeling Unsafe'),
-                  ],
+                content: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: Icon(Icons.emergency),
+                      ),
+                      Text('Tap $tappedCount more times, turn on Feeling Unsafe',
+                      overflow: TextOverflow.clip,),
+                    ],
+                  ),
                 ),
               ),
             );

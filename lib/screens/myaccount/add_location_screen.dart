@@ -447,7 +447,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                 Row(
                   children: [
                     SizedBox(
-                      width: 300,
+                      width: 250,
                       child: TextFormField(
                         readOnly: true,
                         controller: TextEditingController(

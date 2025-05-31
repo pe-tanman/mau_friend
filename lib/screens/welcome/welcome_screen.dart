@@ -116,117 +116,119 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget _buildFeaturesTab() {
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Text(
-              'Privacy and Peace',
-              style: appTheme().textTheme.titleMedium,
-              textAlign: TextAlign.center,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+              child: Text(
+                'Privacy and Peace',
+                style: appTheme().textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-          SizedBox(height: 40),
-          Card(
-            elevation: 0,
-          color: Colors.white,
-          child:
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-
+            SizedBox(height: 40),
+            Card(
+              elevation: 0,
+            color: Colors.white,
+            child:
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
                 children: [
-                  Text('🤝', style: TextStyle(
-                    fontSize: 30,
-                  ),),
-                  SizedBox(width: 10),
-                  Text(
-                    'Our Promise to You',
-                    style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.themeColor,
+                  Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+        
+                  children: [
+                    Text('🤝', style: TextStyle(
+                      fontSize: 30,
+                    ),),
+                    SizedBox(width: 10),
+                    Text(
+                      'Our Promise to You',
+                      style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.themeColor,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Your location and familiar places are stored locally, never shared.',
+                  style: TextStyle(fontSize: 16, color: AppColors.themeColor),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  '*Exept for Feeling Unsafe Mode',
+                  style: TextStyle(
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              color: AppColors.themeColor,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+                ],
+              ),
+            )
+            ),
+            
+            SizedBox(height: 30),
+            Center(
+              child: Link(
+                uri: Uri.parse(
+            'https://petanman.notion.site/Privacy-Policy-1efe73611a8f804388a5d41b98b7165f?pvs=4',
+                ),
+                target: LinkTarget.blank,
+                builder: (BuildContext ctx, FollowLink? openLink) {
+            return TextButton(
+              onPressed: openLink,
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all(
+                  EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.open_in_new, color: AppColors.linkTextColor),
+                  SizedBox(width: 5),
+                  Text(
+              'Our Privacy Policy',
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.linkTextColor,
+                decoration: TextDecoration.underline,
+              ),
                   ),
                 ],
               ),
-            ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Your location and familiar places are stored locally, never shared.',
-                style: TextStyle(fontSize: 16, color: AppColors.themeColor),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                '*Exept for Feeling Unsafe Mode',
-                style: TextStyle(
-            fontSize: 12,
-            fontStyle: FontStyle.italic,
-            color: AppColors.themeColor,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-              ],
-            ),
-          )
-          ),
-          
-          SizedBox(height: 30),
-          Center(
-            child: Link(
-              uri: Uri.parse(
-          'https://petanman.notion.site/Privacy-Policy-1efe73611a8f804388a5d41b98b7165f?pvs=4',
-              ),
-              target: LinkTarget.blank,
-              builder: (BuildContext ctx, FollowLink? openLink) {
-          return TextButton(
-            onPressed: openLink,
-            style: ButtonStyle(
-              padding: MaterialStateProperty.all(
-                EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              ),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.open_in_new, color: AppColors.linkTextColor),
-                SizedBox(width: 5),
-                Text(
-            'Our Privacy Policy',
-            style: TextStyle(
-              fontSize: 16,
-              color: AppColors.linkTextColor,
-              decoration: TextDecoration.underline,
-            ),
-                ),
-              ],
-            ),
-          );
-              },
-            ),
-          ),
-          SizedBox(height: 30),
-          primaryButton('Accept and Continue', () {
-            _pageController.nextPage(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
             );
-          }),
-        ],
+                },
+              ),
+            ),
+            SizedBox(height: 30),
+            primaryButton('Accept and Continue', () {
+              _pageController.nextPage(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -298,7 +300,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SvgPicture.asset('lib/assets/images/Group 9.svg'),
-          SizedBox(height: 100),
+          SizedBox(height: 80),
           primaryButton('Get Started', () {
             Navigator.pushNamed(context, AuthGate.routeName);
           }),
