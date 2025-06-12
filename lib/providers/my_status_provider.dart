@@ -6,6 +6,7 @@ import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/providers/emergency_provider.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
+import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -75,6 +76,7 @@ class MyStatusProvider extends Notifier<UserStatus> {
     if (Platform.isAndroid) {
       locationSettings = AndroidSettings(
         accuracy: LocationAccuracy.high,
+        distanceFilter: 50, // meters
         foregroundNotificationConfig: const ForegroundNotificationConfig(
           notificationTitle: "Location Service is running",
           notificationText: 'mau is updating your status',
@@ -83,6 +85,7 @@ class MyStatusProvider extends Notifier<UserStatus> {
     } else if (Platform.isIOS) {
       locationSettings = AppleSettings(
         accuracy: LocationAccuracy.high,
+        distanceFilter: 50, // meters
         showBackgroundLocationIndicator: true,
         allowBackgroundLocationUpdates: true,
       );
@@ -98,6 +101,11 @@ class MyStatusProvider extends Notifier<UserStatus> {
       }
       final myLocations = ref.read(locationsProvider);
       updateMyStatus(position, myLocations);
+      BehaviorDatabaseHelper().insertData(
+        position.timestamp,
+        position.latitude,
+        position.longitude,
+      );
     });
   }
 
@@ -144,14 +152,13 @@ class MyStatusProvider extends Notifier<UserStatus> {
     final senderImageUrl = myProfile.iconLink ?? Statics.defaultIconLink;
     final senderName = myProfile.name ?? 'username';
     final receivers = await PrefsHelper().getNotificationPrefs();
-   
 
     FirestoreHelper().addMessage(
       title: 'Arrival',
       body: '${senderName} is now in $status',
       imageUrl: senderImageUrl,
       type: 'Arrival',
-      receivers: receivers
+      receivers: receivers,
     );
   } //keep user's basic profile
 

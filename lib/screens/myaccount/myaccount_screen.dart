@@ -268,7 +268,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   Future<void> callLocationDataAnalysis() async {
     //sample data
     final behaviorData = """[
-      {"t": "2025-06-10 07:00:00", "x": 35.7020, "y": 139.7750},
+  {"t": "2025-06-10 07:00:00", "x": 35.7020, "y": 139.7750},
   {"t": "2025-06-10 07:05:00", "x": 35.7021, "y": 139.7751},
   {"t": "2025-06-10 07:10:00", "x": 35.7020, "y": 139.7752},
   {"t": "2025-06-10 07:15:00", "x": 35.7022, "y": 139.7750},

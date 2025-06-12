@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:map_location_picker/map_location_picker.dart';
 import 'package:sqflite/sqflite.dart';
@@ -189,4 +190,100 @@ class NotificationDatabaseHelper {
     final Database? db = await database;
     return await db!.query('notification_table_$myUID');
   }
+}
+class BehaviorDatabaseHelper{
+  static final BehaviorDatabaseHelper _instance =
+      BehaviorDatabaseHelper._internal();
+
+  factory BehaviorDatabaseHelper() {
+    return _instance;
+  }
+
+  BehaviorDatabaseHelper._internal();
+
+  static Database? _database;
+  Future<Database?> get database async {
+    if (_database != null) {
+      return _database;
+    }
+    _database = await initBehaviorDatabase();
+
+    return _database;
+  }
+
+  Future<Database> initBehaviorDatabase() async {
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    String path = join(
+      await getDatabasesPath(),
+      "behavior_database_$myUID.db",
+    );
+    var db = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (Database db, int version) async {
+        await db.execute('''
+          CREATE TABLE behavior_table_$myUID (
+            timestamp TEXT,
+            latitude REAL,
+            longitude REAL,
+            PRIMARY KEY(timestamp)
+          )
+        ''');
+      },
+    );
+    return db;
+  }
+
+  Future<void> insertData(DateTime timestamp, double latitude, double longitude) async {
+    print('Inserting data: $timestamp, $latitude, $longitude');
+    final Database? db = await database;
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+
+    final latestTimestamp = await getLatestTimestamp();
+
+    if (latestTimestamp != null) {
+      final latestDateTime = latestTimestamp;
+      final currentDateTime = timestamp;
+      final difference = currentDateTime.difference(latestDateTime).inMinutes;
+
+      if (difference <= 15) {
+      return; // Do not insert if the difference is 15 minutes or less
+      }
+    }
+
+    Map<String, dynamic> data = {
+      'timestamp': timestamp.toString(),
+      'latitude': latitude,
+      'longitude': longitude,
+    };
+
+    // Check if the data already exists
+    await db!.insert(
+      'behavior_table_$myUID',
+      data,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<DateTime?> getLatestTimestamp() async {
+      final myUID = FirebaseAuth.instance.currentUser!.uid;
+      final Database? db = await database;
+      List<Map<String, dynamic>> maps = await db!.query(
+        'behavior_table_$myUID',
+        orderBy: 'timestamp DESC',
+        limit: 1,
+      );
+      if (maps.isNotEmpty) {
+        String timestampStr = maps.first['timestamp'];
+        return DateTime.parse(timestampStr);
+      }
+      return null;
+  }
+
+  Future<List<Map<String, dynamic>>> getAllData() async {
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    final Database? db = await database;
+    return await db!.query('behavior_table_$myUID');
+  }
+  
 }
