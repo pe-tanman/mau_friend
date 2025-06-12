@@ -242,7 +242,6 @@ def cluster_behaviors(data):
   return agg
 
 def find_nearby_places(api_key, lat, lng, radius, maxResultCount=10, place_types=None):
-  print('api_key', api_key.value)
   url = "https://places.googleapis.com/v1/places:searchNearby"
   headers = {
       "Content-Type": "application/json",
@@ -291,7 +290,8 @@ def find_nearby_places(api_key, lat, lng, radius, maxResultCount=10, place_types
   return data.get("places", [])
 
 @https_fn.on_call(
-    enforce_app_check=True 
+    enforce_app_check=True,
+    memory=512
 )
 def analyze_behavior(req: https_fn.CallableRequest) -> dict:
     behavior_data_str = req.data #pass through some kind of network
