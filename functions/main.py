@@ -242,10 +242,11 @@ def cluster_behaviors(data):
   return agg
 
 def find_nearby_places(api_key, lat, lng, radius, maxResultCount=10, place_types=None):
+  print('api_key', api_key.value)
   url = "https://places.googleapis.com/v1/places:searchNearby"
   headers = {
       "Content-Type": "application/json",
-      "X-Goog-Api-Key": api_key,
+      "X-Goog-Api-Key": api_key.value,
       # Field mask must **not** include spaces around commas
       "X-Goog-FieldMask": "places.displayName,places.id,places.types,places.formattedAddress"
   }
@@ -293,17 +294,19 @@ def find_nearby_places(api_key, lat, lng, radius, maxResultCount=10, place_types
     enforce_app_check=True 
 )
 def analyze_behavior(req: https_fn.CallableRequest) -> dict:
-    behavior_data_path = req.data #pass through some kind of network
+    behavior_data_str = req.data #pass through some kind of network
 
     suggested_status = []
     #turn json into dic
-    behavior_data = json.loads(behavior_data_path)
+    behavior_data = json.loads(behavior_data_str)
     sorted_clusters = cluster_behaviors(behavior_data)
     sorted_clusters = sorted_clusters.reset_index()
 
     three_clusters = sorted_clusters.loc[0:2, ['centroid_lat', 'centroid_lon']]
     print("three clusters:")
     print(three_clusters)
+
+    #ここまではいっている
 
     for _, cluster in three_clusters.iterrows():
         lat = cluster['centroid_lat']
