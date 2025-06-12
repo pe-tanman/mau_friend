@@ -289,7 +289,9 @@ def find_nearby_places(api_key, lat, lng, radius, maxResultCount=10, place_types
       print(f"{name} | types: {types} | address: {address}")
   return data.get("places", [])
 
-@https_fn.on_call()
+@https_fn.on_call(
+    enforce_app_check=True 
+)
 def analyze_behavior(req: https_fn.CallableRequest) -> dict:
     behavior_data_path = req.data #pass through some kind of network
 

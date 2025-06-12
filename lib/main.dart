@@ -36,11 +36,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
   await Firebase.initializeApp();
-  await FirebaseAppCheck.instance.activate(
-    webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
-    androidProvider: AndroidProvider.debug,
-    appleProvider: AppleProvider.appAttest,
-  );
+ 
 
   if (message.data.keys.contains('status')) {
     var status = message.data['status'];
@@ -65,6 +61,11 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
+   await FirebaseAppCheck.instance.activate(
+    webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+    androidProvider: AndroidProvider.debug,
+    appleProvider: AppleProvider.appAttest,
+  );
   dotenv.load(fileName: 'lib/credential.env');
   await HomeWidget.setAppGroupId('group.mau_widget');
 
