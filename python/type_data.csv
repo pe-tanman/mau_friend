@@ -1,0 +1,171 @@
+type,status,emoji
+parking,Transit,🅿️
+corporate_office,Working,💼
+farm,Farming,🚜
+ranch,Farming,🚜
+art_studio,Working,💼
+auditorium,Taking class/Watching concerts,🎶
+performing_arts_theater,Entertainment,🎭
+library,Reading/Studying,📚
+preschool,Preschool,👶
+primary_school,School,🏫
+school,School,🏫
+secondary_school,School,🏫
+university,University,🎓
+amusement_center,Entertainment,🎭
+amusement_park,Entertainment,🎭
+aquarium,Aquarium,🐠
+casino,Entertainment,🎭
+childrens_camp,Camping,🏕️
+community_center,Community Center,🤝
+concert_hall,Entertainment,🎭
+convention_center,Business,💼
+dance_hall,Dancing,💃
+dog_park,Relaxing,😌
+hiking_area,Hiking,🥾
+internet_cafe,Internet Café,💻
+karaoke,Karaoke,🎤
+marina,Marina,⚓
+movie_theater,Entertainment,🎭
+national_park,Relaxing at Park,😌
+night_club,Socializing,🥂
+opera_house,Entertainment,🎭
+park,Relaxing/Playing at Park,😌
+plaza,$name,🏢
+skateboard_park,Skateboarding,🛹
+state_park,Skating,⛸️
+zoo,Leisure,🚶‍♀️
+public_bath,Bath,🛁
+public_bathroom,Bath,🛁
+afghani_restaurant,Eating at favorite restaurant,🍽️
+african_restaurant,Eating at favorite restaurant,🍽️
+american_restaurant,Eating at favorite restaurant,🍽️
+asian_restaurant,Eating at favorite restaurant,🍽️
+bar,Drinking/Socializing at bar,🥂
+bar_and_grill,Drinking/Socializing at bar,🥂
+barbecue_restaurant,Eating at favorite restaurant,🍽️
+brazilian_restaurant,Eating at favorite restaurant,🍽️
+breakfast_restaurant,Eating at favorite restaurant,🍽️
+brunch_restaurant,Eating at favorite restaurant,🍽️
+buffet_restaurant,Eating at favorite restaurant,🍽️
+cafe,Eating/Working at café,☕
+cafeteria,Eating/Working at cafeteria,☕
+cat_cafe,Cat café,🐱
+chinese_restaurant,Eating at favorite restaurant,🍽️
+coffee_shop,Eating/Working at café,☕
+dessert_restaurant,Eating at favorite restaurant,🍽️
+diner,Eating at favorite restaurant,🍽️
+fast_food_restaurant,Grabbing food,🍔
+fine_dining_restaurant,Eating at favorite restaurant,🍽️
+food_court,Grabbing food,🍔
+french_restaurant,Eating at favorite restaurant,🍽️
+greek_restaurant,Eating at favorite restaurant,🍽️
+hamburger_restaurant,Eating at favorite restaurant,🍽️
+indian_restaurant,Eating at favorite restaurant,🍽️
+indonesian_restaurant,Eating at favorite restaurant,🍽️
+italian_restaurant,Eating at favorite restaurant,🍽️
+japanese_restaurant,Eating at favorite restaurant,🍽️
+korean_restaurant,Eating at favorite restaurant,🍽️
+lebanese_restaurant,Eating at favorite restaurant,🍽️
+mediterranean_restaurant,Eating at favorite restaurant,🍽️
+mexican_restaurant,Eating at favorite restaurant,🍽️
+middle_eastern_restaurant,Eating at favorite restaurant,🍽️
+pizza_restaurant,Eating at favorite restaurant,🍽️
+pub,Eating at favorite restaurant,🍽️
+ramen_restaurant,Eating at favorite restaurant,🍽️
+restaurant,Eating at favorite restaurant,🍽️
+seafood_restaurant,Eating at favorite restaurant,🍽️
+spanish_restaurant,Eating at favorite restaurant,🍽️
+steak_house,Eating at favorite restaurant,🍽️
+sushi_restaurant,Eating at favorite restaurant,🍽️
+tea_house,Eating/Working at tea house,☕
+thai_restaurant,Eating at favorite restaurant,🍽️
+turkish_restaurant,Eating at favorite restaurant,🍽️
+vegan_restaurant,Eating at favorite restaurant,🍽️
+vegetarian_restaurant,Eating at favorite restaurant,🍽️
+vietnamese_restaurant,Eating at favorite restaurant,🍽️
+wine_bar,Eating at favorite restaurant,🍽️
+school_district,School,🏫
+dental_clinic,Dentist,🦷
+dentist,Dentist,🦷
+doctor,Hospital,🏥
+drugstore,Shopping,🛍️
+hospital,Hospital,🏥
+massage,Medical/Selfcare,💆‍♀️
+medical_lab,Medical/Shopping,🛍️
+physiotherapist,Medical/Selfcare,💆‍♀️
+sauna,Sauna,🧖‍♀️
+skin_care_clinic,Selfcare,💆‍♀️
+spa,Selfcare,💆‍♀️
+tanning_studio,Selfcare,💆‍♀️
+wellness_center,Selfcare,💆‍♀️
+yoga_studio,Selfcare,💆‍♀️
+budget_japanese_inn,Hotel,🏨
+campground,Camping,🏕️
+camping_cabin,Camping,🏕️
+cottage,Hotel,🏨
+extended_stay_hotel,Hotel,🏨
+hotel,Hotel,🏨
+inn,Hotel,🏨
+japanese_inn,Hotel,🏨
+lodging,Hotel,🏨
+resort_hotel,Hotel,🏨
+beach,Leisure/Relaxing at beach,🏖️
+church,Religious Activity,🙏
+hindu_temple,Religious Activity,🙏
+mosque,Religious Activity,🙏
+synagogue,Religious Activity,🙏
+barber_shop,Selfcare,💆‍♀️
+beautician,Selfcare,💆‍♀️
+beauty_salon,Selfcare,💆‍♀️
+child_care_agency,Child care,👶
+hair_care,Selfcare,💆‍♀️
+hair_salon,Selfcare,💆‍♀️
+laundry,Laundry,🧺
+nail_salon,Selfcare,💆‍♀️
+asian_grocery_store *,Grocery Shopping,🛒
+book_store,Book Store,📚
+butcher_shop,Grocery Shopping,🛒
+clothing_store,Shopping,🛍️
+convenience_store,Convenience Store,🏪
+department_store,Shopping,🛍️
+discount_store,Shopping,🛍️
+electronics_store,Shopping,🛍️
+food_store,Grocery Shopping,🛒
+furniture_store,Shopping,🛍️
+gift_shop,Shopping,🛍️
+grocery_store,Grocery Shopping,🛒
+home_goods_store,Shopping,🛍️
+home_improvement_store,Shopping,🛍️
+market,Shopping,🛍️
+shopping_mall,Shopping,🛍️
+sporting_goods_store,Shopping,🛍️
+store,Shopping,🛍️
+supermarket,Grocery Shopping,🛒
+warehouse_store,Shopping,🛍️
+arena,Sports,🏃‍♀️
+athletic_field,Sports,🏃‍♀️
+fishing_pond,Leisure,🚶‍♀️
+fitness_center,Sports,🏃‍♀️
+golf_course,Golf,⛳
+gym,Gym,💪
+ice_skating_rink,Ice Skating,⛸️
+playground,Playing,🤸
+ski_resort,Skiing,⛷️
+sports_activity_location,Sports,🏃‍♀️
+sports_club,Sports,🏃‍♀️
+sports_coaching,Sports,🏃‍♀️
+sports_complex,Sports,🏃‍♀️
+stadium,Sports,🏃‍♀️
+swimming_pool,Swimming,🏊‍♀️
+airport,$name,✈️
+bus_station,Commuting,🚌
+bus_stop,Commuting,🚌
+ferry_terminal,Commuting,🚌
+international_airport,$name,✈️
+light_rail_station,$name,🚉
+park_and_ride,Commuting,🚌
+subway_station,$name,🚉
+taxi_stand,Commuting,🚌
+train_station,$name,🚉
+transit_station,$name,🚉 

@@ -27,6 +27,7 @@ class HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      
       print('Received message: ${message.notification?.title}');
       if (message.notification != null) {
         if (message.notification!.title!.contains('Feeling Unsafe')) {

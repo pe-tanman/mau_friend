@@ -32,7 +32,7 @@ class AuthGate extends ConsumerWidget {
               GoogleProvider(clientId: clientId),
               AppleProvider(),
               EmailAuthProvider(),
-              
+            
             ],
           );
         }

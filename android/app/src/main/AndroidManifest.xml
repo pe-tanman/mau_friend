@@ -36,12 +36,12 @@
             </intent-filter>
         </activity>
 
-         <service
+         <!-- <service
             android:name="yukams.app.background_locator_2.IsolateHolderService"
             android:permission="android.permission.FOREGROUND_SERVICE"
             android:exported="true"
             android:foregroundServiceType = "location"
-  />
+  /> -->
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

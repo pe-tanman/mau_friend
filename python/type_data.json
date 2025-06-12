@@ -1,0 +1,198 @@
+{
+    "parking": {
+        "status": "Transit",
+        "emoji": "🅿️"
+    },
+    "corporate_office": {
+        "status": "Working",
+        "emoji": "💼"
+    },
+    "auditorium": {
+        "status": "Taking class/Watching concerts",
+        "emoji": "🎶"
+    },
+    "library": {
+        "status": "Reading/Studying",
+        "emoji": "📚"
+    },
+    "preschool": {
+        "status": "Preschool",
+        "emoji": "👶"
+    },
+    "school": {
+        "status": "School",
+        "emoji": "🏫"
+    },
+    "university": {
+        "status": "University",
+        "emoji": "🎓"
+    },
+    "community_center": {
+        "status": "Community Center",
+        "emoji": "🤝"
+    },
+    "convention_center": {
+        "status": "Business",
+        "emoji": "💼"
+    },
+    "dance_hall": {
+        "status": "Dancing",
+        "emoji": "💃"
+    },
+    "dog_park": {
+        "status": "Relaxing",
+        "emoji": "😌"
+    },
+    "internet_cafe": {
+        "status": "Internet Café",
+        "emoji": "💻"
+    },
+    "movie_theater": {
+        "status": "Entertainment",
+        "emoji": "🎭"
+    },
+    "night_club": {
+        "status": "Socializing",
+        "emoji": "🥂"
+    },
+    "park": {
+        "status": "Relaxing/Playing at Park",
+        "emoji": "😌"
+    },
+    "skateboard_park": {
+        "status": "Skateboarding",
+        "emoji": "🛹"
+    },
+    "state_park": {
+        "status": "Skating",
+        "emoji": "⛸️"
+    },
+    "bar": {
+        "status": "Drinking/Socializing at bar",
+        "emoji": "🥂"
+    },
+    "cafe": {
+        "status": "Eating/Working at café",
+        "emoji": "☕"
+    },
+    "cafeteria": {
+        "status": "Eating/Working at cafeteria",
+        "emoji": "☕"
+    },
+    "cat_cafe": {
+        "status": "Cat café",
+        "emoji": "🐱"
+    },
+    "fast_food_restaurant": {
+        "status": "Grabbing food",
+        "emoji": "🍔"
+    },
+    "food_court": {
+        "status": "Grabbing food",
+        "emoji": "🍔"
+    },
+    "pub": {
+        "status": "Eating at favorite restaurant",
+        "emoji": "🍽️"
+    },
+    "restaurant": {
+        "status": "Eating at favorite restaurant",
+        "emoji": "🍽️"
+    },
+    "doctor": {
+        "status": "Clinic",
+        "emoji": "🩺"
+    },
+    "drugstore": {
+        "status": "Shopping",
+        "emoji": "🛍️"
+    },
+    "hospital": {
+        "status": "Hospital",
+        "emoji": "🏥"
+    },
+    "sauna": {
+        "status": "Sauna",
+        "emoji": "🧖‍♀️"
+    },
+    "beach": {
+        "status": "Leisure/Relaxing at beach",
+        "emoji": "🏖️"
+    },
+    "church": {
+        "status": "Religious Activity",
+        "emoji": "🙏"
+    },
+    "hindu_temple": {
+        "status": "Religious Activity",
+        "emoji": "🙏"
+    },
+    "mosque": {
+        "status": "Religious Activity",
+        "emoji": "🙏"
+    },
+    "synagogue": {
+        "status": "Religious Activity",
+        "emoji": "🙏"
+    },
+    "laundry": {
+        "status": "Laundry",
+        "emoji": "🧺"
+    },
+    "nail_salon": {
+        "status": "Selfcare",
+        "emoji": "💆‍♀️"
+    },
+    "convenience_store": {
+        "status": "Convenience Store",
+        "emoji": "🏪"
+    },
+    "grocery_store": {
+        "status": "Grocery Shopping",
+        "emoji": "🛒"
+    },
+    "market": {
+        "status": "Shopping",
+        "emoji": "🛍️"
+    },
+    "shopping_mall": {
+        "status": "Shopping",
+        "emoji": "🛍️"
+    },
+    "store": {
+        "status": "Shopping",
+        "emoji": "🛍️"
+    },
+    "supermarket": {
+        "status": "Grocery Shopping",
+        "emoji": "🛒"
+    },
+    "gym": {
+        "status": "Gym",
+        "emoji": "💪"
+    },
+    "playground": {
+        "status": "Playing",
+        "emoji": "🤸"
+    },
+    "sports_activity_location": {
+        "status": "Sports",
+        "emoji": "🏃‍♀️"
+    },
+    "swimming_pool": {
+        "status": "Swimming",
+        "emoji": "🏊‍♀️"
+    },
+    "airport": {
+        "status": "$name",
+        "emoji": "✈️"
+    },
+    "bus_stop": {
+        "status": "Commuting",
+        "emoji": "🚌"
+    },
+    "transit_station": {
+        "status": "$name",
+        "emoji": "🚉"
+    }
+}

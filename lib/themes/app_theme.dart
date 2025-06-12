@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'app_color.dart';
 
 ThemeData appTheme() => ThemeData(
+  cardColor: AppColors.darkThemeColor,
   appBarTheme: AppBarTheme(backgroundColor: AppColors.scaffoldBackgroundColor),
   useMaterial3: true,
   textTheme: const TextTheme(
@@ -16,21 +17,6 @@ ThemeData appTheme() => ThemeData(
     labelMedium: TextStyle(color: AppColors.themeColor, fontSize: 20, fontWeight: FontWeight.bold)
   ),
   snackBarTheme: const SnackBarThemeData(showCloseIcon: true),
-  cardTheme: CardTheme(
-color: AppColors.backgroundColor,
-    elevation: 3,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-  ),
-  dividerTheme: const DividerThemeData(color: Colors.black),
-  dividerColor: Colors.brown.shade100,
-  dialogTheme: const DialogTheme(
-    backgroundColor: Colors.white,
-    titleTextStyle: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: Colors.black,
-      fontSize: 22,
-    ),
-  ),
   inputDecorationTheme: InputDecorationTheme(
     labelStyle: const TextStyle(fontSize: 14),
     hintStyle: const TextStyle(fontSize: 14),
@@ -58,11 +44,7 @@ color: AppColors.backgroundColor,
 );
 
 ThemeData darkTheme() => ThemeData(
-  cardTheme: CardTheme(
-    color: AppColors.darkBackgroundColor,
-    elevation: 3,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-  ),
+  cardColor: AppColors.darkBackgroundColor,
   textTheme: const TextTheme(
     titleMedium: TextStyle(
       color: AppColors.darkThemeColor,

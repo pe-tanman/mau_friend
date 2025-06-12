@@ -30,10 +30,18 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/screens/friends/notification_screen.dart';
 
+import 'package:firebase_app_check/firebase_app_check.dart';
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
   await Firebase.initializeApp();
+  await FirebaseAppCheck.instance.activate(
+    webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+    androidProvider: AndroidProvider.debug,
+    appleProvider: AppleProvider.appAttest,
+  );
+
   if (message.data.keys.contains('status')) {
     var status = message.data['status'];
     const String iOSWidgetName = 'mau_widget';
@@ -88,7 +96,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     ref.watch(locationsProvider.notifier).loadLocations();
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'mau Friend',
       theme: appTheme(),
       darkTheme: darkTheme(),
       themeMode: mode,

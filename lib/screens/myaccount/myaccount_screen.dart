@@ -15,9 +15,9 @@ import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
 
 import 'dart:async';
 import 'package:mau_friend/providers/locations_provider.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class MyAccountScreen extends ConsumerStatefulWidget {
-  
   static const routeName = 'my-account-screen';
   @override
   _MyAccountScreenState createState() => _MyAccountScreenState();
@@ -147,13 +147,17 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   }
 
   Widget _buildMyCard(Profile profile) {
-    int tappedCount = 5;    return Card(
-      color: (ref.watch(emergencyProvider.notifier).isEmergencyActive())? Colors.red: null,
+    int tappedCount = 5;
+    return Card(
+      color:
+          (ref.watch(emergencyProvider.notifier).isEmergencyActive())
+              ? Colors.red
+              : Theme.of(context).cardColor,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       elevation: 3,
       child: InkWell(
-onTap: () {
+        onTap: () {
           tappedCount--;
           if (tappedCount > 0) {
             ScaffoldMessenger.of(context).removeCurrentSnackBar();
@@ -170,8 +174,10 @@ onTap: () {
                         height: 30,
                         child: Icon(Icons.emergency),
                       ),
-                      Text('Tap $tappedCount more times, turn on Feeling Unsafe',
-                      overflow: TextOverflow.clip,),
+                      Text(
+                        'Tap $tappedCount more times, turn on Feeling Unsafe',
+                        overflow: TextOverflow.clip,
+                      ),
                     ],
                   ),
                 ),
@@ -206,7 +212,7 @@ onTap: () {
                 overflow: TextOverflow.ellipsis,
                 maxLines: 3,
                 profile.bio ?? 'Bio',
-                style: TextStyle(fontSize: 16, color: Colors.grey,),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
               SizedBox(height: 5),
               if (profile.name == null)
@@ -214,7 +220,10 @@ onTap: () {
                   label: Text('Complete your profile'),
                   icon: Icon(Icons.edit),
                   onPressed: () {
-                    Navigator.pushNamed(context, ProfileSettingScreen.routeName);
+                    Navigator.pushNamed(
+                      context,
+                      ProfileSettingScreen.routeName,
+                    );
                   },
                 ),
               SizedBox(height: 20),
@@ -238,13 +247,13 @@ onTap: () {
                     ),
                     SizedBox(width: 10),
                     ConstrainedBox(
-                            constraints: BoxConstraints(maxWidth: 160, minWidth: 50),
-                            child: Text(
-                             ref.watch(myStatusProvider).status,
-                              style: Theme.of(context).textTheme.labelMedium,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          )
+                      constraints: BoxConstraints(maxWidth: 160, minWidth: 50),
+                      child: Text(
+                        ref.watch(myStatusProvider).status,
+                        style: Theme.of(context).textTheme.labelMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -254,6 +263,106 @@ onTap: () {
         ),
       ),
     );
+  }
+
+  Future<void> callLocationDataAnalysis() async {
+    //sample data
+    final behaviorData = [
+      {"t": "2025-06-10 07: 00: 00", "x": 35.7020, "y": 139.7750},
+      {"t": "2025-06-10 07: 05: 00", "x": 35.7021, "y": 139.7751},
+      {"t": "2025-06-10 07: 10: 00", "x": 35.7020, "y": 139.7752},
+      {"t": "2025-06-10 07: 15: 00", "x": 35.7022, "y": 139.7750},
+      {"t": "2025-06-10 07: 20: 00", "x": 35.7021, "y": 139.7751},
+      {"t": "2025-06-10 07: 25: 00", "x": 35.7020, "y": 139.7750},
+      {"t": "2025-06-10 07: 30: 00", "x": 35.7019, "y": 139.7749},
+      {"t": "2025-06-10 07: 35: 00", "x": 35.7018, "y": 139.7748},
+      {"t": "2025-06-10 07: 40: 00", "x": 35.7015, "y": 139.7745},
+      {"t": "2025-06-10 07: 45: 00", "x": 35.7010, "y": 139.7740},
+      {"t": "2025-06-10 07: 50: 00", "x": 35.7005, "y": 139.7735},
+      {"t": "2025-06-10 07: 55: 00", "x": 35.6990, "y": 139.7720},
+      {"t": "2025-06-10 08: 00: 00", "x": 35.6985, "y": 139.7715},
+      {"t": "2025-06-10 08: 05: 00", "x": 35.6980, "y": 139.7710},
+      {"t": "2025-06-10 08: 10: 00", "x": 35.6950, "y": 139.7680},
+      {"t": "2025-06-10 08: 15: 00", "x": 35.6920, "y": 139.7650},
+      {"t": "2025-06-10 08: 20: 00", "x": 35.6890, "y": 139.7620},
+      {"t": "2025-06-10 08: 25: 00", "x": 35.6860, "y": 139.7590},
+      {"t": "2025-06-10 08: 30: 00", "x": 35.6830, "y": 139.7560},
+      {"t": "2025-06-10 08: 35: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 08: 40: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 08: 45: 00", "x": 35.6810, "y": 139.7532},
+      {"t": "2025-06-10 08: 50: 00", "x": 35.6812, "y": 139.7530},
+      {"t": "2025-06-10 08: 55: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 09: 00: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 09: 05: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 09: 10: 00", "x": 35.6810, "y": 139.7532},
+      {"t": "2025-06-10 09: 15: 00", "x": 35.6812, "y": 139.7530},
+      {"t": "2025-06-10 09: 20: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 09: 25: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 09: 30: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 09: 35: 00", "x": 35.6810, "y": 139.7532},
+      {"t": "2025-06-10 09: 40: 00", "x": 35.6812, "y": 139.7530},
+      {"t": "2025-06-10 09: 45: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 09: 50: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 09: 55: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 10: 00: 00", "x": 35.6810, "y": 139.7532},
+      {"t": "2025-06-10 10: 05: 00", "x": 35.6812, "y": 139.7530},
+      {"t": "2025-06-10 10: 10: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 10: 15: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 10: 20: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 10: 25: 00", "x": 35.6810, "y": 139.7532},
+      {"t": "2025-06-10 10: 30: 00", "x": 35.6812, "y": 139.7530},
+      {"t": "2025-06-10 10: 35: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 10: 40: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 10: 45: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 10: 50: 00", "x": 35.6810, "y": 139.7532},
+      {"t": "2025-06-10 10: 55: 00", "x": 35.6812, "y": 139.7530},
+      {"t": "2025-06-10 11: 00: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 11: 05: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 11: 10: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 11: 15: 00", "x": 35.6810, "y": 139.7532},
+      {"t": "2025-06-10 11: 20: 00", "x": 35.6812, "y": 139.7530},
+      {"t": "2025-06-10 11: 25: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 11: 30: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 11: 35: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 11: 40: 00", "x": 35.6810, "y": 139.7532},
+      {"t": "2025-06-10 11: 45: 00", "x": 35.6812, "y": 139.7530},
+      {"t": "2025-06-10 11: 50: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 11: 55: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 12: 00: 00", "x": 35.6815, "y": 139.7535},
+      {"t": "2025-06-10 12: 05: 00", "x": 35.6820, "y": 139.7540},
+      {"t": "2025-06-10 12: 10: 00", "x": 35.6825, "y": 139.7545},
+      {"t": "2025-06-10 12: 15: 00", "x": 35.6826, "y": 139.7546},
+      {"t": "2025-06-10 12: 20: 00", "x": 35.6825, "y": 139.7547},
+      {"t": "2025-06-10 12: 25: 00", "x": 35.6827, "y": 139.7545},
+      {"t": "2025-06-10 12: 30: 00", "x": 35.6826, "y": 139.7546},
+      {"t": "2025-06-10 12: 35: 00", "x": 35.6825, "y": 139.7545},
+      {"t": "2025-06-10 12: 40: 00", "x": 35.6826, "y": 139.7546},
+      {"t": "2025-06-10 12: 45: 00", "x": 35.6825, "y": 139.7547},
+      {"t": "2025-06-10 12: 50: 00", "x": 35.6827, "y": 139.7545},
+      {"t": "2025-06-10 12: 55: 00", "x": 35.6826, "y": 139.7546},
+      {"t": "2025-06-10 13: 00: 00", "x": 35.6820, "y": 139.7540},
+      {"t": "2025-06-10 13: 05: 00", "x": 35.6815, "y": 139.7535},
+      {"t": "2025-06-10 13: 10: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 13: 15: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 13: 20: 00", "x": 35.6810, "y": 139.7532},
+      {"t": "2025-06-10 13: 25: 00", "x": 35.6812, "y": 139.7530},
+      {"t": "2025-06-10 13: 30: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 13: 35: 00", "x": 35.6810, "y": 139.7530},
+      {"t": "2025-06-10 13: 40: 00", "x": 35.6811, "y": 139.7531},
+      {"t": "2025-06-10 13: 45: 00", "x": 35.6810, "y": 139.7532},
+      {"t": "2025-06-10 13: 50: 00", "x": 35.6812, "y": 139.7530},
+    ];
+    final callable = FirebaseFunctions.instance.httpsCallable('analyze_behavior');
+  try {
+    final result = await callable.call({
+      "data": behaviorData,
+    });
+    print("Result: ${result.data}");
+  } catch (e) {
+    print("Error calling function: $e");
+  }
+  
+  
   }
 
   @override
@@ -320,6 +429,14 @@ onTap: () {
                     });
                   }
                 });
+              },
+            ),
+            SizedBox(height: 20),
+            TextButton.icon(
+              label: Text('Favorite Place Recommendation'),
+              icon: Icon(Icons.bolt),
+              onPressed: () {
+                callLocationDataAnalysis();
               },
             ),
           ],

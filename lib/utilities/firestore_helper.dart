@@ -231,6 +231,7 @@ class FirestoreHelper {
     }
   }
 
+
   Future<List<String>> getFriendList() async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     try {
@@ -245,6 +246,8 @@ class FirestoreHelper {
       rethrow;
     }
   }
+
+  
 
   Future<void> updateFriendList(List<String> friendList) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
