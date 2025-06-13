@@ -69,8 +69,8 @@ ThemeData darkTheme() => ThemeData(
   ),
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
-      side: const BorderSide(color: AppColors.themeColor),
-      foregroundColor: AppColors.themeColor,
+      side: const BorderSide(color: AppColors.darkThemeColor),
+      foregroundColor: AppColors.darkThemeColor,
 
     ),
   ),

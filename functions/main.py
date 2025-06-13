@@ -324,25 +324,6 @@ def analyze_behavior(req: https_fn.CallableRequest) -> dict:
                                              'radius': radius
                                              })
                     break
-        radius = 500
-        places = find_nearby_places(api_key, lat, lng, radius, maxResultCount=1, place_types=place_type)
-        for place in places:
-            name = place.get("displayName", {}).get("text")
-            types = place.get("types", [])
-            for type in types:
-                if type in type_data:
-                  
-                  if type_data[type]['status'] == "$name":
-                    status = name
-                  else:
-                    status = type_data[type]['status']
-                  
-                  suggested_status.append({'status': status, 
-                                             'emoji': type_data[type]['emoji'],
-                                             'lat': lat, 'lng': lng,
-                                             'name': name,
-                                             'radius': radius})
-                  break
 
     # Print the suggested places
     print("Suggested Places:")
