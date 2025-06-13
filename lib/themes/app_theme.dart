@@ -36,6 +36,10 @@ ThemeData appTheme() => ThemeData(
     ),
 
   ),
+  dividerTheme: DividerThemeData(
+    color: AppColors.themeColor,
+    thickness: 1,
+  ),
   scaffoldBackgroundColor: AppColors.scaffoldBackgroundColor,
   colorScheme: ColorScheme.light(
     primary: AppColors.themeColor,
@@ -55,6 +59,10 @@ ThemeData darkTheme() => ThemeData(
     headlineSmall: TextStyle(fontSize: 20),
     bodyLarge: TextStyle(fontSize: 16),
     labelMedium: TextStyle(color: AppColors.darkThemeColor, fontSize: 20, fontWeight: FontWeight.bold),
+  ),
+  dividerTheme: DividerThemeData(
+    color: AppColors.darkThemeColor,
+    thickness: 1,
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(backgroundColor: AppColors.darkThemeColor, foregroundColor: Colors.black),

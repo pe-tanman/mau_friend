@@ -8,7 +8,7 @@ class RegisteredLocation {
   final String icon;
   final LatLng coordinates;
   final int radius;
-  RegisteredLocation(this.name, this.icon, this.coordinates, this.radius);
+  RegisteredLocation({required this.name, required this.icon, required this.coordinates, required this.radius});
 }
 
 @riverpod
@@ -34,7 +34,7 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
         var icon = element['icon'];
         var radius = element['radius'];
 
-        output.add(RegisteredLocation(name, icon, coordinates, radius));
+        output.add(RegisteredLocation(name: name, icon: icon, coordinates: coordinates, radius: radius));
       });
       state = output;
     } else {

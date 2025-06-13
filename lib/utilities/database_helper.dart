@@ -120,6 +120,7 @@ class MyLocationDatabaseHelper {
     db.execute('DROP TABLE my_locations_table_$myUID');
   }
 }
+
 class NotificationDatabaseHelper {
   static final NotificationDatabaseHelper _instance =
       NotificationDatabaseHelper._internal();
@@ -191,7 +192,8 @@ class NotificationDatabaseHelper {
     return await db!.query('notification_table_$myUID');
   }
 }
-class BehaviorDatabaseHelper{
+
+class BehaviorDatabaseHelper {
   static final BehaviorDatabaseHelper _instance =
       BehaviorDatabaseHelper._internal();
 
@@ -213,10 +215,7 @@ class BehaviorDatabaseHelper{
 
   Future<Database> initBehaviorDatabase() async {
     final myUID = FirebaseAuth.instance.currentUser!.uid;
-    String path = join(
-      await getDatabasesPath(),
-      "behavior_database_$myUID.db",
-    );
+    String path = join(await getDatabasesPath(), "behavior_database_$myUID.db");
     var db = await openDatabase(
       path,
       version: 1,
@@ -234,7 +233,11 @@ class BehaviorDatabaseHelper{
     return db;
   }
 
-  Future<void> insertData(DateTime timestamp, double latitude, double longitude) async {
+  Future<void> insertData(
+    DateTime timestamp,
+    double latitude,
+    double longitude,
+  ) async {
     print('Inserting data: $timestamp, $latitude, $longitude');
     final Database? db = await database;
     final myUID = FirebaseAuth.instance.currentUser!.uid;
@@ -247,7 +250,7 @@ class BehaviorDatabaseHelper{
       final difference = currentDateTime.difference(latestDateTime).inMinutes;
 
       if (difference <= 15) {
-      return; // Do not insert if the difference is 15 minutes or less
+        return;
       }
     }
 
@@ -266,18 +269,18 @@ class BehaviorDatabaseHelper{
   }
 
   Future<DateTime?> getLatestTimestamp() async {
-      final myUID = FirebaseAuth.instance.currentUser!.uid;
-      final Database? db = await database;
-      List<Map<String, dynamic>> maps = await db!.query(
-        'behavior_table_$myUID',
-        orderBy: 'timestamp DESC',
-        limit: 1,
-      );
-      if (maps.isNotEmpty) {
-        String timestampStr = maps.first['timestamp'];
-        return DateTime.parse(timestampStr);
-      }
-      return null;
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    final Database? db = await database;
+    List<Map<String, dynamic>> maps = await db!.query(
+      'behavior_table_$myUID',
+      orderBy: 'timestamp DESC',
+      limit: 1,
+    );
+    if (maps.isNotEmpty) {
+      String timestampStr = maps.first['timestamp'];
+      return DateTime.parse(timestampStr);
+    }
+    return null;
   }
 
   Future<List<Map<String, dynamic>>> getAllData() async {
@@ -285,5 +288,18 @@ class BehaviorDatabaseHelper{
     final Database? db = await database;
     return await db!.query('behavior_table_$myUID');
   }
-  
+
+  Future<String> getJsonString() async {
+    final allData = await getAllData();
+    List<Map<String, dynamic>> dataList =
+        allData.map((data) {
+          return {
+            '"t"': '"${data['timestamp']}"',
+            '"x"': data['latitude'],
+            '"y"': data['longitude'],
+          };
+        }).toList();
+    print('List: $dataList');
+    return dataList.toString();
+  }
 }

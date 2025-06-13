@@ -15,6 +15,7 @@ import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
 import 'package:mau_friend/screens/friends/friend_detail_screen.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
 import 'package:mau_friend/screens/myaccount/emergency_screen.dart';
+import 'package:mau_friend/screens/myaccount/recommendation_screen.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/screens/settings/current_location_screen.dart';
 import 'package:mau_friend/screens/friends/edit_friend_list_screen.dart';
@@ -47,7 +48,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       HomeWidget.updateWidget(iOSName: iOSWidgetName);
     }
     
-    print('received a background status update');
     // Handle emergency notification
   } else {
     // Handle other types of notifications
@@ -61,10 +61,11 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
+  //TODO: debug -> production stuff
    await FirebaseAppCheck.instance.activate(
     webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     androidProvider: AndroidProvider.debug,
-    appleProvider: AppleProvider.appAttest,
+    appleProvider: AppleProvider.debug,
   );
   dotenv.load(fileName: 'lib/credential.env');
   await HomeWidget.setAppGroupId('group.mau_widget');
@@ -122,6 +123,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         EnterCodeScreen.routeName: (context) => EnterCodeScreen(),
         FriendRequestScreen.routeName: (context) => FriendRequestScreen(),
         FriendDetailScreen.routeName: (context) => FriendDetailScreen(),
+        RecommendationScreen.routeName: (context) => RecommendationScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

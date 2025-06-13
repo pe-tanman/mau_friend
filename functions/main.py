@@ -276,10 +276,10 @@ def find_nearby_places(api_key, lat, lng, radius, maxResultCount=10, place_types
   except ValueError:
       raise RuntimeError("Response not valid JSON:\n" + res.text)
 
-  # 3️⃣ API-level error handling
-  if "places" not in data:
-      error_msg = data.get("error", {}).get("message", str(data))
-      raise RuntimeError(f"API error or malformed response: {error_msg}")
+#   # 3️⃣ API-level error handling
+#   if "places" not in data:
+#       error_msg = data.get("error", {}).get("message", str(data))
+#       raise RuntimeError(f"API error or malformed response: {error_msg}")
 
   # 4️⃣ Iterate results safely
   for p in data.get("places", []):
@@ -306,14 +306,12 @@ def analyze_behavior(req: https_fn.CallableRequest) -> dict:
     print("three clusters:")
     print(three_clusters)
 
-    #ここまではいっている
-
     for _, cluster in three_clusters.iterrows():
         lat = cluster['centroid_lat']
         lng = cluster['centroid_lon']
         place_type = list(type_data.keys())
         places = find_nearby_places(api_key, lat, lng, 100, maxResultCount=1, place_types=place_type)
-
+        radius = 100
         for place in places:
             name = place.get("displayName", {}).get("text")
             types = place.get("types", [])
@@ -322,9 +320,12 @@ def analyze_behavior(req: https_fn.CallableRequest) -> dict:
                     suggested_status.append({'status': type_data[type]['status'], 
                                              'emoji': type_data[type]['emoji'],
                                              'lat': lat, 'lng': lng,
-                                             'name': name})
+                                             'name': name,
+                                             'radius': radius
+                                             })
                     break
-        places = find_nearby_places(api_key, lat, lng, 500, maxResultCount=1, place_types=place_type)
+        radius = 500
+        places = find_nearby_places(api_key, lat, lng, radius, maxResultCount=1, place_types=place_type)
         for place in places:
             name = place.get("displayName", {}).get("text")
             types = place.get("types", [])
@@ -339,9 +340,9 @@ def analyze_behavior(req: https_fn.CallableRequest) -> dict:
                   suggested_status.append({'status': status, 
                                              'emoji': type_data[type]['emoji'],
                                              'lat': lat, 'lng': lng,
-                                             'name': name})
+                                             'name': name,
+                                             'radius': radius})
                   break
-
 
     # Print the suggested places
     print("Suggested Places:")

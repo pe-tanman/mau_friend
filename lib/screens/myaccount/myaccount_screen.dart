@@ -4,6 +4,7 @@ import 'package:mau_friend/providers/emergency_provider.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/screens/myaccount/emergency_screen.dart';
+import 'package:mau_friend/screens/myaccount/recommendation_screen.dart';
 import 'package:mau_friend/screens/settings/setting_screen.dart';
 import 'package:mau_friend/utilities/statics.dart';
 import 'package:geocoding/geocoding.dart';
@@ -19,6 +20,8 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 class MyAccountScreen extends ConsumerStatefulWidget {
   static const routeName = 'my-account-screen';
+  
+
   @override
   _MyAccountScreenState createState() => _MyAccountScreenState();
 }
@@ -31,6 +34,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   LatLng coordinates = Statics.initLocation;
   bool isLoading = true;
   bool isInit = true;
+  bool isSuggestionEnabled = true;
 
   @override
   void initState() {
@@ -86,10 +90,10 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     registeredLocations =
         myLocationsMap.map((location) {
           return RegisteredLocation(
-            location['name'],
-            location['icon'],
-            LatLng(location['latitude'], location['longitude']),
-            location['radius'],
+            name: location['name'],
+            icon: location['icon'],
+            coordinates: LatLng(location['latitude'], location['longitude']),
+            radius: location['radius'],
           );
         }).toList();
 
@@ -265,75 +269,56 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     );
   }
 
-  Future<void> callLocationDataAnalysis() async {
-    //sample data
-    final behaviorData = """[
-  {"t": "2025-06-10 07:00:00", "x": 35.7020, "y": 139.7750},
-  {"t": "2025-06-10 07:05:00", "x": 35.7021, "y": 139.7751},
-  {"t": "2025-06-10 07:10:00", "x": 35.7020, "y": 139.7752},
-  {"t": "2025-06-10 07:15:00", "x": 35.7022, "y": 139.7750},
-  {"t": "2025-06-10 07:20:00", "x": 35.7021, "y": 139.7751},
-  {"t": "2025-06-10 07:25:00", "x": 35.7020, "y": 139.7750},
-  {"t": "2025-06-10 07:30:00", "x": 35.7019, "y": 139.7749},
-  {"t": "2025-06-10 07:35:00", "x": 35.7018, "y": 139.7748},
-  {"t": "2025-06-10 07:40:00", "x": 35.7015, "y": 139.7745},
-  {"t": "2025-06-10 07:45:00", "x": 35.7010, "y": 139.7740},
-  {"t": "2025-06-10 07:50:00", "x": 35.7005, "y": 139.7735},
-  {"t": "2025-06-10 07:55:00", "x": 35.6990, "y": 139.7720},
-  {"t": "2025-06-10 08:00:00", "x": 35.6985, "y": 139.7715},
-  {"t": "2025-06-10 08:05:00", "x": 35.6980, "y": 139.7710},
-  {"t": "2025-06-10 08:10:00", "x": 35.6950, "y": 139.7680},
-  {"t": "2025-06-10 08:15:00", "x": 35.6920, "y": 139.7650},
-  {"t": "2025-06-10 08:20:00", "x": 35.6890, "y": 139.7620},
-  {"t": "2025-06-10 08:25:00", "x": 35.6860, "y": 139.7590},
-  {"t": "2025-06-10 08:30:00", "x": 35.6830, "y": 139.7560},
-  {"t": "2025-06-10 08:35:00", "x": 35.6810, "y": 139.7530},
-  {"t": "2025-06-10 08:40:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 08:45:00", "x": 35.6810, "y": 139.7532},
-  {"t": "2025-06-10 08:50:00", "x": 35.6812, "y": 139.7530},
-  {"t": "2025-06-10 08:55:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 09:00:00", "x": 35.6810, "y": 139.7530},
-  {"t": "2025-06-10 09:05:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 09:10:00", "x": 35.6810, "y": 139.7532},
-  {"t": "2025-06-10 09:15:00", "x": 35.6812, "y": 139.7530},
-  {"t": "2025-06-10 09:20:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 09:25:00", "x": 35.6810, "y": 139.7530},
-  {"t": "2025-06-10 09:30:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 09:35:00", "x": 35.6810, "y": 139.7532},
-  {"t": "2025-06-10 09:40:00", "x": 35.6812, "y": 139.7530},
-  {"t": "2025-06-10 09:45:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 09:50:00", "x": 35.6810, "y": 139.7530},
-  {"t": "2025-06-10 09:55:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 10:00:00", "x": 35.6810, "y": 139.7532},
-  {"t": "2025-06-10 10:05:00", "x": 35.6812, "y": 139.7530},
-  {"t": "2025-06-10 10:10:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 10:15:00", "x": 35.6810, "y": 139.7530},
-  {"t": "2025-06-10 10:20:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 10:25:00", "x": 35.6810, "y": 139.7532},
-  {"t": "2025-06-10 10:30:00", "x": 35.6812, "y": 139.7530},
-  {"t": "2025-06-10 10:35:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 10:40:00", "x": 35.6810, "y": 139.7530},
-  {"t": "2025-06-10 10:45:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 10:50:00", "x": 35.6810, "y": 139.7532},
-  {"t": "2025-06-10 10:55:00", "x": 35.6812, "y": 139.7530},
-  {"t": "2025-06-10 11:00:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 11:05:00", "x": 35.6810, "y": 139.7530},
-  {"t": "2025-06-10 11:10:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 11:15:00", "x": 35.6810, "y": 139.7532},
-  {"t": "2025-06-10 11:20:00", "x": 35.6812, "y": 139.7530},
-  {"t": "2025-06-10 11:25:00", "x": 35.6811, "y": 139.7531},
-  {"t": "2025-06-10 11:30:00", "x": 35.6810, "y": 139.7530}
-    ]""";
-    final callable = FirebaseFunctions.instance.httpsCallable(
-      'analyze_behavior',
+
+
+ Widget _buildSuggestionListCard(int index) {
+    return Card(
+      color: Theme.of(context).colorScheme.surface,
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 5,
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        leading: CircleAvatar(
+          radius: 30,
+          child: Text(
+            registeredLocations[index].icon,
+            style: TextStyle(fontSize: 25),
+          ),
+          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
+        ),
+        title: Text(
+          registeredLocations[index].name,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            AddLocationScreen.routeName,
+            arguments: {registeredLocations[index]},
+          ).then((value) {
+            if (value != null) {
+              var location = value as RegisteredLocation;
+              if (location.name == 'delete') {
+                setState(() {
+                  registeredLocations.removeAt(index);
+                });
+              } else {
+                setState(() {
+                  registeredLocations[index] = location;
+                });
+              }
+              ref
+                  .read(locationsProvider.notifier)
+                  .updateLocations(registeredLocations);
+            }
+          });
+        },
+      ),
     );
-    try {
-      final result = await callable.call(behaviorData);
-      print("Result: ${result.data}");
-    } catch (e) {
-      print("Error calling function: $e");
-    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -354,8 +339,19 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
       MyLocationDatabaseHelper().initMyLocationDatabase();
     }
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+         
+          Navigator.pushNamed(
+            context,
+            RecommendationScreen.routeName,
+          );
+        },
+        child: Text('✨', style: TextStyle(fontSize: 24),
+        )),
       appBar: AppBar(
         title: Text('My Account'),
+        
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -384,7 +380,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                 itemCount: registeredLocations.length,
               ),
             TextButton.icon(
-              label: Text('Add Location'),
+              label: Text('Add Place'),
               icon: Icon(Icons.add),
               onPressed: () {
                 Navigator.pushNamed(context, AddLocationScreen.routeName).then((
@@ -401,15 +397,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                 });
               },
             ),
-            SizedBox(height: 20),
-            TextButton.icon(
-              label: Text('Favorite Place Recommendation'),
-              icon: Icon(Icons.bolt),
-              onPressed: () {
-                callLocationDataAnalysis();
-              },
-            ),
-          ],
+          ]
         ),
       ),
     );

@@ -11,10 +11,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mau_friend/providers/add_location_provider.dart';
 import 'dart:math';
 
 class AddLocationScreen extends ConsumerStatefulWidget {
   static const routeName = 'add-location-screen';
+  final RegisteredLocation? suggestedLocation;
+  const AddLocationScreen({Key? key, this.suggestedLocation}) : super(key: key);
   @override
   _AddLocationScreenState createState() => _AddLocationScreenState();
 }
@@ -34,6 +37,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
   bool isLoadingMarkers = true;
   double _sliderValue = log(100);
   bool isNotificationEnabled = false;
+  bool isSuggested = false;
 
   RegisteredLocation? argument;
   var arguments;
@@ -46,7 +50,6 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
     return MediaQuery.of(context).platformBrightness == Brightness.dark;
   }
 
-  
   @override
   void dispose() {
     nameController.dispose();
@@ -84,6 +87,16 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
             _moveCameraToPosition(coordinates);
             createMyMarkers();
             address = result.formattedAddress ?? "";
+             ref
+                .read(addLocationProvider.notifier)
+                .updateLocation(
+                  RegisteredLocation(
+                    name: name,
+                    icon: icon!.char,
+                    coordinates: coordinates,
+                    radius: radius,
+                  ),
+                );
           });
         }
       },
@@ -100,7 +113,9 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
   Future<void> updateStatus() async {
     final currentPosition = await MyStatusProvider().getCurrentPosition();
     final myLocations = ref.read(locationsProvider);
-    ref.read(myStatusProvider.notifier).updateMyStatus(currentPosition, myLocations);
+    ref
+        .read(myStatusProvider.notifier)
+        .updateMyStatus(currentPosition, myLocations);
   }
 
   Future<void> convertLatLngToAdress(LatLng coordinates) async {
@@ -150,7 +165,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
 
   void deleteLocaition() {
     MyLocationDatabaseHelper().deleteData(name);
-    var result = RegisteredLocation('delete', icon!.char, coordinates, radius);
+    var result = RegisteredLocation(name:'delete', icon: icon!.char, coordinates: coordinates, radius: radius);
     Navigator.pop(context, result);
   }
 
@@ -168,20 +183,13 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
       MyLocationDatabaseHelper().deleteData(argument!.name);
     }
 
-    var result = RegisteredLocation(name, icon!.char, coordinates, radius);
+    
     MyLocationDatabaseHelper().insertData(
       name,
       icon!.char,
       coordinates,
       radius,
     );
-    if(isNotificationEnabled) {
-      PrefsHelper().addLocationNotificationPrefs(name);
-    }
-    else{
-      PrefsHelper().removeLocationNotificationPrefs(name);
-    }
-    Navigator.pop(context, result);
   }
 
   Future<BitmapDescriptor> createEmojiMarker(String emoji) async {
@@ -315,7 +323,6 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
         coordinates = argument!.coordinates;
         radius = argument!.radius;
         _sliderValue = log(radius);
-        print("init e^slider${pow(e, _sliderValue)}");
         name = argument!.name;
         icon = EmojiData(
           id: '',
@@ -327,13 +334,37 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
         );
         name = argument!.name;
       }
-     PrefsHelper().getLocationNotificationPrefs().then((prefs) {
 
-       isNotificationEnabled = prefs.contains(name);
-       setState(() {
+      if (widget.suggestedLocation != null) {
+        isSuggested = true;
+        coordinates = widget.suggestedLocation!.coordinates;
+        radius = widget.suggestedLocation!.radius;
+        _sliderValue = log(radius);
+        name = widget.suggestedLocation!.name;
+        icon = EmojiData(
+          id: '',
+          char: widget.suggestedLocation!.icon,
+          unified: '',
+          category: 'Smileys & Emotion',
+          name: '',
+          skin: 1,
+        );
+         
+      }
+      PrefsHelper().getLocationNotificationPrefs().then((prefs) {
+        isNotificationEnabled = prefs.contains(name);
+        ref
+            .watch(addLocationProvider.notifier)
+            .updateLocation(
+              RegisteredLocation(
+                name: name,
+                icon: icon!.char,
+                coordinates: coordinates,
+                radius: radius,
+              ),
+            );
           isInit = false;
-        });
-     });
+      });
     }
 
     return Scaffold(
@@ -341,33 +372,53 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
         title: Text('Add Location'),
         actions: [
           IconButton(
-            icon: Icon(isNotificationEnabled ? Icons.notifications_active : Icons.notifications_off_outlined),
+            icon: Icon(
+              isNotificationEnabled
+                  ? Icons.notifications_active
+                  : Icons.notifications_off_outlined,
+            ),
             onPressed: () {
               setState(() {
                 isNotificationEnabled = !isNotificationEnabled;
-                if(isNotificationEnabled){
+                if (isNotificationEnabled) {
+                  PrefsHelper().addLocationNotificationPrefs(name);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Registered friends will be notified when you arrive at this location.'),
+                      content: Text(
+                        'Registered friends will be notified when you arrive at this location.',
+                      ),
                       duration: Duration(seconds: 2),
                     ),
                   );
                 }
+                else{
+                  PrefsHelper().removeLocationNotificationPrefs(name);
+                }
               });
-            }
+            },
           ),
+          if(!isSuggested)
           IconButton(
             onPressed: () {
               deleteLocaition();
             },
             icon: Icon(Icons.delete_outlined),
           ),
+
+          if(!isSuggested)
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   saveLocation();
+                   var result = RegisteredLocation(
+                      name: name,
+                      icon: icon!.char,
+                      coordinates: coordinates,
+                      radius: radius,
+                    );
+                    Navigator.pop(context, result);
                 }
               },
               child: Text('Save'),
@@ -398,6 +449,14 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                                     createMyMarkers();
                                     setState(() {
                                       icon = value;
+                                      ref.read(addLocationProvider.notifier).updateLocation(
+                                        RegisteredLocation(
+                                          name: name,
+                                          icon: icon!.char,
+                                          coordinates: coordinates,
+                                          radius: radius,
+                                        ),
+                                      );
                                     });
                                     Navigator.of(context).pop();
                                   },
@@ -431,13 +490,23 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                         onChanged: (value) {
                           createMyMarkers();
                           name = value;
+                           ref
+                              .read(addLocationProvider.notifier)
+                              .updateLocation(
+                                RegisteredLocation(
+                                  name: name,
+                                  icon: icon!.char,
+                                  coordinates: coordinates,
+                                  radius: radius,
+                                ),
+                              );
                         },
                       ),
                     ),
                   ],
                 ),
 
-                SizedBox(height: 20), 
+                SizedBox(height: 20),
 
                 Text(
                   'Address',
@@ -499,6 +568,16 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                         print("result e^slider${pow(e, _sliderValue)}");
                         _sliderValue = value;
                         radius = pow(e, value).round();
+                         ref
+                            .read(addLocationProvider.notifier)
+                            .updateLocation(
+                              RegisteredLocation(
+                                name: name,
+                                icon: icon!.char,
+                                coordinates: coordinates,
+                                radius: radius,
+                              ),
+                            );
                       });
                     },
                   ),
@@ -510,7 +589,8 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                       isLoadingMarkers
                           ? Center(child: CircularProgressIndicator())
                           : GoogleMap(
-                            style: isDarkMode(context) ? Statics.darkStyle : null,
+                            style:
+                                isDarkMode(context) ? Statics.darkStyle : null,
                             onMapCreated:
                                 (controller) => mapController = controller,
                             initialCameraPosition: CameraPosition(
