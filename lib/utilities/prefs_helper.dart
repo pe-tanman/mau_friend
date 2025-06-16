@@ -124,4 +124,18 @@ class PrefsHelper {
     int length = prefs.getInt('unreadNotification_$myUID') ?? 0;
     return length;
   }
+
+  Future<void> updateRecommendationEnabled(bool isEnabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    await prefs.setBool('recommendationEnabled_$myUID', isEnabled);
+  }
+
+  Future<bool> getRecommendationEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    bool isEnabled = prefs.getBool('recommendationEnabled_$myUID') ?? false;
+    return isEnabled;
+  }
+                      
 }

@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
+import 'package:mau_friend/providers/recommendation_enabled_provider.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/enter_code_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/friend_request_screen.dart';
@@ -16,6 +17,7 @@ import 'package:mau_friend/screens/friends/friend_detail_screen.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
 import 'package:mau_friend/screens/myaccount/emergency_screen.dart';
 import 'package:mau_friend/screens/myaccount/recommendation_screen.dart';
+import 'package:mau_friend/screens/settings/privacy_setting_screen.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/screens/settings/current_location_screen.dart';
 import 'package:mau_friend/screens/friends/edit_friend_list_screen.dart';
@@ -91,6 +93,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       setState(() {
         isLoggedIn = user != null;
       });
+      ref.read(recommendationEnabledProvider.notifier).loadRecommendationPrefs();
     });
   }
 
@@ -124,6 +127,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         FriendRequestScreen.routeName: (context) => FriendRequestScreen(),
         FriendDetailScreen.routeName: (context) => FriendDetailScreen(),
         RecommendationScreen.routeName: (context) => RecommendationScreen(),
+        PrivacySettingScreen.routeName: (context) => PrivacySettingScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

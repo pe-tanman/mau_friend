@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mau_friend/providers/emergency_provider.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
+import 'package:mau_friend/providers/recommendation_enabled_provider.dart';
 import 'package:mau_friend/screens/myaccount/emergency_screen.dart';
 import 'package:mau_friend/screens/myaccount/recommendation_screen.dart';
 import 'package:mau_friend/screens/settings/setting_screen.dart';
@@ -270,56 +271,6 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
   }
 
 
-
- Widget _buildSuggestionListCard(int index) {
-    return Card(
-      color: Theme.of(context).colorScheme.surface,
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      elevation: 5,
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        leading: CircleAvatar(
-          radius: 30,
-          child: Text(
-            registeredLocations[index].icon,
-            style: TextStyle(fontSize: 25),
-          ),
-          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
-        ),
-        title: Text(
-          registeredLocations[index].name,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-        onTap: () {
-          Navigator.pushNamed(
-            context,
-            AddLocationScreen.routeName,
-            arguments: {registeredLocations[index]},
-          ).then((value) {
-            if (value != null) {
-              var location = value as RegisteredLocation;
-              if (location.name == 'delete') {
-                setState(() {
-                  registeredLocations.removeAt(index);
-                });
-              } else {
-                setState(() {
-                  registeredLocations[index] = location;
-                });
-              }
-              ref
-                  .read(locationsProvider.notifier)
-                  .updateLocations(registeredLocations);
-            }
-          });
-        },
-      ),
-    );
-  }
-
-
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(profileProvider);
@@ -339,16 +290,22 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
       MyLocationDatabaseHelper().initMyLocationDatabase();
     }
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: (ref.watch(recommendationEnabledProvider))? FloatingActionButton(
         onPressed: () {
          
           Navigator.pushNamed(
             context,
             RecommendationScreen.routeName,
-          );
+          ).then((savedLocations) {
+            if (savedLocations != null && savedLocations is List<RegisteredLocation> && savedLocations.isNotEmpty) {
+              setState(() {
+                registeredLocations.addAll(savedLocations);
+              });
+            }
+          });
         },
         child: Text('✨', style: TextStyle(fontSize: 24),
-        )),
+        )) : null,
       appBar: AppBar(
         title: Text('My Account'),
         

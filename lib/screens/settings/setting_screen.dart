@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mau_friend/screens/settings/privacy_setting_screen.dart';
 import 'package:mau_friend/screens/welcome/authGate.dart';
 import 'package:mau_friend/screens/settings/current_location_screen.dart';
 import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingScreen extends StatefulWidget {
   static const routeName = '/settings';
@@ -36,6 +38,29 @@ class _SettingScreenState extends State<SettingScreen> {
                   context,
                   ProfileSettingScreen.routeName,
             );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.policy_outlined),
+              title: Text('Privacy Settings'),
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  PrivacySettingScreen.routeName,
+                );
+              },
+            ),
+
+            ListTile(
+              leading: Icon(Icons.article_outlined),
+              title: Text('Privacy Policy'),
+              trailing: Icon(Icons.open_in_new),
+              onTap: () async{
+                // Open the privacy policy URL
+                final Uri privacyPolicyUrl = Uri.parse('https://petanman.notion.site/Privacy-Policy-1efe73611a8f804388a5d41b98b7165f?pvs=4');
+                if (!await launchUrl(privacyPolicyUrl)) {
+                  throw Exception('Could not launch $privacyPolicyUrl');
+                }
               },
             ),
             

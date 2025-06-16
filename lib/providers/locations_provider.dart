@@ -8,7 +8,14 @@ class RegisteredLocation {
   final String icon;
   final LatLng coordinates;
   final int radius;
-  RegisteredLocation({required this.name, required this.icon, required this.coordinates, required this.radius});
+  final String? address;
+  RegisteredLocation({
+    required this.name,
+    required this.icon,
+    required this.coordinates,
+    required this.radius,
+    this.address,
+  });
 }
 
 @riverpod
@@ -27,14 +34,21 @@ class LocationsProvider extends Notifier<List<RegisteredLocation>> {
 
     var result = await dbHelper.getAllData();
     var output = <RegisteredLocation>[];
-    if (result != null &&result.isNotEmpty) {
+    if (result != null && result.isNotEmpty) {
       result.forEach((element) {
         var coordinates = LatLng(element['latitude'], element['longitude']);
         var name = element['name'];
         var icon = element['icon'];
         var radius = element['radius'];
 
-        output.add(RegisteredLocation(name: name, icon: icon, coordinates: coordinates, radius: radius));
+        output.add(
+          RegisteredLocation(
+            name: name,
+            icon: icon,
+            coordinates: coordinates,
+            radius: radius,
+          ),
+        );
       });
       state = output;
     } else {

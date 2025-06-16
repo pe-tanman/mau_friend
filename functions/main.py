@@ -11,6 +11,8 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from sklearn.cluster import DBSCAN
+from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
 
 
 api_key = StringParam("API_KEY")
@@ -215,27 +217,62 @@ type_data = {
 }
 
 
+def cluster_radius(cluster_df):
+    centroid = (
+        cluster_df['x'].mean(),
+        cluster_df['y'].mean()
+    )
+    return cluster_df.apply(
+        lambda row: geodesic(centroid, (row['x'], row['y'])).meters, axis=1
+    ).max()
+
+
 def cluster_behaviors(data):
   df = pd.DataFrame(data)
   df['t'] = pd.to_datetime(df['t'])
 
+  df['weekday'] = df['t'].dt.weekday  # 0=月曜…6=日曜
+  df['is_weekday'] = df['weekday'] < 5
+  df['hour'] = df['t'].dt.hour
+  df['is_night'] = df['hour'].apply(lambda h: (h >= 22) or (h < 6))
+  df['is_daytime'] = df['hour'].between(9, 16)  # 9:00～17:00前まで
+
+
   df['w'] = (df['t'].shift(-1) - df['t']).dt.total_seconds().fillna(0)
 
   coords = df[['x','y']].to_numpy()
-  # if coords are lat/lon, convert to radians and use haversine:
   radians = np.radians(coords)
   kms_per_radian = 6371.0088
   epsilon = 0.05 / kms_per_radian  # ~50 m neighborhood
 
-  db = DBSCAN(eps=epsilon, min_samples=1, metric='haversine')
+  db = DBSCAN(eps=epsilon, min_samples=1, metric='haversine')#set db scan function
   df['cluster'] = db.fit_predict(radians)
-
   agg = df.groupby('cluster').agg(
       centroid_lat = ('x',  'mean'),
       centroid_lon = ('y',  'mean'),
       total_time_s = ('w',  'sum'),
       visit_counts = ('w', lambda w: (w>0).sum())  # number of intervals
   ).reset_index()
+
+## 最大の差を求めてもいいけど、標準偏差を求めてもいいかも
+  radii = df.groupby('cluster').apply(cluster_radius).rename("radius_meters").reset_index()
+
+  summary = df.groupby(['cluster','is_night','is_weekday','is_daytime'])['w'].sum().reset_index()
+  night_time = summary[summary['is_night']].groupby('cluster')['w'].sum()
+  home_cluster = night_time.idxmax()
+  agg['is_home'] = agg['cluster'] == home_cluster
+
+# Merge radii with agg summary
+  agg = agg.merge(radii, on='cluster')
+
+  conditions = [
+    agg['radius_meters'] < 5.0,
+    agg['radius_meters'].between(5.0, 30.0),
+    agg['radius_meters'] > 30.0
+    ]
+
+  choices = [50.0, 100.0, 500.0]
+  agg['standarized_radius'] = np.select(conditions, choices, default=0)
 
   # score by total_time (you can combine counts & recency if you like)
   agg = agg.sort_values(by='total_time_s', ascending=False)
@@ -302,28 +339,38 @@ def analyze_behavior(req: https_fn.CallableRequest) -> dict:
     sorted_clusters = cluster_behaviors(behavior_data)
     sorted_clusters = sorted_clusters.reset_index()
 
-    three_clusters = sorted_clusters.loc[0:2, ['centroid_lat', 'centroid_lon']]
+    three_clusters = sorted_clusters.loc[0:2]
     print("three clusters:")
     print(three_clusters)
 
     for _, cluster in three_clusters.iterrows():
         lat = cluster['centroid_lat']
         lng = cluster['centroid_lon']
+        radius = cluster['standarized_radius']
         place_type = list(type_data.keys())
-        places = find_nearby_places(api_key, lat, lng, 100, maxResultCount=1, place_types=place_type)
-        radius = 100
-        for place in places:
-            name = place.get("displayName", {}).get("text")
-            types = place.get("types", [])
-            for type in types:
-                if type in type_data:
-                    suggested_status.append({'status': type_data[type]['status'], 
-                                             'emoji': type_data[type]['emoji'],
-                                             'lat': lat, 'lng': lng,
-                                             'name': name,
-                                             'radius': radius
-                                             })
-                    break
+        if cluster['is_home']:
+          geolocator = Nominatim(user_agent="myGeocoder")
+          location = geolocator.reverse((37.7749, -122.4194))
+          suggested_status.append({'status': 'Home', 
+                                   'emoji': '🏠',
+                                   'lat': lat, 'lng': lng,
+                                   'name': location.address,
+                                   'radius': radius
+                                   })
+        else:
+            places = find_nearby_places(api_key, lat, lng, radius, maxResultCount=1, place_types=place_type)
+            for place in places:
+                name = place.get("displayName", {}).get("text")
+                types = place.get("types", [])
+                for type in types:
+                    if type in type_data:
+                        suggested_status.append({'status': type_data[type]['status'], 
+                                                'emoji': type_data[type]['emoji'],
+                                                'lat': lat, 'lng': lng,
+                                                'name': name,
+                                                'radius': radius
+                                                })
+                        break
 
     # Print the suggested places
     print("Suggested Places:")

@@ -6,6 +6,7 @@ import 'package:map_location_picker/map_location_picker.dart';
 import 'package:mau_friend/providers/emergency_provider.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
+import 'package:mau_friend/providers/recommendation_enabled_provider.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:mau_friend/utilities/prefs_helper.dart';
 import 'package:mau_friend/utilities/statics.dart';
@@ -101,11 +102,13 @@ class MyStatusProvider extends Notifier<UserStatus> {
       }
       final myLocations = ref.read(locationsProvider);
       updateMyStatus(position, myLocations);
-      BehaviorDatabaseHelper().insertData(
-        position.timestamp,
-        position.latitude,
-        position.longitude,
-      );
+      if(ref.read(recommendationEnabledProvider)) {
+        BehaviorDatabaseHelper().insertData(
+          position.timestamp,
+          position.latitude,
+          position.longitude,
+        );
+      }
     });
   }
 

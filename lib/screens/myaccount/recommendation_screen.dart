@@ -6,6 +6,8 @@ import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class RecommendationScreen extends ConsumerStatefulWidget {
   static const String routeName = '/recommendation';
@@ -21,9 +23,12 @@ class _RecommendationScreenState extends ConsumerState<RecommendationScreen> {
   bool isLoading = true;
   PageController _pageController = PageController();
   List<Widget> pageList = [];
+  List<RegisteredLocation> savedLocations = [];
 
   Future<void> callLocationDataAnalysis() async {
     final behaviorData = await BehaviorDatabaseHelper().getJsonString();
+    print(behaviorData);
+    
     final callable = FirebaseFunctions.instance.httpsCallable(
       'analyze_behavior',
     );
@@ -39,9 +44,9 @@ class _RecommendationScreenState extends ConsumerState<RecommendationScreen> {
     } catch (e) {
       print("Error calling function: $e");
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error analyzing location data.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error analyzing location data.')));
     }
   }
 
@@ -59,7 +64,8 @@ class _RecommendationScreenState extends ConsumerState<RecommendationScreen> {
             name: location['status'],
             icon: location['emoji'],
             coordinates: LatLng(location['lat'], location['lng']),
-            radius: location['radius'],
+            radius: location['radius'].round(),
+            address: location['name'],
           ),
         ),
       );
@@ -77,7 +83,7 @@ class _RecommendationScreenState extends ConsumerState<RecommendationScreen> {
       await Future.delayed(Duration(milliseconds: 300));
       pageList.removeAt(currentIndex);
     } else {
-      Navigator.pop(context);
+      Navigator.pop(context, savedLocations);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('All suggestions have been checked!')),
       );
@@ -103,11 +109,11 @@ class _RecommendationScreenState extends ConsumerState<RecommendationScreen> {
               )
               : Stack(
                 children: [
-                    PageView(
+                  PageView(
                     physics: NeverScrollableScrollPhysics(),
                     controller: _pageController,
                     children: pageList,
-                    ),
+                  ),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
@@ -146,6 +152,7 @@ class _RecommendationScreenState extends ConsumerState<RecommendationScreen> {
                                   locationData.radius,
                                 );
                                 goNextPage();
+                                savedLocations.add(locationData);
                               },
 
                               label: Padding(

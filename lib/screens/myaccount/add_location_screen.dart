@@ -349,6 +349,9 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
           name: '',
           skin: 1,
         );
+        if (widget.suggestedLocation!.address != null) {
+            address = widget.suggestedLocation!.address!;
+        }
          
       }
       PrefsHelper().getLocationNotificationPrefs().then((prefs) {
@@ -565,7 +568,6 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                     onChanged: (value) {
                       createMyMarkers();
                       setState(() {
-                        print("result e^slider${pow(e, _sliderValue)}");
                         _sliderValue = value;
                         radius = pow(e, value).round();
                          ref
