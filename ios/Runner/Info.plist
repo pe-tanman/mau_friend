@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -40,19 +42,19 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to scan QR codes.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app needs location access to update user's status after the app is terminated.</string>
+	<string>This app needs location access to update user&apos;s status after the app is terminated.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs location access to update user's status and share it with the user's friends.</string>
+	<string>This app needs location access to update user&apos;s status and share it with the user&apos;s friends.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs photos access to get user icon from photo library</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
-<array>
-	<string>task-identifier</string>
-
-	<string>be.tramckrijte.workmanagerExample.iOSBackgroundAppRefresh</string>
-</array>
+	<array>
+		<string>com.example.fetch</string>
+		<string>task-identifier</string>
+		<string>be.tramckrijte.workmanagerExample.iOSBackgroundAppRefresh</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>

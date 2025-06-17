@@ -1,52 +1,43 @@
-//
-//  mau_widget.swift
-//  mau_widget
-//
-//  Created by pe on 2025/05/27.
-//
-
 import WidgetKit
 import SwiftUI
 
 struct Provider: TimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), userName: "username", iconLink: "https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif", status: "🔴 Offline")
+    func placeholder(in context: Context) -> FlutterEntry {
+        FlutterEntry(date: Date(), widgetData: WidgetData(name: "username", iconLink: "'https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif'", status: "🔴 Offline"))
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
-        let entry: SimpleEntry
+    func getSnapshot(in context: Context, completion: @escaping (FlutterEntry) -> ()) {
+        let entry : FlutterEntry
         if context.isPreview {
             entry = placeholder(in: context)
         } else {
-            let userDefaults = UserDefaults(suiteName: "group.mau_widget")
-            let username: String = userDefaults?.string(forKey: "username") ?? "username"
-            let iconLink: String = userDefaults?.string(forKey: "iconLink") ?? "https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif"
-            let status: String = userDefaults?.string(forKey: "status") ?? "🔴 Offline"
-            entry = SimpleEntry(date: Date(), userName: username, iconLink: iconLink, status: status)
+            entry = FlutterEntry(date: Date(), widgetData: WidgetData(name: "username", iconLink: "'https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif'", status: "🔴 Offline"))
         }
         completion(entry)
     }
 
-
-    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> ()) {
-        getSnapshot(in: context) { (entry: SimpleEntry) in
-// atEnd policy tells widgetkit to request a new entry after the date has passed
-        let timeline: Timeline<SimpleEntry> = Timeline(entries: [entry], policy: .atEnd)
-                  completion(timeline)
-              }
+    func getTimeline(in context: Context, completion: @escaping (Timeline<FlutterEntry>) -> ()) {
+        let sharedDefaults: UserDefaults? = UserDefaults(suiteName: "group.mau_widget")
+        let flutterData: WidgetData? = try? JSONDecoder().decode(WidgetData.self, from: (sharedDefaults?
+            .string(forKey: "mau_widget")?.data(using: .utf8)) ?? Data())
+        let entryDate: Date = Date()
+        let entry: FlutterEntry = FlutterEntry(date: entryDate, widgetData: flutterData)
+        let timeline: Timeline<FlutterEntry> = Timeline(entries: [entry], policy: .atEnd)
+        completion(timeline)
     }
-
-//    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
-//        // Generate a list containing the contexts this widget is relevant in.
-//    }aasdasffsdfsdf
 }
 
-struct SimpleEntry: TimelineEntry {
-    let date: Date
-    let userName: String
+struct WidgetData: Decodable, Hashable {
+    let name: String
     let iconLink: String
     let status: String
 }
+
+struct FlutterEntry: TimelineEntry {
+    let date: Date
+    let widgetData: WidgetData?
+}
+
 extension View {
     @ViewBuilder
     func widgetBackground(_ style: some ShapeStyle) -> some View {
@@ -60,13 +51,14 @@ extension View {
     }
 }
 
-struct mau_widgetEntryView : View {
+struct mau_widgetEntryView: View {
     var entry: Provider.Entry
 
     var body: some View {
-         VStack() {
+
+             VStack() {
             HStack{
- if let url = URL(string: entry.iconLink),
+ if let url = URL(string: entry.widgetData?.iconLink ??  "https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif"),
             let imageData = try? Data(contentsOf: url),
             let uiImage = UIImage(data: imageData) {
             Image(uiImage: uiImage)
@@ -76,7 +68,7 @@ struct mau_widgetEntryView : View {
                     .clipShape(Circle())
         }
             // User Name
-            Text(entry.userName)
+            Text(entry.widgetData?.name ?? "Username")
                 .font(.body)
                 .fontWeight(.bold)
 
@@ -84,7 +76,7 @@ struct mau_widgetEntryView : View {
            
             // Status
             HStack {
-                Text(entry.status)
+                Text(entry.widgetData?.status ?? "🔴 Offline")
                     .font(.body)
                     .fontWeight(.bold)
                     .padding(.horizontal, 16)
@@ -93,27 +85,24 @@ struct mau_widgetEntryView : View {
                     .cornerRadius(12)
             }
         }
-        .widgetBackground(Color(red: 243/255, green: 243/255, blue: 224/255))
     }
-    
 }
 
 struct mau_widget: Widget {
     let kind: String = "mau_widget"
 
-   var body: some WidgetConfiguration {
+    var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             mau_widgetEntryView(entry: entry)
         }
         .configurationDisplayName("Mau Widget")
-        .description("Displays user status and profile.")
+        .description("Display the first status in the list")
     }
 }
 
-
 struct mau_widget_Previews: PreviewProvider {
     static var previews: some View {
-        mau_widgetEntryView(entry: SimpleEntry(date: Date(), userName: "username", iconLink: "https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif", status: "🔴 Offline"))
+        mau_widgetEntryView(entry: FlutterEntry(date: Date(), widgetData: WidgetData(name: "username", iconLink: "https://hpgpixer.jp/image_icons/animals/animal_icon/cat/cat_12.gif", status: "🔴 Offline")))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
 }

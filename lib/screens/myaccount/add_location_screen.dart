@@ -87,16 +87,6 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
             _moveCameraToPosition(coordinates);
             createMyMarkers();
             address = result.formattedAddress ?? "";
-             ref
-                .read(addLocationProvider.notifier)
-                .updateLocation(
-                  RegisteredLocation(
-                    name: name,
-                    icon: icon!.char,
-                    coordinates: coordinates,
-                    radius: radius,
-                  ),
-                );
           });
         }
       },
@@ -352,11 +342,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
         if (widget.suggestedLocation!.address != null) {
             address = widget.suggestedLocation!.address!;
         }
-         
-      }
-      PrefsHelper().getLocationNotificationPrefs().then((prefs) {
-        isNotificationEnabled = prefs.contains(name);
-        ref
+          ref
             .watch(addLocationProvider.notifier)
             .updateLocation(
               RegisteredLocation(
@@ -366,6 +352,10 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                 radius: radius,
               ),
             );
+      }
+      PrefsHelper().getLocationNotificationPrefs().then((prefs) {
+        isNotificationEnabled = prefs.contains(name);
+       
           isInit = false;
       });
     }

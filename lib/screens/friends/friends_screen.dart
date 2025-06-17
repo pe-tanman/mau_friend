@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_widgetkit/flutter_widgetkit.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/providers/notification_provider.dart';
@@ -13,6 +15,7 @@ import 'package:mau_friend/screens/friends/friend_detail_screen.dart';
 import 'package:mau_friend/screens/friends/notification_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
+import 'package:mau_friend/utilities/custom_widget_info.dart';
 import 'package:mau_friend/utilities/database_helper.dart';
 import 'package:mau_friend/utilities/firestore_helper.dart';
 import 'package:mau_friend/utilities/prefs_helper.dart';
@@ -46,6 +49,16 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     await ref.read(friendListProvider.notifier).loadFriendList();
     final newFriendUID = snapshot.data()!['friendList'].last;
     updateFriendStatus(newFriendUID);
+
+    final firstFriend = ref.read(friendListProvider)[0];
+    final firstFriendName =
+        ref.read(friendProfilesProvider)[firstFriend]?.name ?? 'Username';
+    final firstFriendIconLink =
+        ref.read(friendProfilesProvider)[firstFriend]?.iconLink ??
+        Statics.defaultIconLink;
+    PrefsHelper().updateFirstFriend(firstFriend);
+    PrefsHelper().updateFirstFriendName(firstFriendName);
+    PrefsHelper().updateFirstFriendIconLink(firstFriendIconLink);
   }
 
   Future<void> updateFriendStatus(String friendUID) async {
@@ -123,15 +136,27 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   }
 
   Future<void> updateHomeWidget() async {
-    const AppGroupId = 'group.mau_widget';
+    const appGroupId = 'group.mau_widget';
     const String iOSWidgetName = 'mau_widget';
-    final firstProfile = ref.read(friendProfilesProvider).values.first;
-    final statusName = statusMap[firstProfile.userUID]?['status'] ?? 'Offline';
-    final statusIcon = statusMap[firstProfile.userUID]?['icon'] ?? '🔴';
-    HomeWidget.saveWidgetData<String>('username', firstProfile.name);
-    HomeWidget.saveWidgetData<String>('iconLink', firstProfile.iconLink);
-    HomeWidget.saveWidgetData<String>('status', '$statusIcon $statusName');
-    HomeWidget.updateWidget(iOSName: iOSWidgetName);
+
+    final firstFriend = await PrefsHelper().getFirstFriend();
+    final firstFriendName = await PrefsHelper().getFirstFriendName() ?? 'Username';
+    final firstFriendIconLink = await PrefsHelper().getFirstFriendIconLink() ?? Statics.defaultIconLink;
+    final emoji = statusMap[firstFriend]?['icon'] ?? '🔴';
+    final status = statusMap[firstFriend]?['status'] ?? 'offline';
+
+    WidgetKit.setItem(
+      iOSWidgetName,
+      jsonEncode(
+        CustomWidgetInfo(
+          name: firstFriendName,
+          iconLink: firstFriendIconLink,
+          status: '$emoji $status',
+        ),
+      ),
+      appGroupId,
+    );
+    WidgetKit.reloadAllTimelines();
   }
 
   @override

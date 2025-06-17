@@ -10,7 +10,7 @@ import SwiftUI
 import WidgetKit
 
 struct mau_widgetControl: ControlWidget {
-    static let kind: String = "com.wridge.mau.mau_widget"
+    static let kind: String = "com.wridge.mau.mau-widget"
 
     var body: some ControlWidgetConfiguration {
         AppIntentControlConfiguration(

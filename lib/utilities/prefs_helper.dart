@@ -137,5 +137,37 @@ class PrefsHelper {
     bool isEnabled = prefs.getBool('recommendationEnabled_$myUID') ?? false;
     return isEnabled;
   }
-                      
+  Future<void> updateFirstFriendName(String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    await prefs.setString('firstFriendName_$myUID', name);
+  }
+  Future<String?> getFirstFriendName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    String? name = prefs.getString('firstFriendName_$myUID');
+    return name;
+  }
+  Future<void> updateFirstFriendIconLink(String iconLink) async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    await prefs.setString('firstFriendIconLink_$myUID', iconLink);
+  }
+  Future<String?> getFirstFriendIconLink() async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    String? iconLink = prefs.getString('firstFriendIconLink_$myUID');
+    return iconLink;
+  }
+  Future<void> updateFirstFriend(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    final  myUID = FirebaseAuth.instance.currentUser!.uid;
+    await prefs.setString('firstFriend_$myUID', uid);
+  }
+  Future<String?> getFirstFriend() async {
+    final prefs = await SharedPreferences.getInstance();
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    String? uid = prefs.getString('firstFriend_$myUID');
+    return uid;
+  }
 }

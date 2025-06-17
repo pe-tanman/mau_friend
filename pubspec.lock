@@ -41,6 +41,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.0"
+  background_fetch:
+    dependency: "direct main"
+    description:
+      name: background_fetch
+      sha256: "442e82f508708be89fd0cc7e1dc3b27bc7c6c8c39a47967ccb7ed1c57b9108b5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.8"
   baseflow_plugin_template:
     dependency: "direct main"
     description:
@@ -677,6 +685,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_widgetkit:
+    dependency: "direct main"
+    description:
+      name: flutter_widgetkit
+      sha256: "63844c74c642d5c950d34b17b40038a1ef21d4d0a65abd59a04e860f0981956d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   form_builder_extra_fields:
     dependency: transitive
     description:
