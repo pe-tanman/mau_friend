@@ -238,7 +238,6 @@ class BehaviorDatabaseHelper {
     double latitude,
     double longitude,
   ) async {
-    print('Inserting data: $timestamp, $latitude, $longitude');
     final Database? db = await database;
     final myUID = FirebaseAuth.instance.currentUser!.uid;
 

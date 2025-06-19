@@ -484,6 +484,15 @@ class RealtimeDatabaseHelper {
     });
   }
 
+  Future<UserStatus?> getStatus(uid) async {
+    final snapshot = await database.ref('users/$uid').get();
+    if (snapshot.exists) {
+      final data = snapshot.value as Map<dynamic, dynamic>;
+      return UserStatus( data['icon'] as String, data['status'] as String);
+    }
+    return null;
+  }
+
   Future<void> deleteStatus() async {
     var userUID = FirebaseAuth.instance.currentUser!.uid;
     await database.ref('users/$userUID').remove();

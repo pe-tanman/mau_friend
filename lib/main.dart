@@ -1,10 +1,16 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as logger;
 
+import 'package:app_links/app_links.dart';
+import 'package:background_fetch/background_fetch.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flashy_flushbar/flashy_flushbar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_widgetkit/flutter_widgetkit.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:mau_friend/providers/locations_provider.dart';
 import 'package:mau_friend/providers/recommendation_enabled_provider.dart';
@@ -25,6 +31,10 @@ import 'package:mau_friend/screens/friends/add_friends/friend_profile_screen.dar
 import 'package:mau_friend/screens/settings/profile_setting_screen.dart';
 import 'package:mau_friend/screens/settings/setting_screen.dart';
 import 'package:mau_friend/screens/welcome/welcome_screen.dart';
+import 'package:mau_friend/utilities/custom_widget_info.dart';
+import 'package:mau_friend/utilities/firestore_helper.dart';
+import 'package:mau_friend/utilities/prefs_helper.dart';
+import 'package:mau_friend/utilities/statics.dart';
 import 'firebase_options.dart';
 import 'package:mau_friend/screens/home_screen.dart';
 import 'package:mau_friend/screens/myaccount/myaccount_screen.dart';
@@ -34,6 +44,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mau_friend/screens/friends/notification_screen.dart';
 
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:app_links/app_links.dart';
+
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -56,6 +68,21 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+@pragma('vm:entry-point')
+void backgroundFetchHeadlessTask(HeadlessTask task) async {
+  String taskId = task.taskId;
+  bool isTimeout = task.timeout;
+  if (isTimeout) {
+    // This task has exceeded its allowed running-time.
+    // You must stop what you're doing and immediately .finish(taskId)
+    print("[BackgroundFetch] Headless task timed-out: $taskId");
+    BackgroundFetch.finish(taskId);
+    return;
+  }
+  print('[BackgroundFetch] Headless event received.');
+  // Do your work here...
+  BackgroundFetch.finish(taskId);
+}
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Firebase.apps.isEmpty) {
@@ -74,6 +101,7 @@ Future<void> main() async {
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(ProviderScope(child: MyApp()));
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -85,6 +113,10 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> {
   bool isLoggedIn = false;
   ThemeMode mode = ThemeMode.system; // Define the mode variable
+      bool _enabled = true;
+  int _status = 0;
+  List<DateTime> _events = [];
+  late StreamSubscription sub;
 
   @override
   void initState() {
@@ -95,7 +127,68 @@ class _MyAppState extends ConsumerState<MyApp> {
       });
       ref.read(recommendationEnabledProvider.notifier).loadRecommendationPrefs();
     });
+    initPlatformState();
   }
+
+    static void onBackgroundFetch(String taskId) async {
+    const appGroupId = 'group.mau_widget';
+    const String iOSWidgetName = 'mau_widget';
+    final firstFriend = await PrefsHelper().getFirstFriend();
+    final status = await RealtimeDatabaseHelper().getStatus(firstFriend);
+    final firstFriendName =
+        await PrefsHelper().getFirstFriendName() ?? 'Username';
+    final firstFriendIconLink =
+        await PrefsHelper().getFirstFriendIconLink() ?? Statics.defaultIconLink;
+    final emoji = status?.icon ?? '🔴';
+    final statusText = status?.status ?? 'offline';
+
+    WidgetKit.setItem(
+      iOSWidgetName,
+      jsonEncode(
+        CustomWidgetInfo(
+          name: firstFriendName,
+          iconLink: firstFriendIconLink,
+          status: '$emoji $statusText',
+        ),
+      ),
+      appGroupId,
+    );
+    WidgetKit.reloadAllTimelines();
+
+    BackgroundFetch.finish(taskId);
+  }
+
+  static Future<void> onBackgroundFetchTimeout(String taskId) async {
+    print('[BackgroundFetch] TIMEOUT: $taskId');
+    BackgroundFetch.finish(taskId);
+  }
+
+  Future<void> initPlatformState() async {
+
+
+    // Configure BackgroundFetch.
+    int status = await BackgroundFetch.configure(
+      BackgroundFetchConfig(
+        minimumFetchInterval: 15,
+        stopOnTerminate: false,
+        enableHeadless: true,
+        requiresBatteryNotLow: false,
+        requiresCharging: false,
+        requiresStorageNotLow: false,
+        requiresDeviceIdle: false,
+        requiredNetworkType: NetworkType.NONE,
+
+      ),
+      onBackgroundFetch,
+      onBackgroundFetchTimeout
+    );
+    setState(() {
+      _status = status;
+    });
+    if (!mounted) return;
+  }
+
+
 
   @override
   Widget build(BuildContext context) {

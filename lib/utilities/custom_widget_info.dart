@@ -21,3 +21,5 @@ class CustomWidgetInfo {
     'status': status,
   };
 }
+
+

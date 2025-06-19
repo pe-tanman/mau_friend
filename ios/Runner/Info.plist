@@ -35,6 +35,21 @@
 			</array>
 		</dict>
 	</array>
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
+	<key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleTypeRole</key>
+      <string>Editor</string>
+      <key>CFBundleURLName</key>
+      <string>[ANY_URL_NAME]</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>[YOUR_SCHEME]</string>
+      </array>
+    </dict>
+  </array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -51,7 +66,7 @@
 	<true/>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>com.example.fetch</string>
+		<string>com.transistorsoft.customtas</string>
 		<string>task-identifier</string>
 		<string>be.tramckrijte.workmanagerExample.iOSBackgroundAppRefresh</string>
 	</array>

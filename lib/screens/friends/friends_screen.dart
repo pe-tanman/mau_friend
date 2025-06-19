@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:background_fetch/background_fetch.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +62,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     PrefsHelper().updateFirstFriendIconLink(firstFriendIconLink);
   }
 
+
+
   Future<void> updateFriendStatus(String friendUID) async {
     final event =
         await FirebaseDatabase.instance.ref('users/$friendUID').once();
@@ -85,6 +88,14 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   @override
   void initState() {
     super.initState();
+     BackgroundFetch.start()
+        .then((int status) {
+          print('[BackgroundFetch] start success: $status');
+        })
+        .catchError((e) {
+          print('[BackgroundFetch] start FAILURE: $e');
+        });
+    
     NotificationDatabaseHelper().initNotificationDatabase();
     final myUID = FirebaseAuth.instance.currentUser?.uid;
     dbRef = FirebaseDatabase.instance.ref('users');
@@ -104,6 +115,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     statusSubscription = dbRef.onValue.listen((event) {
       final map = event.snapshot.value;
       if (map != null && mounted) {
+
         setState(() {
           isLoading = true;
           statusMap = map as Map;
@@ -135,7 +147,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     });
   }
 
-  Future<void> updateHomeWidget() async {
+   Future<void> updateHomeWidget() async {
     const appGroupId = 'group.mau_widget';
     const String iOSWidgetName = 'mau_widget';
 
@@ -189,7 +201,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               children: [
                 SizedBox(height: 20),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
+                    //TODO: remove this 
+                    int status = await BackgroundFetch.status;
+                    print('[BackgroundFetch] status: $status');
                     Navigator.of(context).pushNamed(
                       FriendDetailScreen.routeName,
                       arguments:
