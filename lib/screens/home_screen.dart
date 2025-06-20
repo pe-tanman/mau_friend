@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flashy_flushbar/flashy_flushbar_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:mau_friend/screens/friends/friends_and_groups_screen.dart';
 import 'package:mau_friend/screens/friends/friends_screen.dart';
 import 'package:mau_friend/screens/myaccount/myaccount_screen.dart';
 import 'package:mau_friend/utilities/statics.dart';
@@ -14,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  final _screens = [FriendsScreen(), MyAccountScreen()];
+  final _screens = [FriendsAndGroupsScreen(), MyAccountScreen()];
 
   int _selectedIndex = 0;
 

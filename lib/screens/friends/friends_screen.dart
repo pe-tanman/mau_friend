@@ -9,11 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widgetkit/flutter_widgetkit.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:mau_friend/providers/profile_provider.dart';
-import 'package:mau_friend/providers/notification_provider.dart';
-import 'package:mau_friend/screens/friends/edit_friend_list_screen.dart';
 import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
 import 'package:mau_friend/screens/friends/friend_detail_screen.dart';
-import 'package:mau_friend/screens/friends/notification_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
 import 'package:mau_friend/utilities/custom_widget_info.dart';
@@ -36,7 +33,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
   String userState = 'offline';
   late StreamSubscription friendsSubscription;
   late StreamSubscription statusSubscription;
-  late StreamSubscription notificationSubscription;
+
   late DatabaseReference dbRef;
   Map statusMap = {};
   bool isLoading = true;
@@ -96,21 +93,11 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
           print('[BackgroundFetch] start FAILURE: $e');
         });
     
-    NotificationDatabaseHelper().initNotificationDatabase();
-    final myUID = FirebaseAuth.instance.currentUser?.uid;
+   
+   
     dbRef = FirebaseDatabase.instance.ref('users');
-
-    notificationSubscription = FirebaseFirestore.instance
-        .collection('notifications')
-        .doc(myUID)
-        .snapshots()
-        .listen((snapshot) {
-          ref.read(notificationProvider.notifier).loadNotification();
-          print('Notification count updated');
-          ref
-              .read(unreadNotificationProvider.notifier)
-              .loadUnreadNotificationCount();
-        });
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+   
 
     statusSubscription = dbRef.onValue.listen((event) {
       final map = event.snapshot.value;
@@ -292,56 +279,13 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
     );
   }
 
-  Widget buildNotificationButton() {
-    int unread = ref.watch(unreadNotificationProvider);
-    if (unread > 0) {
-      return Badge.count(
-        count: unread,
-        child: IconButton(
-          icon: const Icon(Icons.notifications_outlined),
-          onPressed: () {
-            Navigator.pushNamed(context, NotificationScreen.routeName);
-            ref
-                .read(unreadNotificationProvider.notifier)
-                .resetUnreadNotificationCount();
-            PrefsHelper().updateReadNotificationPrefs(
-              ref.read(notificationProvider).length,
-            );
-          },
-        ),
-      );
-    } else {
-      return IconButton(
-        icon: const Icon(Icons.notifications_outlined),
-        onPressed: () {
-          Navigator.pushNamed(context, NotificationScreen.routeName);
-        },
-      );
-    }
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     friendList = ref.watch(
       friendListProvider,
     ); // Update home widget with first friend
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Friends'),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            onPressed: () {
-              Navigator.pushNamed(context, EditFriendListScreen.routeName);
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: buildNotificationButton(),
-          ),
-        ],
-      ),
       body:
           friendList.isEmpty
               ? Center(child: Text("Let's add friends by pressing + button"))
@@ -360,12 +304,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                   );
                 },
               ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.pushNamed(context, AddFriendScreen.routeName);
-        },
-      ),
     );
   }
 }

@@ -28,7 +28,6 @@ class _EditFriendListScreenState extends ConsumerState<EditFriendListScreen> {
   @override
   void initState() {
     loadNotificationPrefs();
-
     super.initState();
   }
 

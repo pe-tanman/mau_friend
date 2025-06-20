@@ -6,7 +6,9 @@ import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mau_friend/providers/my_status_provider.dart';
+import 'package:mau_friend/providers/profile_provider.dart';
 import 'package:mau_friend/utilities/prefs_helper.dart';
+import 'package:mau_friend/utilities/statics.dart';
 
 class FirestoreHelper {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -47,7 +49,6 @@ class FirestoreHelper {
       rethrow;
     }
   }
-
   // Get all documents from a collection
   Future<Map<String, dynamic>> getUserProfile(String userUID) async {
     try {
@@ -231,7 +232,6 @@ class FirestoreHelper {
     }
   }
 
-
   Future<List<String>> getFriendList() async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
     try {
@@ -246,8 +246,6 @@ class FirestoreHelper {
       rethrow;
     }
   }
-
-  
 
   Future<void> updateFriendList(List<String> friendList) async {
     var myUID = FirebaseAuth.instance.currentUser!.uid;
@@ -327,17 +325,14 @@ class FirestoreHelper {
     }
   }
 
-  Future<void> addMessage(
-    {
+  Future<void> addMessage({
     required String title,
     required String body,
     required String imageUrl,
     required String type,
     required List<String> receivers,
     String? message,
-  }
-    
-  ) async {
+  }) async {
     final senderUID = FirebaseAuth.instance.currentUser!.uid;
 
     List<String> receiverTokens = [];
@@ -367,7 +362,15 @@ class FirestoreHelper {
       });
 
       //add notification
-      await addNotification(title, body, imageUrl, type, receivers, senderUID, message: message);
+      await addNotification(
+        title,
+        body,
+        imageUrl,
+        type,
+        receivers,
+        senderUID,
+        message: message,
+      );
     } catch (e) {
       print('Error adding message: $e');
       rethrow;
@@ -380,9 +383,9 @@ class FirestoreHelper {
     String imageUrl,
     String type,
     List<String> receivers,
-    String senderUID,
-    {String? message}
-  ) async {
+    String senderUID, {
+    String? message,
+  }) async {
     final timestamp = Timestamp.now();
     for (String receiver in receivers) {
       await _firestore.collection('notifications').doc(receiver).set({
@@ -444,6 +447,70 @@ class FirestoreHelper {
       print('No valid FCM token found for $friendUID');
     }
   }
+
+  Future<void> addToGroup({
+    required List<String> memberList,
+    required Map<String, Profile> memberProfiles,
+    String? groupId,
+    String? groupName,
+    String? groupIconLink,
+  }) async {
+    Map memberProfileMap = {};
+    memberProfiles.forEach((key, profile) {
+      memberProfileMap[key] = {
+        'userUID': profile.userUID,
+        'username': profile.name,
+        'bio': profile.bio,
+        'iconLink': profile.iconLink,
+      };
+    });
+    //メンバー追加
+    if (groupId != null) {
+      _firestore.collection('groupMemberList').doc(groupId).set({
+        'members': FieldValue.arrayUnion([...memberList]),
+        'memberProfiles': memberProfileMap,
+        'name': groupName,
+        'iconLink': groupIconLink,
+      }, SetOptions(merge: true));
+      for (var member in memberList) {
+        _firestore.collection('userProfiles').doc(member).set({
+          'joinedGroup': {
+            groupId: {
+              'name': groupName ?? 'New Group',
+              'iconLink': groupIconLink ?? Statics.defaultIconLink,
+            },
+          },
+        }, SetOptions(merge: true));
+      }
+    } 
+  }
+
+  Future<void> updateGroupProfile({
+    required String groupId,
+    required String groupName,
+    required String groupIconLink,
+  }) async {
+    try {
+      await _firestore.collection('groups').doc(groupId).update({
+        'name': groupName,
+        'iconLink': groupIconLink,
+      });
+    } catch (e) {
+      print('Error updating group profile: $e');
+      rethrow;
+    }
+  }
+  Future<Map<String, dynamic>> getGroupProfiles() async {
+    final myUID = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      final myProfile =
+          await _firestore.collection('userProfiles').doc(myUID).get();
+         return myProfile.data()?['joinedGroup'] ?? {};
+    } catch (e) {
+      print('Error getting group profile: $e');
+      rethrow;
+    }
+  }
 }
 
 class StorageHelper {
@@ -488,7 +555,7 @@ class RealtimeDatabaseHelper {
     final snapshot = await database.ref('users/$uid').get();
     if (snapshot.exists) {
       final data = snapshot.value as Map<dynamic, dynamic>;
-      return UserStatus( data['icon'] as String, data['status'] as String);
+      return UserStatus(data['icon'] as String, data['status'] as String);
     }
     return null;
   }

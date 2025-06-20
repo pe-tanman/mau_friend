@@ -18,6 +18,8 @@ import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/enter_code_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/friend_request_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/my_permanent_address_screen.dart';
+import 'package:mau_friend/screens/friends/add_member_group_screen.dart';
+import 'package:mau_friend/screens/friends/create_group_screen.dart';
 import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
 import 'package:mau_friend/screens/friends/friend_detail_screen.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
@@ -221,6 +223,8 @@ class _MyAppState extends ConsumerState<MyApp> {
         FriendDetailScreen.routeName: (context) => FriendDetailScreen(),
         RecommendationScreen.routeName: (context) => RecommendationScreen(),
         PrivacySettingScreen.routeName: (context) => PrivacySettingScreen(),
+        CreateGroupScreen.routeName: (context) => CreateGroupScreen(),
+        AddMemberGroupScreen.routeName: (context) => AddMemberGroupScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );
