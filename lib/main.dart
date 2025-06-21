@@ -18,10 +18,12 @@ import 'package:mau_friend/screens/friends/add_friends/add_friend_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/enter_code_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/friend_request_screen.dart';
 import 'package:mau_friend/screens/friends/add_friends/my_permanent_address_screen.dart';
-import 'package:mau_friend/screens/friends/add_member_group_screen.dart';
-import 'package:mau_friend/screens/friends/create_group_screen.dart';
+import 'package:mau_friend/screens/groups/add_member_group_screen.dart';
+import 'package:mau_friend/screens/groups/create_group_screen.dart';
 import 'package:mau_friend/screens/friends/emergency_location_screen.dart';
 import 'package:mau_friend/screens/friends/friend_detail_screen.dart';
+import 'package:mau_friend/screens/groups/group_detail_screen.dart';
+import 'package:mau_friend/screens/groups/group_setting_screen.dart';
 import 'package:mau_friend/screens/myaccount/add_location_screen.dart';
 import 'package:mau_friend/screens/myaccount/emergency_screen.dart';
 import 'package:mau_friend/screens/myaccount/recommendation_screen.dart';
@@ -225,6 +227,8 @@ class _MyAppState extends ConsumerState<MyApp> {
         PrivacySettingScreen.routeName: (context) => PrivacySettingScreen(),
         CreateGroupScreen.routeName: (context) => CreateGroupScreen(),
         AddMemberGroupScreen.routeName: (context) => AddMemberGroupScreen(),
+        GroupDetailScreen.routeName: (context) => GroupDetailScreen(),
+        GroupSettingScreen.routeName: (context) => GroupSettingScreen(),
       },
       home: isLoggedIn ? HomeScreen() : WelcomeScreen(),
     );

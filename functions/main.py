@@ -569,3 +569,30 @@ def onStatusUpdated(event: db_fn.Event[db_fn.Change]):
         print(f"KeyError: Missing required field '{missing_key}' in the document. Ensure that all necessary fields are present.")
         return
 
+@firestore_fn.on_document_updated(
+    document="groupMemberList/{groupId}",
+)
+def onGroupMemberListUpdated(event: firestore_fn.Event[firestore_fn.Change[firestore_fn.DocumentSnapshot | None]]) -> None:
+    firestore_client = firestore.client()
+
+    if event.data is None:
+        return
+    try:
+        groupId = event.params['groupId']
+        profile_dict = event.data.after.to_dict() 
+        members = profile_dict['members']
+        name = profile_dict['name']
+        iconLink = profile_dict['iconLink']
+
+        
+    except KeyError:
+        return
+
+    for memberUid in members:
+        firestore_client.collection("friendList").document(memberUid).set({
+            "joinedGroup": 
+            {groupId: {
+                "name": name,
+                "iconLink": iconLink,
+            }}
+        }, merge=True)
