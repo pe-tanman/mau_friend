@@ -571,6 +571,7 @@ def onStatusUpdated(event: db_fn.Event[db_fn.Change]):
 
 @firestore_fn.on_document_updated(
     document="groupMemberList/{groupId}",
+    memory=512
 )
 def onGroupMemberListUpdated(event: firestore_fn.Event[firestore_fn.Change[firestore_fn.DocumentSnapshot | None]]) -> None:
     firestore_client = firestore.client()
@@ -589,7 +590,7 @@ def onGroupMemberListUpdated(event: firestore_fn.Event[firestore_fn.Change[fires
         return
 
     for memberUid in members:
-        firestore_client.collection("friendList").document(memberUid).set({
+        firestore_client.collection("userProfiles").document(memberUid).set({
             "joinedGroup": 
             {groupId: {
                 "name": name,

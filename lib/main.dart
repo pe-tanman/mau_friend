@@ -117,7 +117,7 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> {
   bool isLoggedIn = false;
   ThemeMode mode = ThemeMode.system; // Define the mode variable
-      bool _enabled = true;
+  bool _enabled = true;
   int _status = 0;
   List<DateTime> _events = [];
   late StreamSubscription sub;

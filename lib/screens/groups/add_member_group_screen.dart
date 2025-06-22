@@ -21,14 +21,18 @@ class _AddMemberGroupScreenState extends ConsumerState<AddMemberGroupScreen> {
   List<String> selectedMembers = [];
   bool isNextPushed = false;
   bool isNewGroup = true;
+
   @override
   void initState() {
     super.initState();
     final currentGroupId = ref.read(currentGroupIdProvider);
     if (ref.read(groupProfilesProvider).keys.contains(currentGroupId)) {
-      // If the group already exists, load the current members
       selectedMembers =
           ref.read(groupProfilesProvider)[currentGroupId]?.memberList ?? [];
+      print('members: ${ref.read(groupProfilesProvider)[currentGroupId]?.memberList}');
+      print(
+        'current name: ${ref.read(groupProfilesProvider)[currentGroupId]?.name}',
+      );
     }
   }
 

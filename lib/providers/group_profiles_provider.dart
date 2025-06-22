@@ -7,11 +7,7 @@ class GroupProfile {
   String? iconLink;
   List<String>? memberList;
 
-  GroupProfile({
-    this.name,
-    this.iconLink,
-    this.memberList,
-  });
+  GroupProfile({this.name, this.iconLink, this.memberList});
 }
 
 class GroupProfilesProvider extends Notifier<Map<String, GroupProfile>> {
@@ -24,10 +20,12 @@ class GroupProfilesProvider extends Notifier<Map<String, GroupProfile>> {
     Map<String, GroupProfile> result = {};
 
     profilesMap.forEach((key, profile) {
+      print(profile);
       result[key] = GroupProfile(
         name: profile['name'],
         iconLink: profile['iconLink'],
-        memberList: List<String>.from(profile['memberList'] ?? []),
+        memberList: List<String>.from(profile['members'] ?? []),//userProfilesの方に貼ってない
+        
       );
     });
     state = result;
